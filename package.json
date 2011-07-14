@@ -1,0 +1,19 @@
+{
+	"name"        : "Templ8",
+	"description" : "JavaScript Client/ Server Template Engine",
+	"keywords"    : ["template", "tpl", "Templ8"],
+
+	"author"      : {
+		"name"    : "constantology",
+		"email"   : "constantology@gmail.com",
+		"url"     : "http://muigui.com"
+	},
+
+	"main"        : "./Templ8.js",
+	"version"     : "0.1.7",
+
+	"repository"  : {
+		"type"    : "git",
+		"url"     : "git@github.com:constantology/Templ8.git"
+	}
+}
