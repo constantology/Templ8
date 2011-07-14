@@ -84,11 +84,11 @@ It also accepts the following four parameters (needless to say that these cannot
 <tr>
 	<td><strong>compiled</strong></td><td>If this is set to <code>true</code> then the Templ8 will be compiled straight away, otherwise it will wait until the first time you call it's <code>parse()</code> method to compile. <strong>Default</strong> is <code>false</code>.</td>
 </tr><tr>
+	<td><strong>debug</strong></td><td>Useful for debugging. Set this to <code>true</code> to have the Templ8 method body logged to the console. <strong>Default</strong> is <code>false</code>.</td>
+</tr><tr>
 	<td><strong>fallback</strong></td><td>This is the String to use as a fallback value in case any values are not present when parsing a Templ8 instance. <strong>Default</strong> is <code>""</code>, Empty String.</td>
 </tr><tr>
 	<td><strong>id</strong></td><td>The ID of your Templ8. This is handy (and mandatory) if you want to use a Templ8 from within another Templ8. Otherwise an anonymous ID will be generated for your Templ8.</td>
-</tr><tr>
-	<td><strong>logCompiledTpl</strong></td><td>Useful for debugging. Set this to <code>true</code> to have the Templ8 method body logged to the console. <strong>Default</strong> is <code>false</code>.</td>
 </tr>
 </table>
 
