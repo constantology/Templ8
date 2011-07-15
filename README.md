@@ -351,7 +351,7 @@ returns the String:
 ### Tag **{[]}** (Array comprehensions or one line for loops)
 
 ```javascript
-    var tpl = new Templ8( '{[ v|parse"k" for each ( [k,v] in items ) if ( k|isTPL ) ]}' );
+    var tpl = new Templ8( '{[ v|parse:k for each ( [k,v] in items ) if ( k|isTPL ) ]}' );
 ```
 
 ---
