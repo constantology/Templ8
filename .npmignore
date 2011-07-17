@@ -3,7 +3,7 @@
 .DS_Store
 node_modules/*
 src/*
-Template.iml
+Templ8.iml
 npm-debug.log
 build.js
 Templ8.client.js
