@@ -1,4 +1,4 @@
-	var _filters = {
+	TPL.Filter.add( {
 //		bold           : function( str ) { return format( '<strong>{0}</strong>', TPL.tostr( str ) ); },
 		capitalize     : function( str ) {
 			str = TPL.tostr( str );
@@ -42,7 +42,6 @@
 			i = parseInt( i, 10 ) || 50;
 			return str.length > i ? str.substring( 0, i ) + '...' : str;
 		},
-		uppercase      : function( str ) { return TPL.tostr( str ).toUpperCase(); }
-	};
-
-	TPL.Filters.add( _filters );
+		uppercase      : function( str ) { return TPL.tostr( str ).toUpperCase(); }//, 
+//		wrap           : function( str, start, end ) { return start + str + ( end || start ); }
+	} );

@@ -2,12 +2,12 @@
 		FALSE = false, NULL = null, TRUE = true, UNDEF,
 		RESERVED = {
 			'$_' : TRUE,
-			'__ASSERT__' : TRUE, '__CONTEXT__' : TRUE, '__FORMAT__' : TRUE, '__OUTPUT__' : TRUE, '__UTIL__' : TRUE,
+			'__ASSERT__' : TRUE, '__CONTEXT__' : TRUE, '__FILTER_' : TRUE, '__OUTPUT__' : TRUE, '__UTIL__' : TRUE,
 			'document' : TRUE, 'false' : TRUE, 'instanceof' : TRUE, 'null' : TRUE, 'true' : TRUE, 'typeof' : TRUE,
 			'undefined' : TRUE, 'window' : TRUE
 		},
 		RE_GSUB  = /\{([^\}\s]+)\}/g,
-		SLICE    = [].slice,
+		SLICE    = ( [] ).slice,
 		ba = {
 			blank      : function( o ) { return !not_empty( o ) || o.trim() == '' || !re_not_blank.test( o ); },
 			contains   : contains,
@@ -22,7 +22,7 @@
 			is         : function( o, v ) { return o === v }, 
 			isEven     : function( i ) { return !( parseInt( i, 10 ) & 1 ); },
 			isOdd      : function( i ) { return !( parseInt( i, 10 ) & 1 ); },
-			isTPL      : function( id ) { return !!TPL.get( id ); },
+			isTPL      : function( id ) { return !!( getTPL( format( tpl_sub, this.id, id ) ) || getTPL( id ) ); },
 			iterable   : function( o ) { return re_iterable.test( TPL.type( o ) ); },
 			notEmpty   : not_empty,
 			startsWith : function( s, str ) { return String( s ).indexOf( str ) === 0; }
@@ -33,7 +33,8 @@
 			output     : function( o ) { return new Output( o ); },
 			iter       : function( i, p, s, c ) { return new Iter( i, p, s, c  ); },
 			parse      : function( o, id ) {
-				var t = getTPL( String( id ).trim() );
+				id    = String( id ).trim();
+				var t = getTPL( format( tpl_sub, this.id, id ) ) || getTPL( id );
 				return t ? t.parse( o, this.filters ) : this.fallback;
 			},
 			stop       : function( iter ) { iter.stop(); }
@@ -43,7 +44,7 @@
 		delim                 = '<~>',
 		esc_chars             = /([\u0021\u0028\u0029\u002a\u002b\u002e\u003a\u003d\u003f\u005b\u005d\u005e\u007b\u007c\u007d\/\\])/g,
 		esc_val               = "\\\$1",
-		fn_var                = { assert : '__ASSERT__', dict : '__CONTEXT__', format : '__FORMAT__', output : '__OUTPUT__', util : '__UTIL__' },
+		fn_var                = { assert : '__ASSERT__', dict : '__CONTEXT__', filter : '__FILTER__', output : '__OUTPUT__', util : '__UTIL__' },
 		fn_end                = format( '$C.destroy(); return {0}.join( "" );\n ', fn_var.output ), 
 		fn_start              = format( 'var $C = {0}.context( {1}, this.fallback ), $_ = $C.current(), iter = {0}.iter(), {2} = {0}.output(), UNDEF;', fn_var.util, fn_var.dict, fn_var.output ),
 		id_count              = 999,
@@ -75,7 +76,9 @@
 		split_token           = '<__SPLIT__TEMPLATE__HERE__>',
 		split_replace         = ['', '$1', '$2', ''].join( split_token ),
 		tpl                   = {},
-		tpl_id                = 'tpl-anon-{0}';
+		tpl_id                = 'tpl-anon-{0}',
+		tpl_statement         = '{0}["{1}"].call( this, {2}{3}, {4} )', 
+		tpl_sub               = '{0}.{1}';
 
 /*** START: Utility Functions ***/
 
@@ -108,6 +111,8 @@
 	function getTPL( id ) { return tpl[id] || NULL; }
 
 	function gsub( s, o, pattern ) { return String( s ).replace( ( pattern || RE_GSUB ), function( m, p ) { return o[p] || ''; } ); }
+
+	function is_obj( o ) { return TPL.type( o ) == OBJ; }
 
 	function mapc( a, fn, ctx ) {
 		ctx || ( ctx = a );
@@ -248,7 +253,6 @@
 	}
 
 	function aggregateStatement( ctx, s ) {
-		var tpl_statement = '{0}["{1}"].call( this, {2}{3}, {4} )';
 		return s.reduce( function( res, v, i, parts ) {
 			if ( i == 0 ) { return wrapGetter( ctx, v ); }
 			v = v.split( ':' );
@@ -275,8 +279,8 @@
 			console.info( ctx.id );
 			console.log( fn );
 		}
-		var func = new Function( fn_var.format, fn_var.assert, fn_var.util, fn_var.dict, fn );
-		return bind( func, ctx, copy( ctx.filters, TPL.Filters.all(), TRUE ), ba, bu );
+		var func = new Function( fn_var.filter, fn_var.assert, fn_var.util, fn_var.dict, fn );
+		return bind( func, ctx, copy( ctx.filters, TPL.Filter.all(), TRUE ), ba, bu );
 	}
 
 	function createTemplate( ctx, str ) {
@@ -288,7 +292,7 @@
 
 	function emitTag( ctx, part, parts ) {
 		var tag;
-		if ( tag = TPL.Tags.get( part ) ) {
+		if ( tag = TPL.Tag.get( part ) ) {
 			part = parts.shift();
 			return tag.emit( internals, ctx, part, parts );
 		}
@@ -304,7 +308,7 @@
 		} ) : wrapGetter( ctx, str );
 	}
 
-	function getFnParent( fn ) { return ( ba[fn] ? fn_var.assert : bu[fn] ? fn_var.util : fn_var.format ); }
+	function getFnParent( fn ) { return ( ba[fn] ? fn_var.assert : bu[fn] ? fn_var.util : fn_var.filter ); }
 
 	function splitStr( str ) {
 		var parts = str.replace( re_split_tpl, split_replace );
@@ -326,10 +330,6 @@
 				var str = o.toString();
 				if ( str != '[object Object]' ) { return str; }
 				return mapc( objvals( o ), tostr ).join( ', ' );
-				/*var k, v = [];
-				for ( k in o ) { v.push( tostr( o[k] ) ); }
-				return v.join( ', ' );
-				break;*/
 			case HTMEL : return o.textContent;
 				break;
 			case HTMCOL : return mapc( SLICE.call( o ), function( el ) { return el.textContent; } ).join( ', ' );
@@ -375,7 +375,7 @@
 
 	function TPL() {
 		var a = SLICE.call( arguments ), 
-			f = TPL.type( a[a.length - 1] ) == OBJ ? a.pop() : TPL.type( a[0] ) == OBJ ? a.shift() : null;
+			f = is_obj( a[a.length - 1] ) ? a.pop() : is_obj( a[0] ) ? a.shift() : null;
 		
 		this.filters = f || {};
 		
@@ -438,10 +438,10 @@
 		type         : T
 	} );
 
-	function TPLFunc( o ) {
+	function Mgr( o ) {
 		var cache = {};
 
-		if ( TPL.type( o ) == OBJ ) { copy( cache, o ); }
+		if ( is_obj( o ) ) { copy( cache, o ); }
 
 		function add( id, fn, replace ) {
 			if ( replace || !( id in cache ) ) { cache[id] = fn; }
@@ -466,10 +466,10 @@
 		};
 	}
 
-	TPL.Assertions = new TPLFunc( ba );
-	TPL.Filters    = new TPLFunc( bf );
-	TPL.Statements = new TPLFunc();
-	TPL.Tags       = new function() {
+	TPL.Assert    = new Mgr( ba );
+	TPL.Filter    = new Mgr( bf );
+	TPL.Statement = new Mgr;
+	TPL.Tag       = new function() {
 		var KEYS   = 'emit end start'.split( ' ' ),
 			ERRORS = {
 				emit  : 'emit function',
@@ -487,8 +487,10 @@
 		function assert_exists( k ) {
 			if ( !( k in this ) ) { throw new TypeError( format( 'A Templ8 Tag requires an {0}', ERRORS[k] ) ); }
 		}
+		
+		this.all           = function() { return copy( tag ); };
 
-		function compileRegExp() {
+		this.compileRegExp = function() {
 			var end = [], start = [], t;
 			for ( t in tag ) {
 				end.push( escapeRE( tag[t].end.substring( 0, 1 ) ) );
@@ -497,18 +499,13 @@
 			return ( re_split_tpl = new RegExp( '(\\{[' + start.join( '' ) + '])\\s*(.+?)\\s*([' + end.join( '' ) + ']\\})', 'gm' ) );
 		}
 
-		function create( o, dont_compile ) {
+		this.create        = function( o, dont_compile ) {
 			new Tag( o );
-			if ( dont_compile !== TRUE ) { compileRegExp(); }
+			if ( dont_compile !== TRUE ) { this.compileRegExp(); }
 			return this;
 		}
 
-		function get( id ) { return tag[id]; }
-
-		this.all           = function() { return copy( tag ); };
-		this.compileRegExp = compileRegExp;
-		this.create        = create;
-		this.get           = get;
+		this.get           = function( id ) { return tag[id]; }
 	};
 
 /*** END:   TPL functionality packages ***/
