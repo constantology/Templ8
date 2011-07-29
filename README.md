@@ -308,7 +308,7 @@ If you only want to parse a value if a certain condition is met, rather than wri
 Which translates to something like this:
 
 ```javascript
-    if ( exists( value ) { value; }
+    if ( exists( value ) ) { value; }
 ```
 
 Notice how you can use the same pipe syntax for conditionals. Templ8's internals work out whether your method is an assertion or a filter and reference the appropriate method.
@@ -347,7 +347,7 @@ An example would be:
 
 ```javascript
     {% if value == 'foo' %}
-        <h1>{{value|bold}}<h1>
+        <h1>{{value|bold}}</h1>
     {% elseif value == 'bar' %}
         <h2>{{value|italics}}</h2>
     {% else %}
@@ -359,10 +359,10 @@ Translating to:
 
 ```javascript
     if ( value == 'foo' ) { 
-        '<h1>' + bold( value ) + '<h1>';
+        '<h1>' + bold( value ) + '</h1>';
     }
     else if ( value == 'bar' ) {
-        '<h2>' + italics( value ) + '<h2>';
+        '<h2>' + italics( value ) + '</h2>';
     }
     else { value; }
 ````
