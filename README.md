@@ -7,7 +7,7 @@
 
 Templ8 as you can probably guess is a JavaScript template engine, with a Django'ish style of syntax.
 
-It's fast, light weight (5kb gzipped & minified) and unlike most other JavaScript template engines: **Templ8 does not use the JavaScript `with` statement** . This actually makes Templ8 parse faster than it would if it did use the `with` statement!
+It's fast, light weight (5kb gzipped & minified) and unlike a lot of other JavaScript template engines: **Templ8 does not use the JavaScript `with` statement** . This actually makes Templ8 parse faster than it would if it did use the `with` statement!
 
 Templ8 does not restrict you to generating HTML. All outputs are strings so if you want to generate HTML, CSS, JavaScript or whatever, the choice is yours...
 
@@ -230,7 +230,7 @@ It has two methods:
 
 This is a reference to Templ8.Assertions.
 
-##### \_\_FORMAT\_\_
+##### \_\_FILTER\_\_
 
 This is a reference to Templ8.Filters.
 
@@ -241,13 +241,152 @@ This is a reference to the internal utility functions used by Templ8.
 ---
 &nbsp;
 
-### Tags
+### Tags & Statements
+
+#### **Tag: {{}}** - Interpolation
+
+This tag is used for interpolating dictionary values with their respective template tokens. At it simplest a tag which will be replaced by a dictionary value `foo` would look something like this:
+
+```javascript
+    var tpl = new Templ8( '{{foo}}' );
+    tpl.parse( { foo : 'bar' } ); // returns: bar
+```
+
+##### Accessing nested values
+
+If your dictionary contains nested objects you can easily access nested values like you would in regular JavaScript.
+
+```javascript
+    var tpl = new Templ8( '{{some.nested.value}}' );
+    tpl.parse( { some : { nested : { value : 'foo' } } } ); // returns: foo
+```
+
+You can also similarly access values from Array's in the same way:
+
+```javascript
+    var tpl = new Templ8( '{{some.nested.1.value}}' );
+    tpl.parse( { some : { nested : [{ value : 'lorem' },{ value : 'ipsum' },{ value : 'dolor' }] } } ); // returns: ispum
+```
+
+##### Filtering
+
+This is all well and good, but at some point we will want to manipulate the values in our dictionary Objects in some way or another.
+
+Templ8 provides a very simple and powerful method for doing so based on Django's pipe syntax for filtering values.
+
+It is probably most easily illustrated with an example showing the pipe syntax converted to JavaScript. So:
+
+```javascript
+    {{value|truncate:30|bold|wrap:"(", ")"|paragraph}}
+```
+
+Would translate to something like this:
+
+```javascript
+	value = truncate( value, 30 );
+	value = bold( value );
+	value = wrap( value, '(', ')' );
+	value = paragraph( value );
+	
+	// or 
+	
+	paragraph( wrap( bold( truncate( value, 30 ) ), '(', ')' ) );
+```
+
+The most important thing to note is that the first value passed to the filter is always the value being parsed by the template, the arguments passed to each filter will always come after the value being parsed.
+
+##### One line statements
+
+As well as standard template conditionals, Templ8 introduces one line statements, because, hey it's JavaScript and we like to keep things concise. 
+
+If you only want to parse a value if a certain condition is met, rather than writing block if tags around it, you can include it in your interpolation tag like so:
+
+```javascript
+    {{value if value|exists}}
+```
+
+Which translates to something like this:
+
+```javascript
+    if ( exists( value ) ) { value; }
+```
+
+Notice how you can use the same pipe syntax for conditionals. Templ8's internals work out whether your method is an assertion or a filter and reference the appropriate method.
+
+You can also use ordinary JavaScript conditions if you want to, as well as an **unless** statement; and filtering is still ok too. 
+
+A more complex example would be:
+
+```javascript
+    {{value|truncate:30|bold|wrap:"(", ")"|paragraph unless value == null}}
+```
+
+Translating to something like:
+
+```javascript
+    if ( !( value == null ) ) { 
+       paragraph( wrap( bold( truncate( value, 30 ) ), '(', ')' ) ); 
+    }
+```
+
+#### **Tag: {%%}** - Evaluation
+
+This tag is used in conjunction with the above tag to give you access to more powerful conditional statements, iteration and sub templates.
+
+##### if/ unless/ elseif/ else/ endif Statements
+
+Just like regular JavaScript Templ8 features conditional statements. It also introduces the **unless** statement based off Perl.
+
+Every open **if** or **unless** statement must end with an **endif** statement -- with any number of **elseif**s in between, and one optional **else** just before the **endif**.
+
+The reason for this is that Templ8 does not use braces to encapsulate block statements, so it requires a flag to let the parser know when to close a block.
+
+**Note: elseif should be written as one word, no spaces.**
+
+An example would be:
+
+```javascript
+    {% if value == 'foo' %}
+        <h1>{{value|bold}}</h1>
+    {% elseif value == 'bar' %}
+        <h2>{{value|italics}}</h2>
+    {% else %}
+        {{value}}
+    {% endif %}
+```
+
+Translating to:
+
+```javascript
+    if ( value == 'foo' ) { 
+        '<h1>' + bold( value ) + '</h1>';
+    }
+    else if ( value == 'bar' ) {
+        '<h2>' + italics( value ) + '</h2>';
+    }
+    else { value; }
+````
+
+##### for/ forempty/ endfor Statements
+TODO
+
+##### sub/ endsub templates
+TODO
+
+#### **Tag: {[]}** - Array Comprehensions
+TODO
+
+#### **Tag: {::}** - Executing Arbitrary JavaScript
+TODO
+
+#### **Tag: {##}** - Comments
+TODO
+
+#### Adding your own Tags and/ or Statements
+TODO
 
 ---
 &nbsp;
-
-### Statements
-
 ## Examples (by tag)
 
 ### **Tag: {{}}**
@@ -270,7 +409,7 @@ This is a reference to the internal utility functions used by Templ8.
 
 returns the String:
 
-```  html
+```html
 	<a href="http://github.com"><strong>github.com is great for sharin...</strong></a>
 ```
 
@@ -328,21 +467,36 @@ returns the String:
 ```javascript
     var tpl = new Templ8(
 	    '{% for item in items %}',
-            '{{item}}',
+            '<p>{{item}}</p>',
         '{% forempty %}',
-            'No items',
+            '<p><strong>No items</strong></p>',
         '{% endfor %}' 
     );
+
+    tpl.parse( { items : ['one', 'two', 'three'] } );               // returns: <p>one</p><p>two</p><p>three</p>
+
+    tpl.parse( { items : { "one" : 1, "two" : 2, "three" : 3 } } ); // returns: <p>1</p><p>2</p><p>3</p>
+
+    tpl.parse( {} );                                                // returns: <p><strong>No items</strong></p>
+    
+    tpl.parse( { items : foo } );                                   // returns: <p><strong>No items</strong></p>
 ```
 
 #### *sub/ endsub* templates
 
 ```javascript
     var tpl = new Templ8(
-        '{% sub sub_template_name %}',
-            '{{$_}}',
-        '{% endsub %}' 
+        '{% sub list_item %}', '<li>{{$_}}</li>', '{% endsub %}', 
+        '<ul>{[ item|parse:"list_item" for each ( item in items ) ]}</ul>'
     );
+
+	tpl.parse( { items : ['one', 'two', 'three'] } );
+```
+
+returns the String:
+
+```html
+	<ul><li>one</li><li>two</li><li>three</li></ul>
 ```
 
 ---
@@ -351,8 +505,24 @@ returns the String:
 ### Tag **{[]}** (Array comprehensions or one line for loops)
 
 ```javascript
-    var tpl = new Templ8( '{[ v|parse:k for each ( [k,v] in items ) if ( k|isTPL ) ]}' );
+    var tpl_foo = new Templ8( { id : 'foo' }, '<em>{{val}}</em>' ), 
+        tpl_bar = new Templ8( { id : 'bar' }, '<strong>{{val}}</strong>' ), 
+        tpl     = new Templ8( '{[ v|parse:k|paragraph for each ( [k,v] in items ) if ( k|isTPL ) ]}' );
+
+    tpl.parse( {
+        foo  : { val : 'foo' }, 	
+        bar  : { val : 'bar' }, 
+        greg : { val : 'not gonna happen' }
+    } );
 ```
+
+returns the String:
+
+```html
+	<p><em>foo</em></p><p><strong>bar</strong></p>
+```
+
+as **greg** does not exist as a template (poor greg), the value is not rendered...
 
 ---
 &nbsp;

@@ -81,7 +81,7 @@
 			}
 		} ],
 		dummy_arr              = [],
-		getStatement           = TPL.Statements.get,
+		getStatement           = TPL.Statement.get,
 		re_comma_spacing       = /\s*(,)\s*/g,
 		re_comprehension_split = /^\(\s*(.*?)(?:\bin\b){0,1}(.*?)\s*\)\s*(if|unless){0,1}\s*(.*)$/i,
 		re_keys                = /(\w+)/g,
@@ -89,6 +89,6 @@
 		re_one_liner_simple    = /^(.*?)\s+(if|unless)\s+(.*)|$/i,
 		re_one_liner_test      = /\s+(if|unless)\s+/i;
 
-	_tags.forEach( function( tag ) { TPL.Tags.create( tag, TRUE ); } );
+	_tags.forEach( function( tag ) { TPL.Tag.create( tag, TRUE ); } );
 
-	TPL.Tags.compileRegExp();
+	TPL.Tag.compileRegExp();

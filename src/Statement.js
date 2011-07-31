@@ -79,6 +79,6 @@
 		return stmt.split( ' ' ).map( function( s ) { return fmt( ctx, s ); } ).join( ' ' );
 	}
 
-	TPL.Statements.add( _statements );
-	TPL.Statements.add( 'elsif', _statements.elseif );
+	TPL.Statement.add( _statements );
+	TPL.Statement.add( 'elsif', _statements.elseif );
 }() );
