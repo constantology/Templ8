@@ -20,7 +20,7 @@
 	}, {
 //  default values,
 		dir_output    : './',              dir_src       : 'src',
-		encoding      : 'UTF-8',           files         : 'Tags,Statements,Filters',
+		encoding      : 'UTF-8',           files         : 'Tag,Statement,Filter',
 		file_name     : 'Templ8',          file_shim     : 'shimmed',
 		global_client : 'window',          global_server : 'global',
 		ns_client     : 'window.Templ8',   ns_server     : 'module.exports'
