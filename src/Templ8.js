@@ -25,7 +25,8 @@
 			isTPL      : function( id ) { return !!( getTPL( format( tpl_sub, this.id, id ) ) || getTPL( id ) ); },
 			iterable   : function( o ) { return re_iterable.test( TPL.type( o ) ); },
 			notEmpty   : not_empty,
-			startsWith : function( s, str ) { return String( s ).indexOf( str ) === 0; }
+			startsWith : function( s, str ) { return String( s ).indexOf( str ) === 0; },
+			type       : T
 		},
 		bf = {}, 
 		bu = {
