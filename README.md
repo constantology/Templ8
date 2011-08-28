@@ -335,13 +335,13 @@ This tag is used in conjunction with the above tag to give you access to more po
 
 ##### if/ unless/ elseif/ else/ endif Statements
 
-Just like regular JavaScript Templ8 features conditional statements. It also introduces the **unless** statement based off Perl.
+Just like regular JavaScript Templ8 features conditional statements. It also introduces the `unless` statement based off Perl.
 
-Every open **if** or **unless** statement must end with an **endif** statement -- with any number of **elseif**s in between, and one optional **else** just before the **endif**.
+Every open `if`/ `unless` statement must end with an `endif` statement -- with any number of`elseif`s in between; an optional `else` is also allowed just before `endif`.
 
-The reason for this is that Templ8 does not use braces to encapsulate block statements, so it requires a flag to let the parser know when to close a block.
+The reason for the `endif` statement is that Templ8 does not use braces to encapsulate block statements, so it requires a flag to let the parser know when to close a block.
 
-**Note: elseif should be written as one word, no spaces.**
+**Note: `elseif` should be written as one word, no spaces. It can also be written as `elsif`, again, based off Perl.**
 
 An example would be:
 
@@ -368,7 +368,63 @@ Translating to:
 ````
 
 ##### for/ forempty/ endfor Statements
-TODO
+The `for` statement allows you to iterate over Arrays as well as Objects. There are a number of options available with the `for` statement.
+
+Just like the `if` statement the `for` statement must end with an `endfor` statement to tell the parser that the statement block is ending.
+
+You can also include a `forempty` statement which will be used in the case where an Array/ Object is either empty or the item you are trying to iterate over is not iterable, e.g. a Number or Date. `forempty` is not mandatory.
+
+The `iter` variable mentioned above is the standard way to access any and all properties you require while iterating over an Array/ Object.
+
+You can also use `$_` to access the current value being iterated over.
+
+However you can also assign your own variable names to the `for`. e.g.
+
+```javascript
+    {% for item in items %}
+        {{item}}
+    {% forempty %}
+        No items
+    {% endfor %}
+```
+
+Will assign the current value being iterated over to the variable `item`, which is accessible as demonstrated.
+
+```javascript
+    {% for [key, value] in items %}
+        {{key}}. {{value}}
+    {% endfor %}
+```
+
+Will assign the current value being iterated over to the variable `value`. If you are iterating over an Array then the variable `key` will be the zero based index of the the current item being iterated over. If you are iterating over an Object then the variable `key` will be the the key name of the current item being iterted over.
+
+If you want to limit the number of items you are iterating over you can do so by using brackets to specify the range of items to iterate over.
+
+```javascript
+    {% for item in items [..10] %}
+        {{item}}
+    {% endfor %}
+```
+
+Will iterate over items 0 to 10, so the first 11 items in the Array/ Object.
+
+```javascript
+    {% for item in items [5..10] %}
+        {{item}}
+    {% endfor %}
+```
+
+Will iterate over items 5 to 10.
+
+```javascript
+    {% for item in items [5..] %}
+        {{item}}
+    {% endfor %}
+```
+
+Will iterate over all items starting from the 6th item in the Array/ Object.
+
+If you are nesting `for` statements you can access the parent `iter` Object by using the syntax `iter.parent` this will maintain state no matter how deep you nest.
 
 ##### sub/ endsub templates
 TODO
