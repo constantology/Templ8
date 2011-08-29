@@ -165,7 +165,7 @@
 		if ( ba.exists( o ) ) { this.push( o ); }
 	}
 	ContextStack.prototype = {
-		current : function() { return this[cs][0]; },
+		current : function() { return this[cs][0].dict; },
 		destroy : function() {
 			this.destroyed = TRUE;
 			delete this[ck]; delete this[cs];
