@@ -379,6 +379,9 @@
 	function TPL() {
 		var a = SLICE.call( arguments ), 
 			f = is_obj( a[a.length - 1] ) ? a.pop() : is_obj( a[0] ) ? a.shift() : null;
+
+// take care of peeps who are too lazy or too ©ººL to use the "new" constructor...
+		if ( !( this instanceof TPL ) ) { return is_obj( f ) ? new TPL( a.join( '' ), f ) : new TPL( a.join( '' ) ); }
 		
 		this.filters = f || {};
 		
