@@ -4,6 +4,13 @@
 			str = TPL.tostr( str );
 			return str.charAt( 0 ).toUpperCase() + str.substring( 1 ).toLowerCase();
 		},
+		count          : function( o ) {
+			switch( Templ8.type( o ) ) {
+				case 'array'  : case 'htmlcollection' : case 'string' : return o.length;
+				case 'object' : return Templ8.objectKeys( o ).length;
+			}
+			return 0;
+		},
 		crop           : function( str, i ) {
 			str = TPL.tostr( str );
 			i = parseInt( i, 10 ) || 50;
