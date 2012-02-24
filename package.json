@@ -1,19 +1,20 @@
 {
-	"name"        : "Templ8",
-	"description" : "JavaScript Client/ Server Template Engine",
-	"keywords"    : ["template", "tpl", "Templ8"],
-
 	"author"      : {
 		"name"    : "constantology",
 		"email"   : "constantology@gmail.com",
 		"url"     : "http://muigui.com"
 	},
-
+	"description" : "JavaScript Client/ Server Template Engine",
+	"keywords"    : ["template", "tpl", "Templ8"],
+	"licenses"        : [ {
+		"type" : "MIT",
+	     "url" : "https://raw.github.com/constantology/Templ8/master/LICENSE"
+	} ],
 	"main"        : "./Templ8.js",
-	"version"     : "0.3.0",
-
+	"name"        : "Templ8",
 	"repository"  : {
 		"type"    : "git",
 		"url"     : "git@github.com:constantology/Templ8.git"
-	}
+	},
+	"version"     : "0.4.0"
 }

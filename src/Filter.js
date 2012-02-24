@@ -1,54 +1,54 @@
-	TPL.Filter.add( {
-//		bold           : function( str ) { return format( '<strong>{0}</strong>', TPL.tostr( str ) ); },
+	Templ8.Filter.add( {
+//		bold           : function( str ) { return format( '<strong>{0}</strong>', Templ8.stringify( str ) ); },
 		capitalize     : function( str ) {
-			str = TPL.tostr( str );
+			str = Templ8.stringify( str );
 			return str.charAt( 0 ).toUpperCase() + str.substring( 1 ).toLowerCase();
 		},
 		count          : function( o ) {
 			switch( Templ8.type( o ) ) {
-				case 'array'  : case 'htmlcollection' : case 'string' : return o.length;
-				case 'object' : return Templ8.objectKeys( o ).length;
+				case ARR : case HTMCOL : case STR : return o.length;
+				case OBJ : return Object.keys( o ).length;
 			}
 			return 0;
 		},
 		crop           : function( str, i ) {
-			str = TPL.tostr( str );
-			i = parseInt( i, 10 ) || 50;
+			str = Templ8.stringify( str );
+			i   = parseInt( i, 10 ) || 50;
 			return str.length > i ? str.substring( 0, i / 2 ) + '...' + str.substring( str.length - ( i / 2 ) ) : str;
 		},
 		def            : function( str, def ) { return ba.blank( str ) ? def : str; },
 		first          : function( o ) {
-			switch ( TPL.type( o ) ) {
+			switch ( Templ8.type( o ) ) {
 				case ARR : return o[0];
 				case STR : return o.charAt( 0 );
 			}
 		},
-//		italics        : function( str ) { return format( '<em>{0}</em>', TPL.tostr( str ) ); },
+//		italics        : function( str ) { return format( '<em>{0}</em>', Templ8.stringify( str ) ); },
 		last           : function( o ) {
-			switch ( TPL.type( o ) ) {
+			switch ( Templ8.type( o ) ) {
 				case ARR : return o[o.length-1];
 				case STR : return o.charAt( o.length - 1 );
 			}
 		},
-//		linebreaks     : function( str ) { return TPL.tostr( str ).replace( /[\r\n]/gm, '<br />\n' ); },
+//		linebreaks     : function( str ) { return Templ8.stringify( str ).replace( /[\r\n]/gm, '<br />\n' ); },
 //		link           : function( url, str ) {
-//			str = typeof str == 'string' ? str : url;
+//			str = is_str( str ) ? str : url;
 //			return str.link( ( !!~url.indexOf( '@' ) ? 'mailto:' : '' ) + url );
 //		},
 //		log            : function() {
 //			console.log( SLICE.call( arguments ) );
 //			return '';
 //		},
-		lowercase      : function( str ) { return TPL.tostr( str ).toLowerCase(); },
-//		paragraph      : function( str ) { return TPL.tostr( str ).replace( /([^\r\n]+)/gm, '<p>$1</p>' ); },
+		lowercase      : function( str ) { return Templ8.stringify( str ).toLowerCase(); },
+//		paragraph      : function( str ) { return Templ8.stringify( str ).replace( /([^\r\n]+)/gm, '<p>$1</p>' ); },
 		prefix         : function( str1, str2 ) { return str2 + str1; },
 //		stripe         : function( i ) { return parseInt( i, 10 ) & 1 ? 'stripe-odd' : 'stripe-even'; },
 		suffix         : function( str1, str2 ) { return str1 + str2; },
 		truncate       : function( str, i ) {
-			str = TPL.tostr( str );
-			i = parseInt( i, 10 ) || 50;
+			str = Templ8.stringify( str );
+			i   = parseInt( i, 10 ) || 50;
 			return str.length > i ? str.substring( 0, i ) + '...' : str;
 		},
-		uppercase      : function( str ) { return TPL.tostr( str ).toUpperCase(); }//, 
+		uppercase      : function( str ) { return Templ8.stringify( str ).toUpperCase(); }//,
 //		wrap           : function( str, start, end ) { return start + str + ( end || start ); }
 	} );

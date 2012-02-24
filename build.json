@@ -1,0 +1,10 @@
+{
+	"encoding"  : "UTF-8",
+	"ext"       : "js",
+	"file_err"  : "continue",
+	"out"       : { "dir" : "./", "file" : "Templ8", "min" : "Templ8.min" },
+	"src" : {
+		"dir"   : "./src",
+		"files" : ["$begin", "Templ8", "Tag", "Statement", "Filter", "$end"]
+	}
+}

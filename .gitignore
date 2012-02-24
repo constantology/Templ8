@@ -1,9 +1,9 @@
 .DS_Store
-
 .idea/
-npm-debug.log
-Templ8.iml
 
 node_modules/
+npm-debug.log
 
+test/
 
+index.html

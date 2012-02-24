@@ -1,0 +1,10 @@
+{
+	"encoding"  : "UTF-8",
+	"ext"       : "js",
+	"file_err"  : "continue",
+	"out"       : { "dir" : "./", "file" : "Templ8.shim", "min" : "Templ8.shim.min" },
+	"src" : {
+		"dir"   : "./",
+		"files" : ["wedgES/wedgES", "Templ8", "src/shim"]
+	}
+}

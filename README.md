@@ -7,7 +7,7 @@
 
 Templ8 as you can probably guess is a JavaScript template engine, with a Django'ish style of syntax.
 
-It's fast, light weight (5kb gzipped & minified) and unlike a lot of other JavaScript template engines: **Templ8 does not use the JavaScript `with` statement** . This actually makes Templ8 parse faster than it would if it did use the `with` statement!
+It's fast, light weight and unlike a lot of other JavaScript template engines: **Templ8 does not use the JavaScript `with` statement**. This actually makes Templ8 parse templates faster than it would if it did use the `with` statement!
 
 Templ8 does not restrict you to generating HTML. All outputs are strings so if you want to generate HTML, CSS, JavaScript or whatever, the choice is yours...
 
@@ -29,10 +29,23 @@ Templ8 is avaiable as a Node JS module as well as a browser micro-framework.
 
 You have 2 options.
 
-1. `Templ8.client.js` is the version optimised for modern browsers (i.e. browsers that implement JavaScript version 1.6).
-2. `Templ8.shimmed.js` contains shims to enable backwards compatibility with older browsers -- only an extra 0.5kb (min + gzip).
+1. `Templ8.js`/ `Templ8.min.js` are the dev/ prod versions optimised for modern browsers (i.e. browsers that have implemented all of the items in [kangax's es5 compatability table](http://kangax.github.com/es5-compat-table/)).
+2. `Templ8.shim.js`/ `Templ8.shim.min.js` are as above, except that [wedgES](https://github.com/constantology/wedgES) – only an extra 1.6kb – has been included to enable backwards compatibility with older browsers.
 
-**NOTE:** The shimmed version will still use JavaScript 1.6 features where available.
+**NOTE:** Safari <= 5.1.3 still has not implemented `Function.prototype.bind` so you will need to use `Templ8.shim.js` for Safari.
+
+**NOTE:** The shimmed methods **will not** overwrite any native implementations.
+
+## File size
+
+<table border="0" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr><td>Templ8.js</td><td>6.7kb</td><td>deflate</td>
+		<tr><td>Templ8.min.js</td><td>5.1kb</td><td>uglified + deflate</td>
+		<tr><td>Templ8.shim.js</td><td>8.5kb</td><td>deflate</td>
+		<tr><td>Templ8.shim.min.js</td><td>6.5kb</td><td>uglified + deflate</td>
+	</tbody>
+</table>
 
 ## API
 
