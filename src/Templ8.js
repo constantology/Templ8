@@ -7,8 +7,7 @@
 			'$_'         : T,  'document'    : T, 'false'     : T, 'global'     : T, 'instanceof' : T,
 			'null'       : T,  'true'        : T, 'typeof'    : T, 'undefined'  : T, 'window'     : T
 		},
-		RE_GSUB  = /\$?\{([^\}\s]+)\}/g,
-		SLICE    = ( [] ).slice,
+		RE_GSUB  = /\$?\{([^\}\s]+)\}/g, SLICE = ( [] ).slice,
 		ba       = {
 			blank      : function( o )      { return !not_empty( o ) || !o.trim() || !re_not_blank.test( o ); },
 			contains   : contains,
@@ -28,8 +27,7 @@
 			notEmpty   : not_empty,
 			startsWith : function( s, str ) { return String( s ).indexOf( str ) === 0; }
 		},
-		bf       = {},
-		bu       = {
+		bf = {}, bu = {
 			context    : function( o, fb )      { return new ContextStack( o, fb ); },
 			output     : function( o )          { return new Output( o ); },
 			iter       : function( i, p, s, c ) { return new Iter( i, p, s, c  ); },
@@ -41,37 +39,26 @@
 			stop       : function( iter )       { iter.stop(); },
 			type       : function( o )          { return Templ8.type( o ); }
 		},
-		ck                    = '__tpl_cs_cached_keys',
-		cs                    = '__tpl_cs_stack',
-		defaults              = ['compiled', 'debug', 'fallback', 'id'],
-		delim                 = '<~>',
-		esc_chars             = /([-\*\+\?\.\|\^\$\/\\\(\)[\]\{\}])/g,
-		esc_val               = '\\$1',
-		fn_var                = { assert : '__ASSERT__', dict : '__CONTEXT__', filter : '__FILTER__', output : '__OUTPUT__', util : '__UTIL__' },
-		fn_end                = format( '$C.destroy(); return {0}.join( "" );\n ', fn_var.output ), 
-		fn_start              = format( 'var $C = {0}.context( {1}, this.fallback ), $_ = $C.current(), iter = {0}.iter(), {2} = {0}.output(), U;', fn_var.util, fn_var.dict, fn_var.output ),
-		id_count              = 999,
-		internals,
-		re_domiter            = new RegExp( format( '{0}|{1}', HTMCOL, NODELIST ) ), //htmlcollection|nodelist/,
-		re_esc                = /(['"])/g,
-		re_element            = /^html\w+?element$/,
-		re_format_delim       = new RegExp( delim, 'gm' ),
-		re_global             = /global|window/,
-		re_iterable           = new RegExp( format( '{0}|{1}|{2}|arguments|{3}', ARR, HTMCOL, OBJ, NODELIST ) ), //array|htmlcollection|object|arguments|nodelist/,
-		re_new_line           = /[\r\n]+/g,
-		re_not_blank          = /\S/,
-		re_special_char       = /[\(\)\[\]\{\}\?\*\+\/<>%&=!-]/,
-		re_statement_fix      = /\.(\d+)(\.?)/g,
-		re_statement_replacer = '[\'$1\']$2',
-		re_statement_split    = new RegExp( '\\s*([^\\|]+(?:\\|[^\\|]+?)){0,}' + delim, 'g' ),
-		re_space              = /\s+/g,
-		re_split_tpl,
-		split_token           = '<__SPLIT__TEMPLATE__HERE__>',
-		split_replace         = ['', '$1', '$2', ''].join( split_token ),
-		tpl                   = {},
-		tpl_id                = 'tpl-anon-{0}',
-		tpl_statement         = '{0}["{1}"].call( this, {2}{3}, {4} )', 
-		tpl_sub               = '{0}.{1}';
+		ck        = '__tpl_cs_cached_keys',                  cs      = '__tpl_cs_stack',
+		defaults  = ['compiled', 'debug', 'fallback', 'id'], delim   = '<~>',
+		esc_chars = /([-\*\+\?\.\|\^\$\/\\\(\)[\]\{\}])/g,   esc_val = '\\$1',
+
+		fn_var   = { assert : '__ASSERT__', dict : '__CONTEXT__', filter : '__FILTER__', output : '__OUTPUT__', util : '__UTIL__' },
+		fn_end   = format( '$C.destroy(); return {0}.join( "" );\n ', fn_var.output ),
+		fn_start = format( 'var $C = {0}.context( {1}, this.fallback ), $_ = $C.current(), iter = {0}.iter(), {2} = {0}.output(), U;', fn_var.util, fn_var.dict, fn_var.output ),
+
+		id_count = 999, internals,
+
+		re_domiter       = new RegExp( format( '{0}|{1}', HTMCOL, NODELIST ) ), //htmlcollection|nodelist/,
+		re_esc           = /(['"])/g,       re_element            = /^html\w+?element$/, re_format_delim    = new RegExp( delim, 'gm' ),
+		re_global        = /global|window/, re_iterable           = new RegExp( format( '{0}|{1}|{2}|arguments|{3}', ARR, HTMCOL, OBJ, NODELIST ) ), //array|htmlcollection|object|arguments|nodelist/,
+		re_new_line      = /[\r\n]+/g,      re_not_blank          = /\S/,                re_special_char    = /[\(\)\[\]\{\}\?\*\+\/<>%&=!-]/,
+		re_statement_fix = /\.(\d+)(\.?)/g, re_statement_replacer = '[\'$1\']$2',        re_statement_split = new RegExp( '\\s*([^\\|]+(?:\\|[^\\|]+?)){0,}' + delim, 'g' ),
+		re_space         = /\s+/g,          re_split_tpl,
+
+		split_token = '<__SPLIT__TEMPLATE__HERE__>', split_replace = ['', '$1', '$2', ''].join( split_token ),
+
+		tpl = {}, tpl_id = 'tpl-anon-{0}', tpl_statement = '{0}["{1}"].call( this, {2}{3}, {4} )', tpl_sub = '{0}.{1}';
 
 /*** START: Utility Functions ***/
 
@@ -85,7 +72,7 @@
 
 	function copy( d, s, n ) {
 		n = n === T; s || ( s = d, d = {} );
-		for ( var k in s ) ( n || ( k in d ) ) || ( d[k] = s[k] );
+		for ( var k in s ) ( n && k in d ) || ( d[k] = s[k] );
 		return d;
 	}
 
@@ -160,7 +147,7 @@
 		if ( ba.exists( o ) ) this.push( o );
 	}
 	ContextStack.prototype = {
-		current : function() { return this[cs][0].dict; },
+		current : function() { return ( this[cs][0] || {} ).dict; },
 		destroy : function() {
 			this.destroyed = T;
 			delete this[ck]; delete this[cs];
@@ -270,13 +257,13 @@
 		if ( ctx.debug && typeof console != UNDEF ) {
 			console.info( ctx.id ); console.log( fn );
 		}
-		var func = new Function( fn_var.filter, fn_var.assert, fn_var.util, fn_var.dict, fn );
-		return func.bind( ctx, copy( ctx.filters, Templ8.Filter.all(), T ), ba, bu );
+		var func = new Function( 'root', fn_var.filter, fn_var.assert, fn_var.util, fn_var.dict, fn );
+		return func.bind( ctx, root, copy( ctx.filters, Templ8.Filter.all(), T ), ba, bu );
 	}
 
-	function createTemplate( ctx, str ) {
+	function createTemplate( ctx ) {
 		ctx.currentIterKeys = [];
-		var fn = compileTemplate( ctx, assembleParts( ctx, splitStr( str ) ) );
+		var fn = compileTemplate( ctx, assembleParts( ctx, splitStr( ctx.__tpl__ ) ) );
 		delete ctx.currentIterKeys;
 		return fn;
 	}
@@ -349,20 +336,19 @@
 
 	function Templ8() {
 		var a = SLICE.call( arguments ), 
-			f = is_obj( a[a.length - 1] ) ? a.pop() : is_obj( a[0] ) ? a.shift() : null;
+			f = is_obj( a[a.length - 1] ) ? a.pop() : is_obj( a[0] ) ? a.shift() : N;
 
 // take care of peeps who are too lazy or too ©ººL to use the "new" constructor...
 		if ( !( this instanceof Templ8 ) ) return is_obj( f ) ? new Templ8( a.join( '' ), f ) : new Templ8( a.join( '' ) );
 		
-		this.filters = f || {};
-		
 		!f || defaults.forEach( function( k ) {
 			if ( !( k in f ) ) return;
-			this[k] = f[k];
-			delete f[k];
+			this[k] = f[k]; delete f[k];
 		}, this );
 
-		this.__tpl = a.join( '' );
+		this.filters = f || {};
+
+		this.__tpl__ = a.join( '' );
 
 		tpl[$id( this )] = this;
 
@@ -380,7 +366,7 @@
 	function compile( ctx ) {
 		if ( !ctx.compiled ) {
 			ctx.compiled = T;
-			ctx._parse = createTemplate( ctx, ctx.__tpl );
+			ctx._parse = createTemplate( ctx );
 		}
 		return ctx;
 	}

@@ -92,7 +92,7 @@
     function copy(d, s, n) {
         n = n === T;
         s || (s = d, d = {});
-        for (var k in s) n || k in d || (d[k] = s[k]);
+        for (var k in s) n && k in d || (d[k] = s[k]);
         return d;
     }
     function escapeRE(s) {
@@ -178,7 +178,7 @@
     }
     ContextStack.prototype = {
         current : function() {
-            return this[cs][0].dict;
+            return (this[cs][0] || {}).dict;
         },
         destroy : function() {
             this.destroyed = T;
@@ -296,12 +296,12 @@
             console.info(ctx.id);
             console.log(fn);
         }
-        var func = new Function(fn_var.filter, fn_var.assert, fn_var.util, fn_var.dict, fn);
-        return func.bind(ctx, copy(ctx.filters, Templ8.Filter.all(), T), ba, bu);
+        var func = new Function("root", fn_var.filter, fn_var.assert, fn_var.util, fn_var.dict, fn);
+        return func.bind(ctx, root, copy(ctx.filters, Templ8.Filter.all(), T), ba, bu);
     }
-    function createTemplate(ctx, str) {
+    function createTemplate(ctx) {
         ctx.currentIterKeys = [];
-        var fn = compileTemplate(ctx, assembleParts(ctx, splitStr(str)));
+        var fn = compileTemplate(ctx, assembleParts(ctx, splitStr(ctx.__tpl__)));
         delete ctx.currentIterKeys;
         return fn;
     }
@@ -375,15 +375,15 @@
         wrap : wrapStr
     };
     function Templ8() {
-        var a = SLICE.call(arguments), f = is_obj(a[a.length - 1]) ? a.pop() : is_obj(a[0]) ? a.shift() : null;
+        var a = SLICE.call(arguments), f = is_obj(a[a.length - 1]) ? a.pop() : is_obj(a[0]) ? a.shift() : N;
         if (!(this instanceof Templ8)) return is_obj(f) ? new Templ8(a.join(""), f) : new Templ8(a.join(""));
-        this.filters = f || {};
         !f || defaults.forEach(function(k) {
             if (!(k in f)) return;
             this[k] = f[k];
             delete f[k];
         }, this);
-        this.__tpl = a.join("");
+        this.filters = f || {};
+        this.__tpl__ = a.join("");
         tpl[$id(this)] = this;
         if (this.compiled) {
             this.compiled = F;
@@ -397,7 +397,7 @@
     function compile(ctx) {
         if (!ctx.compiled) {
             ctx.compiled = T;
-            ctx._parse = createTemplate(ctx, ctx.__tpl);
+            ctx._parse = createTemplate(ctx);
         }
         return ctx;
     }
@@ -612,7 +612,7 @@
                     id : id
                 }, ctx.filters));
                 sub_tpl.currentIterKeys = [];
-                sub_tpl.__tpl = parts.join("");
+                sub_tpl.__tpl__ = parts.join("");
                 sub_tpl._parse = internals.compiletpl(sub_tpl, internals.assembleparts(sub_tpl, parts));
                 delete sub_tpl.currentIterKeys;
                 sub_tpl.compiled = T;
@@ -686,6 +686,9 @@
         },
         uppercase : function(str) {
             return Templ8.stringify(str).toUpperCase();
+        },
+        wrap : function(str, start, end) {
+            return start + str + (end || start);
         }
     });
     typeof global == UNDEF || (root = global);
