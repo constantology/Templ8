@@ -11,17 +11,23 @@
     function tostr(o) {
         return OP.toString.call(o);
     }
-    var A = Array, F = !1, N = null, O = Object, PROTO = "prototype", T = !0, U, AP = A[PROTO], OP = O[PROTO], slice = AP.slice;
+    var A = Array, F = !1, N = null, O = Object, PROTO = "prototype", T = !0, U, AP = A[PROTO], OP = O[PROTO], defProp = "defineProperty", slice = AP.slice;
     !function() {
         function add(p, n, f) {
             typeof p[n] != "undefined" || (p[n] = f);
+        }
+        function defproptest(o) {
+            var k = "wedgES";
+            try {
+                return k in O[defProp](o, k, {});
+            } catch (e) {}
         }
         var _proto_ = "__proto__", access = !has(OP, "__defineGetter__") ? N : {
             dget : OP.__defineGetter__,
             dset : OP.__defineSetter__,
             lget : OP.__lookupGetter__,
             lset : OP.__lookupSetter__
-        }, f, get = "get", n, noenum = {
+        }, defprop, f, get = "get", n, noenum = {
             constructor : T,
             hasOwnProperty : T,
             isPrototypeOf : T,
@@ -41,6 +47,11 @@
             },
             defineProperty : function defineProperty(o, k, d) {
                 var proto;
+                if (defprop) {
+                    try {
+                        return defprop.call(O, o, k, d);
+                    } catch (e) {}
+                }
                 if (has(d, value)) {
                     if (access && (access.lget.call(o, k) || access.lset.call(o, k))) {
                         proto = o[_proto_];
@@ -100,70 +111,80 @@
                 return values;
             }
         };
-        for (n in f) !has(f, n) || add(O, n, f[n]);
+        !O[defProp] || defproptest({}) && defproptest(document.createElement("div")) || (defprop = O[defProp], O[defProp] = f.defineProperty);
+        for (n in f) has(f, n) && has(OP, n) || add(O, n, f[n]);
     }();
     !function() {
         var f = {
             every : function every(fn, ctx) {
-                var i = -1, l = this.length;
-                ctx || (ctx = this);
-                while (++i < l) if (!fn.call(ctx, this[i], i, this)) return F;
+                var a = O(this), i = -1, l = a.length >>> 0;
+                while (++i < l) if (i in a && !fn.call(ctx, a[i], i, a)) return F;
                 return T;
             },
             forEach : function forEach(fn, ctx) {
-                var i = -1, l = this.length;
-                ctx || (ctx = this);
-                while (++i < l) fn.call(ctx, this[i], i, this);
+                var a = O(this), i = -1, l = a.length >>> 0;
+                while (++i < l) !(i in a) || fn.call(ctx, a[i], i, a);
             },
             filter : function filter(fn, ctx) {
-                ctx || (ctx = this);
-                return this.reduce(function(v, o, i, a) {
+                return AP.reduce.call(this, function(v, o, i, a) {
                     !fn.call(ctx, o, i, a) || v.push(o);
                     return v;
                 }, []);
             },
             indexOf : function indexOf(o, i) {
-                var l = this.length;
+                var a = O(this), l = a.length >>> 0;
+                if (l === 0) return -1;
                 i = isNaN(i) ? 0 : i < 0 ? l + i - 1 : i ? i - 1 : -1;
-                while (++i < l) if (this[i] === o) return i;
+                while (++i < l) if (i in a && a[i] === o) return i;
                 return -1;
             },
             lastIndexOf : function lastIndexOf(o, i) {
-                var l = this.length, n;
+                var a = O(this), l = a.length >>> 0, n;
+                if (l === 0) return -1;
                 i = isNaN(i) ? l : i < 0 ? l + i : i;
-                n = this.slice(0, i).reverse().indexOf(o);
+                n = slice.call(a, 0, i).reverse().indexOf(o);
                 return n < 0 ? n : i - n - 1;
             },
             map : function map(fn, ctx) {
-                ctx || (ctx = this);
-                return this.reduce(function(v, o, i, a) {
+                return AP.reduce.call(this, function(v, o, i, a) {
                     v.push(fn.call(ctx, o, i, a));
                     return v;
                 }, []);
             },
-            reduce : function reduce(fn, val) {
-                var i = -1, l = this.length;
-                while (++i < l) val = fn.call(this, val, this[i], i, this);
+            reduce : function reduce(fn) {
+                var a = O(this), i = -1, l = a.length >>> 0, val;
+                arguments.length > 1 ? val = arguments[1] : (val = a[0], i = 0);
+                while (++i < l) !(i in a) || (val = fn.call(U, val, a[i], i, a));
                 return val;
             },
-            reduceRight : function reduceRight(fn, val) {
-                var l = this.length;
-                while (--l >= 0) val = fn.call(this, val, this[l], l, this);
+            reduceRight : function reduceRight(fn) {
+                var a = O(this), l = a.length >>> 0, val;
+                if (arguments.length < 2) {
+                    do {
+                        if (l in a) {
+                            val = a[l--];
+                            break;
+                        }
+                        if (--l < 0) throw new TypeError;
+                    } while (T);
+                } else val = arguments[1];
+                while (--l >= 0) !(i in a) || (val = fn.call(U, val, a[l], l, a));
                 return val;
             },
             some : function some(fn, ctx) {
-                var i = -1, l = this.length;
-                ctx || (ctx = this);
-                while (++i < l) if (fn.call(ctx, this[i], i, this)) return T;
+                var a = O(this), i = -1, l = a.length >>> 0;
+                while (++i < l) if (i in a && fn.call(ctx, a[i], i, a)) return T;
                 return F;
             }
         }, n;
         A.isArray || (A.isArray = function isArray(a) {
             return tostr(a) == "[object Array]";
         });
-        for (n in f) !has(f, n) || O.defineProperty(AP, n, {
-            enumerable : F,
-            value : f[n]
+        f.forEach.call(O.keys(f), function(k) {
+            has(AP, k) || O[defProp](AP, k, {
+                enumerable : F,
+                value : f[k]
+            });
         });
     }();
     !function() {
@@ -175,12 +196,12 @@
         }
         var D = Date, DP = D[PROTO], format = "$3-$1-$2T$4.$5Z", iso = "toISOString", n = 1e3, re = /1(..).*?(\d\d)\D+(\d+).(\S+).*(...)/;
         "now" in D || (D.now = now);
-        iso in DP || O.defineProperty(DP, iso, {
+        iso in DP || O[defProp](DP, iso, {
             enumerable : F,
             value : toISOString
         });
     }();
-    Function[PROTO].bind || O.defineProperty(Function[PROTO], "bind", function() {
+    Function[PROTO].bind || O[defProp](Function[PROTO], "bind", function() {
         return {
             enumerable : F,
             value : function bind(ctx) {
@@ -205,9 +226,11 @@
                 return this.trimLeft().trimRight();
             }
         }, n;
-        for (n in f) !has(f, n) || O.defineProperty(SP, n, {
-            enumerable : F,
-            value : f[n]
+        O.keys(f).forEach(function(k) {
+            has(SP, k) || O[defProp](SP, k, {
+                enumerable : F,
+                value : f[k]
+            });
         });
     }();
 }(this);
@@ -306,7 +329,7 @@
     function copy(d, s, n) {
         n = n === T;
         s || (s = d, d = {});
-        for (var k in s) n || k in d || (d[k] = s[k]);
+        for (var k in s) n && k in d || (d[k] = s[k]);
         return d;
     }
     function escapeRE(s) {
@@ -392,7 +415,7 @@
     }
     ContextStack.prototype = {
         current : function() {
-            return this[cs][0].dict;
+            return (this[cs][0] || {}).dict;
         },
         destroy : function() {
             this.destroyed = T;
@@ -510,12 +533,12 @@
             console.info(ctx.id);
             console.log(fn);
         }
-        var func = new Function(fn_var.filter, fn_var.assert, fn_var.util, fn_var.dict, fn);
-        return func.bind(ctx, copy(ctx.filters, Templ8.Filter.all(), T), ba, bu);
+        var func = new Function("root", fn_var.filter, fn_var.assert, fn_var.util, fn_var.dict, fn);
+        return func.bind(ctx, root, copy(ctx.filters, Templ8.Filter.all(), T), ba, bu);
     }
-    function createTemplate(ctx, str) {
+    function createTemplate(ctx) {
         ctx.currentIterKeys = [];
-        var fn = compileTemplate(ctx, assembleParts(ctx, splitStr(str)));
+        var fn = compileTemplate(ctx, assembleParts(ctx, splitStr(ctx.__tpl__)));
         delete ctx.currentIterKeys;
         return fn;
     }
@@ -589,15 +612,15 @@
         wrap : wrapStr
     };
     function Templ8() {
-        var a = SLICE.call(arguments), f = is_obj(a[a.length - 1]) ? a.pop() : is_obj(a[0]) ? a.shift() : null;
+        var a = SLICE.call(arguments), f = is_obj(a[a.length - 1]) ? a.pop() : is_obj(a[0]) ? a.shift() : N;
         if (!(this instanceof Templ8)) return is_obj(f) ? new Templ8(a.join(""), f) : new Templ8(a.join(""));
-        this.filters = f || {};
         !f || defaults.forEach(function(k) {
             if (!(k in f)) return;
             this[k] = f[k];
             delete f[k];
         }, this);
-        this.__tpl = a.join("");
+        this.filters = f || {};
+        this.__tpl__ = a.join("");
         tpl[$id(this)] = this;
         if (this.compiled) {
             this.compiled = F;
@@ -611,7 +634,7 @@
     function compile(ctx) {
         if (!ctx.compiled) {
             ctx.compiled = T;
-            ctx._parse = createTemplate(ctx, ctx.__tpl);
+            ctx._parse = createTemplate(ctx);
         }
         return ctx;
     }
@@ -632,6 +655,7 @@
         get : getTPL,
         gsub : gsub,
         stringify : stringify,
+        tostr : tostr,
         type : type
     });
     function Mgr(o) {
@@ -826,7 +850,7 @@
                     id : id
                 }, ctx.filters));
                 sub_tpl.currentIterKeys = [];
-                sub_tpl.__tpl = parts.join("");
+                sub_tpl.__tpl__ = parts.join("");
                 sub_tpl._parse = internals.compiletpl(sub_tpl, internals.assembleparts(sub_tpl, parts));
                 delete sub_tpl.currentIterKeys;
                 sub_tpl.compiled = T;
@@ -900,13 +924,16 @@
         },
         uppercase : function(str) {
             return Templ8.stringify(str).toUpperCase();
+        },
+        wrap : function(str, start, end) {
+            return start + str + (end || start);
         }
     });
     typeof global == UNDEF || (root = global);
     if (typeof module != UNDEF && "exports" in module) module.exports = Templ8; else root.Templ8 = Templ8;
 }(this);
 
-Templ8.type = function(o) {
+typeof document == "undefined" || tostr(document.createElement("div")) == "[object HTMLDivElement]" || (Templ8.type = function(o) {
     if (o === U || o === N) return F;
     var HTMDOC = "htmldocument", t = tostr.call(o).split(" ")[1].toLowerCase();
     t = t.substring(0, t.length - 1);
@@ -922,4 +949,4 @@ Templ8.type = function(o) {
         if (!!~t.indexOf("html")) return !!~t.indexOf(HTMDOC) ? HTMDOC : re_global.test(t) ? GLOBAL : HTMEL;
     }
     return t;
-};
+});

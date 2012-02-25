@@ -388,8 +388,8 @@
 /*** START: Templ8 functionality packages ***/
 
 	copy( Templ8, { // exposed for general usage
-		copy : copy, escapeRE  : escapeRE,  format : format, get : getTPL,
-		gsub : gsub, stringify : stringify, type   : type
+		copy : copy, escapeRE  : escapeRE,  format : format, get  : getTPL,
+		gsub : gsub, stringify : stringify, tostr  : tostr,  type : type
 	} );
 
 	function Mgr( o ) {

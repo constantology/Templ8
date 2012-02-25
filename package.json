@@ -1,20 +1,23 @@
 {
-	"author"      : {
-		"name"    : "constantology",
-		"email"   : "constantology@gmail.com",
-		"url"     : "http://muigui.com"
+	"author"          : {
+		"name"        : "constantology",
+		"email"       : "constantology@gmail.com",
+		"url"         : "http://muigui.com"
 	},
-	"description" : "JavaScript Client/ Server Template Engine",
-	"keywords"    : ["template", "tpl", "Templ8"],
+	"description"     : "JavaScript Client/ Server Template Engine",
+	"devDependencies" : {
+		"priv8i"      : ">= 0.0.1"
+	},
+	"keywords"        : ["template", "tpl", "Templ8"],
 	"licenses"        : [ {
-		"type" : "MIT",
-	     "url" : "https://raw.github.com/constantology/Templ8/master/LICENSE"
+		"type"        : "MIT",
+	     "url"        : "https://raw.github.com/constantology/Templ8/master/LICENSE"
 	} ],
-	"main"        : "./Templ8.js",
-	"name"        : "Templ8",
-	"repository"  : {
-		"type"    : "git",
-		"url"     : "git@github.com:constantology/Templ8.git"
+	"main"            : "./Templ8.js",
+	"name"            : "Templ8",
+	"repository"      : {
+		"type"        : "git",
+		"url"         : "git@github.com:constantology/Templ8.git"
 	},
-	"version"     : "0.5.0"
+	"version"         : "0.6.0"
 }

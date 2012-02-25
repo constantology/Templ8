@@ -418,6 +418,7 @@
         get : getTPL,
         gsub : gsub,
         stringify : stringify,
+        tostr : tostr,
         type : type
     });
     function Mgr(o) {
