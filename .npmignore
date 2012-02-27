@@ -10,7 +10,6 @@ test/
 src/
 build*
 
-Templ8.client.js
-Templ8.shim.js
-Templ8.shim.min.js
+Templ8.min.js
+*shim*
 index.html
