@@ -10,6 +10,7 @@ test/
 src/
 build*
 
+cre8.js
 Templ8.min.js
 *shim*
 index.html
