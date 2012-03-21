@@ -1,7 +1,7 @@
 {
 	"author"          : {
 		"name"        : "constantology",
-		"email"       : "constantology@gmail.com",
+		"email"       : "christos@muigui.com",
 		"url"         : "http://muigui.com"
 	},
 	"description"     : "JavaScript Client/ Server Template Engine",
@@ -19,5 +19,5 @@
 		"type"        : "git",
 		"url"         : "git@github.com:constantology/Templ8.git"
 	},
-	"version"         : "0.7.1"
+	"version"         : "0.7.2"
 }

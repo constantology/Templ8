@@ -693,5 +693,6 @@
         }
     });
     typeof global == UNDEF || (root = global);
-    if (typeof module != UNDEF && "exports" in module) module.exports = Templ8; else root.Templ8 = Templ8;
+    Templ8.global = root;
+    typeof module != UNDEF && "exports" in module ? module.exports = Templ8 : root.Templ8 = Templ8;
 }(this);
