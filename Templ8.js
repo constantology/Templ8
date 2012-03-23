@@ -1,4 +1,5 @@
 !function(root) {
+    "use strict";
     var F = !1, N = null, OP = Object.prototype, T = !0, U, ARR = "array", FUN = "function", GLOBAL = "global", HTMCOL = "htmlcollection", HTMEL = "htmlelement", NODELIST = "nodelist", NUM = "number", OBJ = "object", STR = "string", UNDEF = "undefined", RESERVED = {
         __ASSERT__ : T,
         __CONTEXT__ : T,
