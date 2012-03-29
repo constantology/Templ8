@@ -4,8 +4,10 @@
 		"email"       : "christos@muigui.com",
 		"url"         : "http://muigui.com"
 	},
+	"bin"             : { "Templ8" : "./bin/Templ8" },
 	"description"     : "JavaScript Client/ Server Template Engine",
 	"devDependencies" : {
+		"commander"   : ">= 0.5.0",
 		"priv8i"      : ">= 0.0.1"
 	},
 	"keywords"        : ["template", "tpl", "Templ8"],
@@ -19,5 +21,5 @@
 		"type"        : "git",
 		"url"         : "git@github.com:constantology/Templ8.git"
 	},
-	"version"         : "0.8.0"
+	"version"         : "0.9.0"
 }
