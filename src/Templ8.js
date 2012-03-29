@@ -9,7 +9,7 @@
 		},
 		RE_GSUB  = /\$?\{([^\}\s]+)\}/g, SLICE = ( [] ).slice,
 		ba       = {
-			blank      : function( o )      { return !not_empty( o ) || !o.trim() || !re_not_blank.test( o ); },
+			blank      : function( o ) { return !not_empty( o ) || !o.trim() || !re_not_blank.test( o ); },
 			contains   : contains,
 			endsWith   : function( s, str ) {
 				s = String( s );
@@ -31,13 +31,20 @@
 			context    : function( o, fb )      { return new ContextStack( o, fb ); },
 			output     : function( o )          { return new Output( o ); },
 			iter       : function( i, p, s, c ) { return new Iter( i, p, s, c  ); },
-			parse      : function( o, id )      {
+			objectify  : function( v, k )       { var o = {}; o[k] = v; return o; },
+			parse      : function( o, id, mixins ) {
 				id    = String( id ).trim();
 				var t = getTPL( format( tpl_sub, this.id, id ) ) || getTPL( id );
-				return t ? t.parse( o, this.filters ) : this.fallback;
+				switch( Templ8.type( mixins ) ) {
+					case OBJ :              break;
+					case F   : mixins = {}; break;
+					default  : mixins = { __MIXINS__ : mixins };
+				}
+
+				return t ? t.parse( copy( mixins, o, T ), this.filters ) : this.fallback;
 			},
-			stop       : function( iter )       { iter.stop(); },
-			type       : function( o )          { return Templ8.type( o ); }
+			stop       : function( iter ) { iter.stop(); },
+			type       : function( o )    { return Templ8.type( o ); }
 		},
 		ck        = '__tpl_cs_cached_keys',                  cs      = '__tpl_cs_stack',
 		defaults  = ['compiled', 'debug', 'fallback', 'id'], delim   = '<~>',
@@ -342,8 +349,7 @@
 		if ( !( this instanceof Templ8 ) ) return is_obj( f ) ? new Templ8( a.join( '' ), f ) : new Templ8( a.join( '' ) );
 		
 		!f || defaults.forEach( function( k ) {
-			if ( !( k in f ) ) return;
-			this[k] = f[k]; delete f[k];
+			if ( k in f ) { this[k] = f[k]; delete f[k]; }
 		}, this );
 
 		this.filters = f || {};

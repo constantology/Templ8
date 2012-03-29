@@ -64,10 +64,26 @@
         iter : function(i, p, s, c) {
             return new Iter(i, p, s, c);
         },
-        parse : function(o, id) {
+        objectify : function(v, k) {
+            var o = {};
+            o[k] = v;
+            return o;
+        },
+        parse : function(o, id, mixins) {
             id = String(id).trim();
             var t = getTPL(format(tpl_sub, this.id, id)) || getTPL(id);
-            return t ? t.parse(o, this.filters) : this.fallback;
+            switch (Templ8.type(mixins)) {
+              case OBJ:
+                break;
+              case F:
+                mixins = {};
+                break;
+              default:
+                mixins = {
+                    __MIXINS__ : mixins
+                };
+            }
+            return t ? t.parse(copy(mixins, o, T), this.filters) : this.fallback;
         },
         stop : function(iter) {
             iter.stop();
@@ -379,9 +395,10 @@
         var a = SLICE.call(arguments), f = is_obj(a[a.length - 1]) ? a.pop() : is_obj(a[0]) ? a.shift() : N;
         if (!(this instanceof Templ8)) return is_obj(f) ? new Templ8(a.join(""), f) : new Templ8(a.join(""));
         !f || defaults.forEach(function(k) {
-            if (!(k in f)) return;
-            this[k] = f[k];
-            delete f[k];
+            if (k in f) {
+                this[k] = f[k];
+                delete f[k];
+            }
         }, this);
         this.filters = f || {};
         this.__tpl__ = a.join("");
