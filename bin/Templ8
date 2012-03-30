@@ -9,9 +9,8 @@ var fs       = require( 'fs' ),
 
 	defaults = n8iv.obj();
 
-function validFiles( f ) {
-	var ext = program.extension;
-	return ( f.lastIndexOf( ext ) === f.length - ext.length ) ? ( this + '/' + f ) : null;
+function lines( str ) {
+	return str.replace( /(["'])/g, "\\$1" ).replace( /^(\s*)(.*)/, "$1'$2'" );
 }
 
 function toId( f ) {
@@ -19,14 +18,19 @@ function toId( f ) {
 }
 
 function toTempl8( id, str ) {
-	str = str.split( /[\n\r]/ ).compact( true ).join( '\\n' ).replace( /\t/g, '\\t' ).replace( /'/g, "\\'" );
-	return Templ8.format( 'new Templ8( Templ8.copy( { id : \'{0}\' }, config ), \'{1}\' );', id, str );
+	str = str.split( /[\n\r]/ ).compact( true ).map( lines ).join( ',\n' );
+	return Templ8.format( 'new Templ8( Templ8.copy( { id : \'{0}\' }, config ), {1} );', id, str );
+}
+
+function validFiles( f ) {
+	var ext = program.extension;
+	return ( f.lastIndexOf( ext ) === f.length - ext.length ) ? ( this + '/' + f ) : null;
 }
 
 defaults.config = function( config ) {
 	var c = fs.readFileSync( config, program.charset );
 	( c && c.length ) || ( c = '{}' );
-	return c;
+	return c.trim();
 };
 defaults.dir = function( dir ) {
 	var files = fs.readdirSync( dir ).mapc( validFiles, dir );
