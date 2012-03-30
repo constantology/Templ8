@@ -18,7 +18,7 @@
         window : T
     }, RE_GSUB = /\$?\{([^\}\s]+)\}/g, SLICE = [].slice, ba = {
         blank : function(o) {
-            return !not_empty(o) || !o.trim() || !re_not_blank.test(o);
+            return !not_empty(o) || is_str(o) && !o.trim() || !re_not_blank.test(o);
         },
         contains : contains,
         endsWith : function(s, str) {
@@ -72,18 +72,21 @@
         parse : function(o, id, mixins) {
             id = String(id).trim();
             var t = getTPL(format(tpl_sub, this.id, id)) || getTPL(id);
-            switch (Templ8.type(mixins)) {
-              case OBJ:
-                break;
-              case F:
-                mixins = {};
-                break;
-              default:
-                mixins = {
-                    __MIXINS__ : mixins
-                };
+            if (is_obj(o) && mixins !== this.__dict__) {
+                switch (Templ8.type(mixins)) {
+                  case OBJ:
+                    break;
+                  case F:
+                    mixins = {};
+                    break;
+                  default:
+                    mixins = {
+                        __MIXINS__ : mixins
+                    };
+                }
+                o = copy(mixins, o, T);
             }
-            return t ? t.parse(copy(mixins, o, T), this.filters) : this.fallback;
+            return t ? t.parse(o) : this.fallback;
         },
         stop : function(iter) {
             iter.stop();
@@ -170,7 +173,7 @@
             a = a[0].split(".");
         }
         while (k = a.shift()) {
-            if (!(k in o)) return U;
+            if (!(k in Object(o))) return U;
             o = o[k];
         }
         return o;
@@ -291,9 +294,12 @@
     function aggregateStatement(ctx, s) {
         return s.reduce(function(res, v, i, parts) {
             if (i == 0) return wrapGetter(ctx, v);
-            v = v.split(":");
-            var args = "", fn = v.shift();
-            !is_str(v[0]) || (args = ", " + v[0].split(",").map(function(o) {
+            var args = "", fn, j = v.indexOf(":");
+            if (!!~j) {
+                fn = v.substring(0, j);
+                args = v.substring(j + 1);
+            } else fn = v;
+            !args || (args = ", " + args.split(",").map(function(o) {
                 return wrapGetter(this, o);
             }, ctx).join(", "));
             return format(tpl_statement, getFnParent(fn), fn, wrapGetter(ctx, res), args, fn_var.dict);
@@ -421,7 +427,10 @@
     }
     function parse(dict) {
         this.compiled || compile(this);
-        return this._parse(dict);
+        this.__dict__ = dict;
+        var s = this._parse(dict);
+        delete this.__dict__;
+        return s;
     }
     Templ8.prototype = {
         compiled : F,
@@ -680,6 +689,9 @@
               case STR:
                 return o.charAt(0);
             }
+        },
+        join : function(o, s) {
+            return "join" in Object(o) && typeof o.join == "function" ? o.join(s) : o;
         },
         last : function(o) {
             switch (Templ8.type(o)) {

@@ -22,6 +22,7 @@
 				case STR : return o.charAt( 0 );
 			}
 		},
+		join           : function( o, s ) { return ( 'join' in Object( o ) && typeof o.join == 'function' ) ? o.join( s ) : o; },
 		last           : function( o ) {
 			switch ( Templ8.type( o ) ) {
 				case ARR : return o[o.length-1];
