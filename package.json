@@ -6,14 +6,16 @@
 	},
 	"bin"             : { "Templ8" : "./bin/Templ8" },
 	"description"     : "JavaScript Client/ Server Template Engine",
-	"devDependencies" : {
+	"dependencies" : {
 		"commander"   : ">= 0.5.0",
-		"priv8i"      : ">= 0.0.1"
+		"mkdirp"      : ">= 0.3.0",
+		"n8iv"        : ">= 0.1.0",
+		"uglify-js"   : ">= 1.2.5"
 	},
 	"keywords"        : ["template", "tpl", "Templ8"],
 	"licenses"        : [ {
 		"type"        : "MIT",
-	     "url"        : "https://raw.github.com/constantology/Templ8/master/LICENSE"
+		"url"        : "https://raw.github.com/constantology/Templ8/master/LICENSE"
 	} ],
 	"main"            : "./Templ8.js",
 	"name"            : "Templ8",
