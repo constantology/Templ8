@@ -1,20 +1,11 @@
 !function( root ) {
-	var el, txt, u, undef = u + '';
-	typeof Templ8 != undef || typeof require == undef || ( Templ8 = require( 'Templ8' ) );
+	var reamp = /&/g, regt = />/g, relt = /</g, req = /"/g;
 
-	if ( typeof root.document != undef ) {
-		el  = document.createElement( 'div' );
-		txt = el.appendChild( document.createTextNode( '' ) );
-		Templ8.Filter.add( 'escapeHTML', function( str ) {
-			txt.data = str;
-			var s    = el.innerHTML;
-			txt.data = '';
-			return s;
-		} );
-	}
+	typeof Templ8 != 'undefined' || typeof require == 'undefined' || ( Templ8 = require( 'Templ8' ) );
 
 	Templ8.Filter.add( {
 		bold       : function( str ) { return Templ8.format( '<strong>{0}</strong>', Templ8.stringify( str ) ); },
+		escapeHTML : function( str ) { return str.replace( reamp, '&amp;' ).replace( regt, '&gt;' ).replace( relt, '&lt;' ).replace( req, '&quot;' ); },
 		italics    : function( str ) { return Templ8.format( '<em>{0}</em>', Templ8.stringify( str ) ); },
 		linebreaks : function( str ) { return Templ8.stringify( str ).replace( /[\r\n]/gm, '<br />\n' ); },
 		link       : function( url, str ) {

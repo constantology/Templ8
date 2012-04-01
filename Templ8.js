@@ -1,22 +1,9 @@
 !function(root) {
     "use strict";
-    var F = !1, N = null, OP = Object.prototype, T = !0, U, ARR = "array", FUN = "function", GLOBAL = "global", HTMCOL = "htmlcollection", HTMEL = "htmlelement", NODELIST = "nodelist", NUM = "number", OBJ = "object", STR = "string", UNDEF = "undefined", RESERVED = {
-        __ASSERT__ : T,
-        __CONTEXT__ : T,
-        __FILTER_ : T,
-        __OUTPUT__ : T,
-        __UTIL__ : T,
-        $_ : T,
-        document : T,
-        "false" : T,
-        global : T,
-        "instanceof" : T,
-        "null" : T,
-        "true" : T,
-        "typeof" : T,
-        "undefined" : T,
-        window : T
-    }, RE_GSUB = /\$?\{([^\}\s]+)\}/g, SLICE = [].slice, ba = {
+    var F = !1, N = null, OP = Object.prototype, T = !0, U, RESERVED = "__ASSERT__ __CONTEXT__ __FILTER_ __OUTPUT__ __UTIL__ $_ document false global instanceof null true typeof undefined window".split(" ").reduce(function(o, k) {
+        o[k] = T;
+        return o;
+    }, Object.create(N)), RE_GSUB = /\$?\{([^\}\s]+)\}/g, SLICE = [].slice, ba = {
         blank : function(o) {
             return !not_empty(o) || is_str(o) && !o.trim() || !re_not_blank.test(o);
         },
@@ -33,7 +20,7 @@
             return o == v;
         },
         exists : function(o) {
-            return typeof o == NUM ? !isNaN(o) : o !== U && o !== N;
+            return typeof o == "number" ? !isNaN(o) : o !== U && o !== N;
         },
         is : function(o, v) {
             return o === v;
@@ -74,7 +61,7 @@
             var t = getTPL(format(tpl_sub, this.id, id)) || getTPL(id);
             if (is_obj(o) && mixins !== this.__dict__) {
                 switch (Templ8.type(mixins)) {
-                  case OBJ:
+                  case "object":
                     break;
                   case F:
                     mixins = {};
@@ -100,14 +87,14 @@
         filter : "__FILTER__",
         output : "__OUTPUT__",
         util : "__UTIL__"
-    }, fn_end = format('$C.destroy(); return {0}.join( "" );\n ', fn_var.output), fn_start = format("var $C = {0}.context( {1}, this.fallback ), $_ = $C.current(), iter = {0}.iter(), {2} = {0}.output(), U;", fn_var.util, fn_var.dict, fn_var.output), id_count = 999, internals, re_domiter = new RegExp(format("{0}|{1}", HTMCOL, NODELIST)), re_esc = /(['"])/g, re_element = /^html\w+?element$/, re_format_delim = new RegExp(delim, "gm"), re_global = /global|window/, re_iterable = new RegExp(format("{0}|{1}|{2}|arguments|{3}", ARR, HTMCOL, OBJ, NODELIST)), re_new_line = /[\r\n]+/g, re_not_blank = /\S/, re_special_char = /[\(\)\[\]\{\}\?\*\+\/<>%&=!-]/, re_statement_fix = /\.(\d+)(\.?)/g, re_statement_replacer = "['$1']$2", re_statement_split = new RegExp("\\s*([^\\|]+(?:\\|[^\\|]+?)){0,}" + delim, "g"), re_space = /\s+/g, re_split_tpl, split_token = "<__SPLIT__TEMPLATE__HERE__>", split_replace = [ "", "$1", "$2", "" ].join(split_token), tpl = {}, tpl_id = "tpl-anon-{0}", tpl_statement = '{0}["{1}"].call( this, {2}{3}, {4} )', tpl_sub = "{0}.{1}";
+    }, fn_end = format('$C.destroy(); return {0}.join( "" );\n ', fn_var.output), fn_start = format("var $C = {0}.context( {1}, this.fallback ), $_ = $C.current(), iter = {0}.iter(), {2} = {0}.output(), U;", fn_var.util, fn_var.dict, fn_var.output), id_count = 999, internals, re_domiter = /htmlcollection|nodelist/, re_esc = /(['"])/g, re_element = /^html\w+?element$/, re_format_delim = new RegExp(delim, "gm"), re_global = /global|window/, re_iterable = /array|htmlcollection|object|arguments|nodelist/, re_new_line = /[\r\n]+/g, re_not_blank = /\S/, re_special_char = /[\(\)\[\]\{\}\?\*\+\/<>%&=!-]/, re_statement_fix = /\.(\d+)(\.?)/g, re_statement_replacer = "['$1']$2", re_statement_split = new RegExp("\\s*([^\\|]+(?:\\|[^\\|]+?)){0,}" + delim, "g"), re_space = /\s+/g, re_split_tpl, split_token = "<__SPLIT__TEMPLATE__HERE__>", split_replace = [ "", "$1", "$2", "" ].join(split_token), tpl = {}, tpl_id = "t8-anon-{0}", tpl_statement = '{0}["{1}"].call( this, {2}{3}, {4} )', tpl_sub = "{0}.{1}";
     Object.values || (Object.values = function(o) {
         var k, values = [];
         for (k in o) !has(o, k) || values.push(o[k]);
         return values;
     });
     function contains(o, k) {
-        return Templ8.type(o.indexOf) == FUN ? !!~o.indexOf(k) : k in o;
+        return Templ8.type(o.indexOf) == "function" ? !!~o.indexOf(k) : k in o;
     }
     function copy(d, s, n) {
         n = n === T;
@@ -133,13 +120,13 @@
         return OP.hasOwnProperty.call(o, k);
     }
     function is_fn(o) {
-        return typeof o == FUN;
+        return typeof o == "function";
     }
     function is_obj(o) {
-        return Templ8.type(o) == OBJ;
+        return Templ8.type(o) == "object";
     }
     function is_str(o) {
-        return typeof o == STR;
+        return typeof o == "string";
     }
     function mapc(a, fn, ctx) {
         ctx || (ctx = a);
@@ -153,13 +140,13 @@
         switch (Templ8.type(o)) {
           case F:
             return F;
-          case NUM:
+          case "number":
             return !isNaN(o);
-          case STR:
+          case "string":
             return o != "";
-          case ARR:
+          case "array":
             return !!o.length;
-          case OBJ:
+          case "object":
             for (var k in o) if (k) return T;
         }
         return F;
@@ -185,7 +172,7 @@
         if (o === U || o === N) return F;
         var t = tostr(o).split(" ")[1].toLowerCase();
         t = t.substring(0, t.length - 1);
-        return re_domiter.test(t) ? HTMCOL : re_element.test(t) ? HTMEL : re_global.test(t) ? GLOBAL : t;
+        return re_domiter.test(t) ? "htmlcollection" : re_element.test(t) ? "htmlelement" : re_global.test(t) ? "global" : t;
     }
     function ContextStack(o, fallback) {
         this[ck] = {};
@@ -243,7 +230,7 @@
         this.index1 = start + 1;
         this.items = ba.iterable(iter) ? iter : N;
         this.type = Templ8.type(iter);
-        if (this.type == OBJ) {
+        if (this.type == "object") {
             this.items = Object.values(iter);
             this.keys = Object.keys(iter);
             this.firstKey = this.keys[0];
@@ -263,7 +250,7 @@
             this.current = this.items[this.index];
             this.previous = this.items[this.index - 1] || U;
             this.next = this.items[++this.index1] || U;
-            if (this.type == OBJ) {
+            if (this.type == "object") {
                 this.key = this.keys[this.index];
                 this.previousKey = this.keys[this.index - 1] || U;
                 this.nextKey = this.keys[this.index1] || U;
@@ -276,7 +263,7 @@
         }
     };
     function Output(o) {
-        this.__data = Templ8.type(o) == ARR ? o : [];
+        this.__data = Templ8.type(o) == "array" ? o : [];
     }
     Output.prototype = {
         join : function() {
@@ -315,7 +302,7 @@
         return str.replace(re_format_delim, "").replace(re_new_line, "\n").replace(re_space, " ").trim();
     }
     function compileTemplate(ctx, fn) {
-        if (ctx.debug && typeof console != UNDEF) {
+        if (ctx.debug && typeof console != "undefined") {
             console.info(ctx.id);
             console.log(fn);
         }
@@ -351,18 +338,18 @@
     function stringify(o, str) {
         switch (Templ8.type(o)) {
           case "boolean":
-          case NUM:
-          case STR:
+          case "number":
+          case "string":
             return String(o);
           case "date":
             return o.toDateString();
-          case ARR:
+          case "array":
             return mapc(o, stringify).join(", ");
-          case OBJ:
+          case "object":
             return ck in o ? stringify(o.dict) : (str = o.toString()) != "[object Object]" ? str : mapc(Object.values(o), stringify).join(", ");
-          case HTMEL:
+          case "htmlelement":
             return o.textContent || o.text || o.innerText;
-          case HTMCOL:
+          case "htmlcollection":
             return mapc(SLICE.call(o), function(el) {
                 return stringify(el);
             }).join(", ");
@@ -451,36 +438,31 @@
     function Mgr(o) {
         var cache = {};
         !is_obj(o) || copy(cache, o);
-        function add(id, fn, replace) {
+        function _add(id, fn, replace) {
             !replace && id in cache || (cache[id] = fn);
+        }
+        function add(replace, o) {
+            switch (typeof o) {
+              case "string":
+                _add(o, arguments[2], replace);
+                break;
+              case "object":
+                for (var k in o) _add(k, o[k], replace);
+                break;
+            }
+            return this;
         }
         this.all = function() {
             return copy(cache);
         };
-        this.add = function(o) {
-            switch (typeof o) {
-              case STR:
-                add(o, arguments[1], F);
-                break;
-              case OBJ:
-                for (var k in o) add(k, o[k], F);
-                break;
-            }
-            return this;
+        this.add = function() {
+            return add.call(this, F, arguments[0], arguments[1]);
         };
         this.get = function(id) {
             return cache[id];
         };
-        this.replace = function(o) {
-            switch (typeof o) {
-              case STR:
-                add(o, arguments[1], T);
-                break;
-              case OBJ:
-                for (var k in o) add(k, o[k], T);
-                break;
-            }
-            return this;
+        this.replace = function() {
+            return add.call(this, T, arguments[0], arguments[1]);
         };
     }
     Templ8.Assert = new Mgr(ba);
@@ -665,11 +647,11 @@
         },
         count : function(o) {
             switch (Templ8.type(o)) {
-              case ARR:
-              case HTMCOL:
-              case STR:
+              case "array":
+              case "htmlcollection":
+              case "string":
                 return o.length;
-              case OBJ:
+              case "object":
                 return Object.keys(o).length;
             }
             return 0;
@@ -684,9 +666,9 @@
         },
         first : function(o) {
             switch (Templ8.type(o)) {
-              case ARR:
+              case "array":
                 return o[0];
-              case STR:
+              case "string":
                 return o.charAt(0);
             }
         },
@@ -695,9 +677,9 @@
         },
         last : function(o) {
             switch (Templ8.type(o)) {
-              case ARR:
+              case "array":
                 return o[o.length - 1];
-              case STR:
+              case "string":
                 return o.charAt(o.length - 1);
             }
         },
@@ -722,7 +704,7 @@
             return start + str + (end || start);
         }
     });
-    typeof global == UNDEF || (root = global);
+    typeof global == "undefined" || (root = global);
     Templ8.global = root;
-    typeof module != UNDEF && "exports" in module ? module.exports = Templ8 : root.Templ8 = Templ8;
+    typeof module != "undefined" && "exports" in module ? module.exports = Templ8 : root.Templ8 = Templ8;
 }(this);

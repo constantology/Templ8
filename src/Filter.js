@@ -5,8 +5,8 @@
 		},
 		count          : function( o ) {
 			switch( Templ8.type( o ) ) {
-				case ARR : case HTMCOL : case STR : return o.length;
-				case OBJ : return Object.keys( o ).length;
+				case 'array'  : case 'htmlcollection' : case 'string' : return o.length;
+				case 'object' : return Object.keys( o ).length;
 			}
 			return 0;
 		},
@@ -18,15 +18,15 @@
 		def            : function( str, def ) { return ba.blank( str ) ? def : str; },
 		first          : function( o ) {
 			switch ( Templ8.type( o ) ) {
-				case ARR : return o[0];
-				case STR : return o.charAt( 0 );
+				case 'array'  : return o[0];
+				case 'string' : return o.charAt( 0 );
 			}
 		},
 		join           : function( o, s ) { return ( 'join' in Object( o ) && typeof o.join == 'function' ) ? o.join( s ) : o; },
 		last           : function( o ) {
 			switch ( Templ8.type( o ) ) {
-				case ARR : return o[o.length-1];
-				case STR : return o.charAt( o.length - 1 );
+				case 'array'  : return o[o.length-1];
+				case 'string' : return o.charAt( o.length - 1 );
 			}
 		},
 		lowercase      : function( str ) { return Templ8.stringify( str ).toLowerCase(); },
