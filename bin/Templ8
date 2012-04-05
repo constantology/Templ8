@@ -54,6 +54,8 @@ defaults.prefix = function( pfx ) {
 	return pfx;
 };
 
+process.argv.length > 2 || process.argv.push( '-h' );
+
 program.version( '0.8.1' )
 	   .description( 'Generate Templ8s from your nice clean HTML.' )
 	   .option( '-c, --config <file>',       'An optional Templ8 configuration include in all processed Templ8\'s.', defaults.config )
