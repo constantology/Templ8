@@ -325,6 +325,12 @@
     }
     function formatStatement(ctx, str) {
         str = clean(str);
+        switch (str) {
+          case "AND":
+            return " && ";
+          case "OR":
+            return " || ";
+        }
         return contains(str, "|") || contains(str, delim) ? (" " + str + delim).replace(re_statement_split, function(m) {
             return ba.blank(m) || m == delim ? "" : aggregateStatement(ctx, clean(m).split("|"));
         }) : wrapGetter(ctx, str);
