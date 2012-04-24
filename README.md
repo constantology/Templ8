@@ -1,7 +1,6 @@
 #TODO:
 
 - documentation is not yet complete
-- add unit tests (already have tests: just wanting to port them from my own framework to an existing one like JSTestDriver or something).
 
 # Templ8
 
