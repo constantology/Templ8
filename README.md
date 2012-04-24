@@ -40,10 +40,8 @@ You have 2 options.
 
 <table border="0" cellpadding="0" cellspacing="0">
 	<tbody>
-		<tr><td>Templ8.js</td><td>6.9kb</td><td>deflate</td>
-		<tr><td>Templ8.min.js</td><td>5.2kb</td><td>uglified + deflate</td>
-		<tr><td>Templ8.shim.js</td><td>8.9kb</td><td>deflate</td>
-		<tr><td>Templ8.shim.min.js</td><td>6.8kb</td><td>uglified + deflate</td>
+		<tr><td>Templ8.js</td><td>6.6kb</td><td>deflate</td>
+		<tr><td>Templ8.min.js</td><td>5.0kb</td><td>uglified + deflate</td>
 		<tr><td>Templ8.Filter.html.js</td><td>0.59kb</td><td>deflate</td>
 	</tbody>
 </table>

@@ -1,11 +1,11 @@
-!function(root) {
+!function(m8) {
     "use strict";
-    var F = !1, N = null, OP = Object.prototype, T = !0, U, RESERVED = "__ASSERT__ __CONTEXT__ __FILTER_ __OUTPUT__ __UTIL__ $_ document false global instanceof null true typeof undefined window".split(" ").reduce(function(o, k) {
-        o[k] = T;
+    var U, RESERVED = "__ASSERT__ __CONTEXT__ __FILTER_ __OUTPUT__ __UTIL__ $_ document false global instanceof null true typeof undefined window".split(" ").reduce(function(o, k) {
+        o[k] = true;
         return o;
-    }, Object.create(N)), RE_GSUB = /\$?\{([^\}\s]+)\}/g, SLICE = [].slice, ba = {
+    }, m8.obj()), RE_GSUB = /\$?\{([^\}\s]+)\}/g, ba = {
         blank : function(o) {
-            return !not_empty(o) || is_str(o) && !o.trim() || !re_not_blank.test(o);
+            return m8.empty(o) || is_str(o) && !o.trim() || !re_not_blank.test(o);
         },
         contains : contains,
         endsWith : function(s, str) {
@@ -13,15 +13,11 @@
             var n = s.length - str.length;
             return n >= 0 && s.lastIndexOf(str) == n;
         },
-        empty : function(o) {
-            return !not_empty(o);
-        },
+        empty : m8.empty,
         equals : function(o, v) {
             return o == v;
         },
-        exists : function(o) {
-            return typeof o == "number" ? !isNaN(o) : o !== U && o !== N;
-        },
+        exists : m8.exists,
         is : function(o, v) {
             return o === v;
         },
@@ -35,7 +31,7 @@
             return !!(getTPL(format(tpl_sub, this.id, id)) || getTPL(id));
         },
         iterable : function(o) {
-            return re_iterable.test(Templ8.type(o));
+            return re_iterable.test(m8.type(o));
         },
         notEmpty : not_empty,
         startsWith : function(s, str) {
@@ -60,10 +56,11 @@
             id = String(id).trim();
             var t = getTPL(format(tpl_sub, this.id, id)) || getTPL(id);
             if (is_obj(o) && mixins !== this.__dict__) {
-                switch (Templ8.type(mixins)) {
+                switch (m8.type(mixins)) {
                   case "object":
+                  case "nullobject":
                     break;
-                  case F:
+                  case false:
                     mixins = {};
                     break;
                   default:
@@ -71,7 +68,7 @@
                         __MIXINS__ : mixins
                     };
                 }
-                o = copy(mixins, o, T);
+                o = m8.copy(mixins, o, true);
             }
             return t ? t.parse(o) : this.fallback;
         },
@@ -79,7 +76,7 @@
             iter.stop();
         },
         type : function(o) {
-            return Templ8.type(o);
+            return m8.type(o);
         }
     }, ck = "__tpl_cs_cached_keys", cs = "__tpl_cs_stack", defaults = [ "compiled", "debug", "fallback", "id" ], delim = "<~>", esc_chars = /([-\*\+\?\.\|\^\$\/\\\(\)[\]\{\}])/g, esc_val = "\\$1", fn_var = {
         assert : "__ASSERT__",
@@ -87,43 +84,29 @@
         filter : "__FILTER__",
         output : "__OUTPUT__",
         util : "__UTIL__"
-    }, fn_end = format('$C.destroy(); return {0}.join( "" );\n ', fn_var.output), fn_start = format("var $C = {0}.context( {1}, this.fallback ), $_ = $C.current(), iter = {0}.iter(), {2} = {0}.output(), U;", fn_var.util, fn_var.dict, fn_var.output), id_count = 999, internals, re_domiter = /htmlcollection|nodelist/, re_esc = /(['"])/g, re_element = /^html\w+?element$/, re_format_delim = new RegExp(delim, "gm"), re_global = /global|window/, re_iterable = /array|htmlcollection|object|arguments|nodelist/, re_new_line = /[\r\n]+/g, re_not_blank = /\S/, re_special_char = /[\(\)\[\]\{\}\?\*\+\/<>%&=!-]/, re_statement_fix = /\.(\d+)(\.?)/g, re_statement_replacer = "['$1']$2", re_statement_split = new RegExp("\\s*([^\\|]+(?:\\|[^\\|]+?)){0,}" + delim, "g"), re_space = /\s+/g, re_split_tpl, split_token = "<__SPLIT__TEMPLATE__HERE__>", split_replace = [ "", "$1", "$2", "" ].join(split_token), tpl = {}, tpl_id = "t8-anon-{0}", tpl_statement = '{0}["{1}"].call( this, {2}{3}, {4} )', tpl_sub = "{0}.{1}";
-    Object.values || (Object.values = function(o) {
-        var k, values = [];
-        for (k in o) !has(o, k) || values.push(o[k]);
-        return values;
-    });
+    }, fn_end = format('$C.destroy(); return {0}.join( "" );\n ', fn_var.output), fn_start = format("var $C = {0}.context( {1}, this.fallback ), $_ = $C.current(), iter = {0}.iter(), {2} = {0}.output(), U;", fn_var.util, fn_var.dict, fn_var.output), id_count = 999, internals, re_esc = /(['"])/g, re_format_delim = new RegExp(delim, "gm"), re_iterable = /array|htmlcollection|object|arguments|nodelist/, re_new_line = /[\r\n]+/g, re_not_blank = /\S/, re_special_char = /[\(\)\[\]\{\}\?\*\+\/<>%&=!-]/, re_statement_fix = /\.(\d+)(\.?)/g, re_statement_replacer = "['$1']$2", re_statement_split = new RegExp("\\s*([^\\|]+(?:\\|[^\\|]+?)){0,}" + delim, "g"), re_space = /\s+/g, re_split_tpl, split_token = "<__SPLIT__TEMPLATE__HERE__>", split_replace = [ "", "$1", "$2", "" ].join(split_token), tpl = {}, tpl_id = "t8-anon-{0}", tpl_statement = '{0}["{1}"].call( this, {2}{3}, {4} )', tpl_sub = "{0}.{1}";
     function contains(o, k) {
-        return Templ8.type(o.indexOf) == "function" ? !!~o.indexOf(k) : k in o;
-    }
-    function copy(d, s, n) {
-        n = n === T;
-        s || (s = d, d = {});
-        for (var k in s) n && k in d || (d[k] = s[k]);
-        return d;
+        return m8.nativeType(o.indexOf) == "function" ? !!~o.indexOf(k) : k in o;
     }
     function escapeRE(s) {
         return String(s).replace(esc_chars, esc_val);
     }
     function format(s) {
-        return gsub(s, SLICE.call(arguments, 1));
+        return gsub(s, Array.coerce(arguments, 1));
     }
     function getTPL(id) {
-        return tpl[id] || N;
+        return tpl[id] || null;
     }
     function gsub(s, o, pattern) {
         return String(s).replace(pattern || RE_GSUB, function(m, p) {
             return o[p] || "";
         });
     }
-    function has(o, k) {
-        return OP.hasOwnProperty.call(o, k);
-    }
     function is_fn(o) {
         return typeof o == "function";
     }
     function is_obj(o) {
-        return Templ8.type(o) == "object";
+        return m8.nativeType(o) == "object";
     }
     function is_str(o) {
         return typeof o == "string";
@@ -137,48 +120,13 @@
         }, []);
     }
     function not_empty(o) {
-        switch (Templ8.type(o)) {
-          case F:
-            return F;
-          case "number":
-            return !isNaN(o);
-          case "string":
-            return o != "";
-          case "array":
-            return !!o.length;
-          case "object":
-            for (var k in o) if (k) return T;
-        }
-        return F;
-    }
-    function objval(o) {
-        if (o === U) return U;
-        var a = SLICE.call(arguments, 1), k;
-        if (a.length == 1) {
-            if (a[0] === U) return U;
-            if (!~a[0].indexOf(".")) return o[a[0]];
-            a = a[0].split(".");
-        }
-        while (k = a.shift()) {
-            if (!(k in Object(o))) return U;
-            o = o[k];
-        }
-        return o;
-    }
-    function tostr(o) {
-        return OP.toString.call(o);
-    }
-    function type(o) {
-        if (o === U || o === N) return F;
-        var t = tostr(o).split(" ")[1].toLowerCase();
-        t = t.substring(0, t.length - 1);
-        return re_domiter.test(t) ? "htmlcollection" : re_element.test(t) ? "htmlelement" : re_global.test(t) ? "global" : t;
+        return !m8.empty(o);
     }
     function ContextStack(o, fallback) {
         this[ck] = {};
-        this[cs] = [ root ];
+        this[cs] = [ m8.global ];
         if (fallback !== U) {
-            this.hasFallback = T;
+            this.hasFallback = true;
             this.fallback = fallback;
         }
         if (ba.exists(o)) this.push(o);
@@ -188,7 +136,7 @@
             return (this[cs][0] || {}).dict;
         },
         destroy : function() {
-            this.destroyed = T;
+            this.destroyed = true;
             delete this[ck];
             delete this[cs];
             return this;
@@ -199,7 +147,7 @@
                 o = s[i];
                 d = o.dict;
                 if (k in c && d === c[k].o) return c[k].v;
-                if ((v = objval(d, k)) !== U) {
+                if ((v = Object.value(d, k)) !== U) {
                     c[k] = {
                         o : d,
                         v : v
@@ -228,8 +176,8 @@
         count = count === U ? 0 : count;
         this.index = start;
         this.index1 = start + 1;
-        this.items = ba.iterable(iter) ? iter : N;
-        this.type = Templ8.type(iter);
+        this.items = ba.iterable(iter) ? iter : null;
+        this.type = m8.nativeType(iter);
         if (this.type == "object") {
             this.items = Object.values(iter);
             this.keys = Object.keys(iter);
@@ -245,8 +193,8 @@
     }
     Iter.prototype = {
         hasNext : function() {
-            if (this.stopped || isNaN(this.index) || !this.items || ++this.index >= this.count) return F;
-            if (this.index >= this.count - 1) this.isLast = T;
+            if (this.stopped || isNaN(this.index) || !this.items || ++this.index >= this.count) return false;
+            if (this.index >= this.count - 1) this.isLast = true;
             this.current = this.items[this.index];
             this.previous = this.items[this.index - 1] || U;
             this.next = this.items[++this.index1] || U;
@@ -258,12 +206,12 @@
             return this;
         },
         stop : function() {
-            this.stopped = T;
+            this.stopped = true;
             return this;
         }
     };
     function Output(o) {
-        this.__data = Templ8.type(o) == "array" ? o : [];
+        this.__data = m8.nativeType(o) == "array" ? o : [];
     }
     Output.prototype = {
         join : function() {
@@ -303,11 +251,11 @@
     }
     function compileTemplate(ctx, fn) {
         if (ctx.debug && typeof console != "undefined") {
-            console.info(ctx.id);
+            console.info("Templ8: ", ctx.id, ", source: ");
             console.log(fn);
         }
         var func = new Function("root", fn_var.filter, fn_var.assert, fn_var.util, fn_var.dict, fn);
-        return func.bind(ctx, root, copy(ctx.filters, Templ8.Filter.all(), T), ba, bu);
+        return func.bind(ctx, m8.global, m8.copy(ctx.filters, Templ8.Filter.all(), true), ba, bu);
     }
     function createTemplate(ctx) {
         ctx.currentIterKeys = [];
@@ -342,7 +290,7 @@
         return str.replace(re_split_tpl, split_replace).split(split_token).reduce(aggregatetNonEmpty, []);
     }
     function stringify(o, str) {
-        switch (Templ8.type(o)) {
+        switch (m8.type(o)) {
           case "boolean":
           case "number":
           case "string":
@@ -351,12 +299,13 @@
             return o.toDateString();
           case "array":
             return mapc(o, stringify).join(", ");
+          case "nullobject":
           case "object":
             return ck in o ? stringify(o.dict) : (str = o.toString()) != "[object Object]" ? str : mapc(Object.values(o), stringify).join(", ");
           case "htmlelement":
             return o.textContent || o.text || o.innerText;
           case "htmlcollection":
-            return mapc(SLICE.call(o), function(el) {
+            return mapc(Array.coerce(o), function(el) {
                 return stringify(el);
             }).join(", ");
         }
@@ -391,7 +340,7 @@
         wrap : wrapStr
     };
     function Templ8() {
-        var a = SLICE.call(arguments), f = is_obj(a[a.length - 1]) ? a.pop() : is_obj(a[0]) ? a.shift() : N;
+        var a = Array.coerce(arguments), f = is_obj(a[a.length - 1]) ? a.pop() : is_obj(a[0]) ? a.shift() : null;
         if (!(this instanceof Templ8)) return is_obj(f) ? new Templ8(a.join(""), f) : new Templ8(a.join(""));
         !f || defaults.forEach(function(k) {
             if (k in f) {
@@ -403,7 +352,7 @@
         this.__tpl__ = a.join("");
         tpl[$id(this)] = this;
         if (this.compiled) {
-            this.compiled = F;
+            this.compiled = false;
             compile(this);
         }
     }
@@ -413,7 +362,7 @@
     }
     function compile(ctx) {
         if (!ctx.compiled) {
-            ctx.compiled = T;
+            ctx.compiled = true;
             ctx._parse = createTemplate(ctx);
         }
         return ctx;
@@ -426,24 +375,21 @@
         return s;
     }
     Templ8.prototype = {
-        compiled : F,
-        debug : F,
+        compiled : false,
+        debug : false,
         fallback : "",
         parse : parse
     };
-    copy(Templ8, {
-        copy : copy,
+    m8.defs(Templ8, {
         escapeRE : escapeRE,
         format : format,
         get : getTPL,
         gsub : gsub,
-        stringify : stringify,
-        tostr : tostr,
-        type : type
-    });
+        stringify : stringify
+    }, "r");
     function Mgr(o) {
         var cache = {};
-        !is_obj(o) || copy(cache, o);
+        !is_obj(o) || m8.copy(cache, o);
         function _add(id, fn, replace) {
             !replace && id in cache || (cache[id] = fn);
         }
@@ -459,16 +405,16 @@
             return this;
         }
         this.all = function() {
-            return copy(cache);
+            return m8.copy(cache);
         };
         this.add = function() {
-            return add.call(this, F, arguments[0], arguments[1]);
+            return add.call(this, false, arguments[0], arguments[1]);
         };
         this.get = function(id) {
             return cache[id];
         };
         this.replace = function() {
-            return add.call(this, T, arguments[0], arguments[1]);
+            return add.call(this, true, arguments[0], arguments[1]);
         };
     }
     Templ8.Assert = new Mgr(ba);
@@ -482,7 +428,7 @@
         }, tag = {};
         function Tag(config) {
             KEYS.forEach(assert_exists, config);
-            copy(this, config);
+            m8.copy(this, config);
             tag[this.start] = this;
         }
         function assert_exists(k) {
@@ -491,7 +437,7 @@
             }
         }
         this.all = function() {
-            return copy(tag);
+            return m8.copy(tag);
         };
         this.compileRegExp = function() {
             var end = [], start = [], t;
@@ -503,7 +449,7 @@
         };
         this.create = function(o, dont_compile) {
             new Tag(o);
-            dont_compile === T || this.compileRegExp();
+            dont_compile === true || this.compileRegExp();
             return this;
         };
         this.get = function(id) {
@@ -578,14 +524,14 @@
         }
     } ], dummy_arr = [], getStatement = Templ8.Statement.get, re_comma_spacing = /\s*(,)\s*/g, re_comprehension_split = /^\(\s*(.*?)(?:\bin\b){0,1}(.*?)\s*\)\s*(if|unless){0,1}\s*(.*)$/i, re_keys = /(\w+)/g, re_one_liner_simple = /^(.*?)\s+(if|unless)\s+(.*)|$/i, re_one_liner_test = /\s+(if|unless)\s+/i;
     _tags.forEach(function(tag) {
-        Templ8.Tag.create(tag, T);
+        Templ8.Tag.create(tag, true);
     });
     Templ8.Tag.compileRegExp();
     (function() {
         var _statements = {
             "for" : function(internals, ctx, statement) {
                 var count, iter, keys, parts = internals.clean(statement).match(re_for_split), start, str = [], undef = "U", vars = internals.fnvar;
-                if (parts === N) {
+                if (parts === null) {
                     iter = statement;
                 } else {
                     parts.shift();
@@ -622,7 +568,7 @@
                 parts = tpl_parts.splice(0, i + 1);
                 parts.splice(parts.length - 2, parts.length);
                 id = format("{0}.{1}", ctx.id, id);
-                sub_tpl = new Templ8("", Templ8.copy({
+                sub_tpl = new Templ8("", m8.copy({
                     debug : ctx.debug,
                     fallback : ctx.fallback,
                     id : id
@@ -631,7 +577,7 @@
                 sub_tpl.__tpl__ = parts.join("");
                 sub_tpl._parse = internals.compiletpl(sub_tpl, internals.assembleparts(sub_tpl, parts));
                 delete sub_tpl.currentIterKeys;
-                sub_tpl.compiled = T;
+                sub_tpl.compiled = true;
                 return "";
             },
             unless : function(internals, ctx, statement) {
@@ -652,15 +598,7 @@
             return str.charAt(0).toUpperCase() + str.substring(1).toLowerCase();
         },
         count : function(o) {
-            switch (Templ8.type(o)) {
-              case "array":
-              case "htmlcollection":
-              case "string":
-                return o.length;
-              case "object":
-                return Object.keys(o).length;
-            }
-            return 0;
+            return m8.len(o) || 0;
         },
         crop : function(str, i) {
             str = Templ8.stringify(str);
@@ -671,7 +609,7 @@
             return ba.blank(str) ? def : str;
         },
         first : function(o) {
-            switch (Templ8.type(o)) {
+            switch (m8.nativeType(o)) {
               case "array":
                 return o[0];
               case "string":
@@ -679,10 +617,10 @@
             }
         },
         join : function(o, s) {
-            return "join" in Object(o) && typeof o.join == "function" ? o.join(s) : o;
+            return m8.got(o, "join") && typeof o.join == "function" ? o.join(s) : o;
         },
         last : function(o) {
-            switch (Templ8.type(o)) {
+            switch (m8.nativeType(o)) {
               case "array":
                 return o[o.length - 1];
               case "string":
@@ -710,7 +648,10 @@
             return start + str + (end || start);
         }
     });
-    typeof global == "undefined" || (root = global);
-    Templ8.global = root;
-    typeof module != "undefined" && "exports" in module ? module.exports = Templ8 : root.Templ8 = Templ8;
-}(this);
+    m8.def(Templ8, "m8", m8.describe({
+        value : m8
+    }, "r"));
+    m8.ENV != "commonjs" ? m8.def(m8.global, "Templ8", m8.describe({
+        value : Templ8
+    }, "r")) : module.exports = Templ8;
+}(typeof m8 != "undefined" ? m8 : typeof require != "undefined" ? require("m8") : null);

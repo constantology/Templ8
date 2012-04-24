@@ -1,4 +1,4 @@
-!function( root ) {
+!function() {
 	var reamp = /&/g, regt = />/g, relt = /</g, req = /"/g;
 
 	typeof Templ8 != 'undefined' || typeof require == 'undefined' || ( Templ8 = require( 'Templ8' ) );
@@ -15,5 +15,4 @@
 		paragraph  : function( str ) { return Templ8.stringify( str ).replace( /([^\r\n]+)/gm, '<p>$1</p>' ); },
 		stripe     : function( i ) { return parseInt( i, 10 ) & 1 ? 'stripe-odd' : 'stripe-even'; }
 	} );
-
-}( typeof Templ8 != 'undefined' ? Templ8.global : this );
+}();

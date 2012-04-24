@@ -3,11 +3,13 @@
 var fs       = require( 'fs' ),
 
 	mkdirp   = require( 'mkdirp' ),
-	n8iv     = require( 'n8iv' ),
 	program  = require( 'commander' ),
 	Templ8   = require( 'Templ8' ),
+	n8iv     = require( 'n8iv' ),
+	m8       = Templ8.m8.x( Object, Array, Boolean, Function, Number, String ),
 
-	defaults = n8iv.obj();
+	defaults = m8.obj();
+
 
 function lines( str ) {
 	return str.replace( /(["'])/g, "\\$1" ).replace( /^(\s*)(.*)/, "$1'$2'" );
@@ -39,7 +41,7 @@ defaults.dir = function( dir ) {
 };
 defaults.extension = function( ext ) {
 	 ext || ( ext = 'html' );
-	!ext.startsWith( '.' ) || ( ext = ext.substring( 1 ) );
+	 ext.indexOf( '.' ) || ( ext = ext.substring( 1 ) );
 	 return '.' + ext;
 };
 defaults.output = function( f ) {

@@ -7,7 +7,7 @@
 				undef = 'U',
 				vars  = internals.fnvar;
 
-			if ( parts === N ) { iter = statement; }
+			if ( parts === null ) { iter = statement; }
 			else {
 				parts.shift();
 				count = parts.pop()   || U;
@@ -56,13 +56,13 @@
 
 			id = format( '{0}.{1}', ctx.id, id );
 
-			sub_tpl = new Templ8( '', Templ8.copy( { debug : ctx.debug, fallback : ctx.fallback, id : id }, ctx.filters ) );
+			sub_tpl = new Templ8( '', m8.copy( { debug : ctx.debug, fallback : ctx.fallback, id : id }, ctx.filters ) );
 // the parts have already been split, for efficiency we can skip a call to createTemplate() and the more costly splitStr()
 			sub_tpl.currentIterKeys = [];
 			sub_tpl.__tpl__  = parts.join( '' );
 			sub_tpl._parse   = internals.compiletpl( sub_tpl, internals.assembleparts( sub_tpl, parts ) );
 			delete sub_tpl.currentIterKeys;
-			sub_tpl.compiled = T;
+			sub_tpl.compiled = true;
 
 			return '';
 		},

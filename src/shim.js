@@ -1,17 +1,18 @@
      typeof document == 'undefined'
-||   Templ8.tostr( document.createElement( 'div' ) ) == '[object HTMLDivElement]'
+||   m8.tostr( document.createElement( 'div' ) ) == '[object HTMLDivElement]'
 || ( Templ8.type = function() {
-	var U; return function type( o ) {
+	var U, re_global = /global|window/;
+	return function type( o ) {
 		if ( o === U || o === null ) return !1;
-		var t = Templ8.tostr.call( o ).split( ' ' )[1].toLowerCase();
+		var t = m8.tostr( o ).split( ' ' )[1].toLowerCase();
 			t = t.substring( 0, t.length - 1 );
 		switch ( t ) {
 			case 'object'   :
-				if ( root.attachEvent ) {              // handle IE coz it can has stupidz
+				if ( m8.global.attachEvent ) {              // handle IE coz it can has stupidz
 					return o.nodeName && o.nodeType == 1
 						 ? 'htmlelement'    : !isNaN( o.length ) && is_fn( o.item )
-						 ? 'htmlcollection' : o === root.document
-						 ? 'htmldocument'   : o === root
+						 ? 'htmlcollection' : o === m8.global.document
+						 ? 'htmldocument'   : o === m8.global
 						 ? 'global'         : t;
 				}
 				return t;

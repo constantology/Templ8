@@ -81,6 +81,6 @@
 		re_one_liner_simple    = /^(.*?)\s+(if|unless)\s+(.*)|$/i,
 		re_one_liner_test      = /\s+(if|unless)\s+/i;
 
-	_tags.forEach( function( tag ) { Templ8.Tag.create( tag, T ); } );
+	_tags.forEach( function( tag ) { Templ8.Tag.create( tag, true ); } );
 
 	Templ8.Tag.compileRegExp();
