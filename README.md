@@ -11,30 +11,29 @@ It's fast, light weight and unlike a lot of other JavaScript template engines: *
 
 Templ8 does not restrict you to generating HTML. All outputs are strings so if you want to generate HTML, CSS, JavaScript or whatever, the choice is yours...
 
-## Usage
-Templ8 is avaiable as a Node JS module as well as a browser micro-framework.
+## WARNING!!!
+While **Templ8** has been tested, the testing framework I've written and used is very much a work in progress.
 
-### Node
+Also I'm currently between virtual machine software and operating system licenses, so I have only tested on mac osx lion and snow leopard: nodejs – >= v0.613 – as well as current – and beta/ nightly – versions of Chrome, Safari/ Webkit and FireFox.
 
-#### Installation
-```
-   npm install Templ8
-```
-#### Requiring
+## Dependencies
+
+Templ8.js only has one dependency [m8.js](/constantology/m8).
+
+**NOTE:**
+If you are using Templ8 within a commonjs module, you don't need to require m8 before requiring Templ8 as this is done internally and a reference to **m8** is available as: `Templ8.m8`.
+
 ```javascript
-   var Templ8 = require( 'Templ8' );
+
+   var Templ8 = require( 'Templ8' ),
+       m8     = Templ8.m8; // <= reference to m8
+
+// if running in a sandboxed environment remember to:
+   m8.x( Object, Array, Boolean, Function, String ); // and/ or any other Types that require extending.
+
 ```
 
-### Browser
-
-You have 2 options.
-
-1. `Templ8.js`/ `Templ8.min.js` are the dev/ prod versions optimised for modern browsers (i.e. browsers that have implemented all of the items in [kangax's es5 compatability table](http://kangax.github.com/es5-compat-table/)).
-2. `Templ8.shim.js`/ `Templ8.shim.min.js` are as above, except that [wedgES](https://github.com/constantology/wedgES) – only an extra 1.6kb – has been included to enable backwards compatibility with older browsers.
-
-**NOTE:** Safari <= 5.1.3 still has not implemented `Function.prototype.bind` so you will need to use `Templ8.shim.js` for Safari.
-
-**NOTE:** The shimmed methods **will not** overwrite any native implementations.
+See [m8: Extending into the future](/constantology/m8) for more information on working with sandboxed modules.
 
 ## File size
 
