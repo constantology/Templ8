@@ -210,18 +210,6 @@
             return this;
         }
     };
-    function Output(o) {
-        this.__data = Array.isArray(o) ? o : [];
-    }
-    Output.prototype = {
-        join : function Output_join() {
-            return this.__data.join("");
-        },
-        push : function Output_push(o) {
-            this.__data.push(o);
-            return this;
-        }
-    };
     function aggregatetNonEmpty(res, str) {
         m8.empty(str) || res.push(str);
         return res;

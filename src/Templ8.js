@@ -14,8 +14,8 @@
 			equals     : function( o, v )   { return o == v },
 			exists     : m8.exists,
 			is         : function( o, v )   { return o === v },
-			isEven     : function( i )      { return !( parseInt( i, 10 ) & 1 ); },
-			isOdd      : function( i )      { return !( parseInt( i, 10 ) & 1 ); },
+			isEven     : function( i )      { return  !( parseInt( i, 10 ) & 1 ); },
+			isOdd      : function( i )      { return  !( parseInt( i, 10 ) & 1 ); },
 			isTPL      : function( id )     { return !!( getTPL( format( tpl_sub, this.id, id ) ) || getTPL( id ) ); },
 			iterable   : function( o )      { return m8.iter( o ); },
 			notEmpty   : not_empty,
@@ -24,7 +24,6 @@
 		bf = {}, bu = {
 			context    : function( o, fb )      { return new ContextStack( o, fb ); },
 			output     : function( o )          { return new Output( o ); },
-//			iter       : function( i, p, s, c ) { return new Iter( i, p, s, c  ); },
 			objectify  : function( v, k )       { var o = {}; o[k] = v; return o; },
 			parse      : function( o, id, mixins ) {
 				id    = String( id ).trim();
@@ -50,9 +49,7 @@
 		esc_chars = /([-\*\+\?\.\|\^\$\/\\\(\)[\]\{\}])/g,   esc_val     = '\\$1',
 
 		fn_var    = { assert : '__ASSERT__', dict : '__CONTEXT__', filter : '__FILTER__', output : '__OUTPUT__', util : '__UTIL__' },
-//		fn_end    = format( '$C.destroy(); return {0}.join( "" );\n ', fn_var.output ),
 		fn_end    = format( '$C.destroy(); return {0};\n ', fn_var.output ),
-//		fn_start  = '\n"use strict"\n' + format( 'var $C = {0}.context( {1}, this.fallback ), $_ = $C.current(), iter = {0}.iter(), {2} = {0}.output(), U;', fn_var.util, fn_var.dict, fn_var.output ),
 		fn_start  = '\n"use strict";\n' + format( 'var $C = new ContextStack( {0}, this.fallback ), $_ = $C.current(), iter = new Iter( null ), {1} = "", U;', fn_var.dict, fn_var.output ),
 
 		id_count  = 999, internals, logger = 'console', // <= gets around jsLint
@@ -118,19 +115,6 @@
 			delete this[cache_key]; delete this[cache_stack];
 			return this;
 		},
-//		get     : function ContextStack_get( key ) {
-//			var cache = this[cache_key], ctx, dict, i = -1, stack = this[cache_stack], l = stack.length, val;
-//			while ( ++i < l ) {
-//				ctx = stack[i]; dict = ctx.dict;
-//				if ( key in cache && dict === cache[key].dict ) return cache[key].val;
-//				if ( ( val = Object.value( dict, key ) ) !== U ) {
-//					cache[key] = { dict : dict, val : val };
-//					ctx[cache_key].push( key );
-//					return cache[key].val;
-//				}
-//			}
-//			return this.hasFallback ? this.fallback : U;
-//		},
 		get     : function ContextStack_get( key ) {
 			var ctx, stack = this[cache_stack], l = stack.length, val;
 			while ( l-- ) {
@@ -201,13 +185,6 @@
 			this.stopped = true;
 			return this;
 		}
-	};
-
-	function Output( o ) { this.__data = Array.isArray( o ) ? o : []; }
-	Output.prototype = {
-//		join : function Output_join() { return mapc( this.__data, stringify ).join( '' ); },
-		join : function Output_join() { return this.__data.join( '' ); },
-		push : function Output_push( o ) { this.__data.push( o ); return this; }
 	};
 
 /*** END:   Classes used by compiled templates ***/
@@ -320,7 +297,6 @@
 		? o.replace( re_statement_fix, re_statement_replacer ) : format( '$C.get( "{0}" )', o );
 	}
 
-//	function wrapStr( str ) { return format( '{0}.push( {1} );', fn_var.output, str.replace( re_br, '\\n' ) ); }
 	function wrapStr( str ) { return format( '{0} += {1};', fn_var.output, str.replace( re_br, '\\n' ) ); }
 
 // these will be passed to tags & statements for internal usage

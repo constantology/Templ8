@@ -13,7 +13,7 @@ Templ8 does not restrict you to generating HTML. All outputs are strings so if y
 ## WARNING!!!
 While **Templ8** has been tested, the testing framework I've written and used is very much a work in progress.
 
-Also I'm currently between virtual machine software and operating system licenses, so I have only tested on mac osx lion and snow leopard: nodejs – >= v0.613 – as well as current – and beta/ nightly – versions of Chrome, Safari/ Webkit and FireFox.
+Also I'm currently between virtual machine software and operating system licenses, so I have only tested on mac osx lion and snow leopard: nodejs – >= v0.6.13 – as well as current – and beta/ nightly – versions of Chrome, Safari/ Webkit and FireFox.
 
 ## Dependencies
 
@@ -204,7 +204,7 @@ It also has the following two methods:
 
 Along with the above Templ8 has some internal variables accessible for the more advanced user, should they require access to them.
 
-##### $C or \_\_CONTEXT\_\_
+##### $C:ContextStack
 
 Templ8 **does not use the JavaScript `with` statement**. It implements its own version of a `with` statement using an internal class called **ContextStack**.
 
@@ -223,18 +223,9 @@ It has five methods (**you should NOT** call these if you DO NOT know what you'r
 </tr>
 </table>
 
-##### \_\_OUTPUT\_\_
+##### \_\_OUTPUT\_\_:String
 
-This is where all parsed template output is stored. It is an instance of an internal class call **Output**.
-
-It has two methods:
-<table border="0" cellpadding="0" cellspacing="0">
-<tr>
-	<td><strong>join</strong></td><td>returns the output of the Templ8 instance.</td>
-</tr><tr>
-	<td><strong>push</strong></td><td>adds a String representation of the passed parameter to the Templ8 instance's output.</td>
-</tr>
-</table>
+This is where all parsed template output is stored.
 
 ##### \_\_ASSERT\_\_
 
