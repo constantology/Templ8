@@ -30,7 +30,7 @@
 					parts = str.split( ' ' );
 					tag   = getStatement( parts.shift().toLowerCase() );
 
-					if ( parts.length == 0 && is_str( tag ) ) return tag;
+					if ( parts.length == 0 && typeof tag == 'string' ) return tag;
 
 					statement = parts.join( ' ' );
 
@@ -39,7 +39,7 @@
 
 				if ( !tag ) throw new SyntaxError( format( 'Templ8 tag: {0} does not exist.', tag ) );
 
-				return is_fn( tag ) ? tag( internals, ctx, statement, tpl_parts ) : tag;
+				return typeof tag == 'function' ? tag( internals, ctx, statement, tpl_parts ) : tag;
 			}
 		}, {
 			start : '{[', end : ']}',

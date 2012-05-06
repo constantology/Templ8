@@ -1,2 +1,2 @@
-!function( m8 ) {
+;!function( m8 ) {
 	"use strict";

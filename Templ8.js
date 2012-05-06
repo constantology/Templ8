@@ -5,7 +5,7 @@
         return o;
     }, m8.obj()), RE_GSUB = /\$?\{([^\}\s]+)\}/g, ba = {
         blank : function(o) {
-            return m8.empty(o) || is_str(o) && !o.trim() || !re_not_blank.test(o);
+            return m8.empty(o) || typeof o == "string" && !o.trim();
         },
         contains : contains,
         endsWith : function(s, str) {
@@ -31,7 +31,7 @@
             return !!(getTPL(format(tpl_sub, this.id, id)) || getTPL(id));
         },
         iterable : function(o) {
-            return re_iterable.test(m8.type(o));
+            return m8.iter(o);
         },
         notEmpty : not_empty,
         startsWith : function(s, str) {
@@ -44,9 +44,6 @@
         output : function(o) {
             return new Output(o);
         },
-        iter : function(i, p, s, c) {
-            return new Iter(i, p, s, c);
-        },
         objectify : function(v, k) {
             var o = {};
             o[k] = v;
@@ -56,11 +53,11 @@
             id = String(id).trim();
             var t = getTPL(format(tpl_sub, this.id, id)) || getTPL(id);
             if (is_obj(o) && mixins !== this.__dict__) {
-                switch (m8.type(mixins)) {
+                switch (m8.nativeType(mixins)) {
                   case "object":
-                  case "nullobject":
                     break;
-                  case false:
+                  case "null":
+                  case "undefined":
                     mixins = {};
                     break;
                   default:
@@ -75,18 +72,19 @@
         stop : function(iter) {
             iter.stop();
         },
+        stringify : stringify,
         type : function(o) {
             return m8.type(o);
         }
-    }, ck = "__tpl_cs_cached_keys", cs = "__tpl_cs_stack", defaults = [ "compiled", "debug", "fallback", "id" ], delim = "<~>", esc_chars = /([-\*\+\?\.\|\^\$\/\\\(\)[\]\{\}])/g, esc_val = "\\$1", fn_var = {
+    }, cache_key = "__tpl_cs_cached_keys", cache_stack = "__tpl_cs_stack", defaults = [ "compiled", "debug", "fallback", "id" ], delim = "<~>", esc_chars = /([-\*\+\?\.\|\^\$\/\\\(\)[\]\{\}])/g, esc_val = "\\$1", fn_var = {
         assert : "__ASSERT__",
         dict : "__CONTEXT__",
         filter : "__FILTER__",
         output : "__OUTPUT__",
         util : "__UTIL__"
-    }, fn_end = format('$C.destroy(); return {0}.join( "" );\n ', fn_var.output), fn_start = format("var $C = {0}.context( {1}, this.fallback ), $_ = $C.current(), iter = {0}.iter(), {2} = {0}.output(), U;", fn_var.util, fn_var.dict, fn_var.output), id_count = 999, internals, re_esc = /(['"])/g, re_format_delim = new RegExp(delim, "gm"), re_iterable = /array|htmlcollection|object|arguments|nodelist/, re_new_line = /[\r\n]+/g, re_not_blank = /\S/, re_special_char = /[\(\)\[\]\{\}\?\*\+\/<>%&=!-]/, re_statement_fix = /\.(\d+)(\.?)/g, re_statement_replacer = "['$1']$2", re_statement_split = new RegExp("\\s*([^\\|]+(?:\\|[^\\|]+?)){0,}" + delim, "g"), re_space = /\s+/g, re_split_tpl, split_token = "<__SPLIT__TEMPLATE__HERE__>", split_replace = [ "", "$1", "$2", "" ].join(split_token), tpl = {}, tpl_id = "t8-anon-{0}", tpl_statement = '{0}["{1}"].call( this, {2}{3}, {4} )', tpl_sub = "{0}.{1}";
+    }, fn_end = format("$C.destroy(); return {0};\n ", fn_var.output), fn_start = '\n"use strict";\n' + format('var $C = new ContextStack( {0}, this.fallback ), $_ = $C.current(), iter = new Iter( null ), {1} = "", U;', fn_var.dict, fn_var.output), id_count = 999, internals, logger = "console", re_br = /[\n\r]/gm, re_esc = /(['"])/g, re_format_delim = new RegExp(delim, "gm"), re_new_line = /[\r\n]+/g, re_space = /\s+/g, re_special_char = /[\(\)\[\]\{\}\?\*\+\/<>%&=!-]/, re_split_tpl, re_statement_fix = /\.(\d+)(\.?)/g, re_statement_replacer = "['$1']$2", re_statement_split = new RegExp("\\s*([^\\|]+(?:\\|[^\\|]+?)){0,}" + delim, "g"), split_token = "<__SPLIT__TEMPL8__HERE__>", split_replace = [ "", "$1", "$2", "" ].join(split_token), tpl = {}, tpl_id = "t8-anon-{0}", tpl_statement = '{0}["{1}"].call( this, {2}{3}, {4} )', tpl_sub = "{0}.{1}";
     function contains(o, k) {
-        return m8.nativeType(o.indexOf) == "function" ? !!~o.indexOf(k) : k in o;
+        return typeof o.indexOf == "function" && !!~o.indexOf(k) || m8.got(o, k);
     }
     function escapeRE(s) {
         return String(s).replace(esc_chars, esc_val);
@@ -102,128 +100,130 @@
             return o[p] || "";
         });
     }
-    function is_fn(o) {
-        return typeof o == "function";
-    }
     function is_obj(o) {
-        return m8.nativeType(o) == "object";
-    }
-    function is_str(o) {
-        return typeof o == "string";
+        return typeof o == "object" && (o.constructor === Object || o.constructor === U);
     }
     function mapc(a, fn, ctx) {
+        fn || (fn = m8);
         ctx || (ctx = a);
-        return a.reduce(function(res, o, i) {
-            var v = fn.call(ctx, o, i, a);
-            ba.blank(v) || res.push(v);
-            return res;
-        }, []);
+        var i = -1, l = a.length, res = [], v;
+        while (++i < l) {
+            v = fn.call(ctx, a[i], i, a);
+            switch (v) {
+              case null:
+              case U:
+                break;
+              default:
+                switch (typeof v) {
+                  case "string":
+                    v.trim() === "" || res.push(v);
+                    break;
+                  case "number":
+                    isNaN(v) || res.push(v);
+                    break;
+                  default:
+                    !m8.iter(v) || m8.len(v) || res.push(v);
+                    break;
+                }
+            }
+        }
+        return res;
     }
     function not_empty(o) {
         return !m8.empty(o);
     }
-    function ContextStack(o, fallback) {
-        this[ck] = {};
-        this[cs] = [ m8.global ];
+    function ContextStack(dict, fallback) {
+        this[cache_stack] = [];
+        this.push(m8.global);
         if (fallback !== U) {
             this.hasFallback = true;
             this.fallback = fallback;
         }
-        if (ba.exists(o)) this.push(o);
+        !m8.exists(dict) || this.push(dict);
     }
     ContextStack.prototype = {
-        current : function() {
-            return (this[cs][0] || {}).dict;
+        current : function ContextStack_current() {
+            return this.top.dict;
         },
-        destroy : function() {
+        destroy : function ContextStack_destroy() {
             this.destroyed = true;
-            delete this[ck];
-            delete this[cs];
+            delete this[cache_key];
+            delete this[cache_stack];
             return this;
         },
-        get : function(k) {
-            var c = this[ck], i = -1, d, o, s = this[cs], l = s.length, v;
-            while (++i < l) {
-                o = s[i];
-                d = o.dict;
-                if (k in c && d === c[k].o) return c[k].v;
-                if ((v = Object.value(d, k)) !== U) {
-                    c[k] = {
-                        o : d,
-                        v : v
-                    };
-                    o[ck].push(k);
-                    return c[k].v;
-                }
+        get : function ContextStack_get(key) {
+            var ctx, stack = this[cache_stack], l = stack.length, val;
+            while (l--) {
+                ctx = stack[l];
+                if (key in ctx.cache) return ctx.cache[key];
+                if ((val = Object.value(ctx.dict, key)) !== U) return ctx.cache[key] = val;
             }
             return this.hasFallback ? this.fallback : U;
         },
-        pop : function() {
-            return this[cs].shift();
+        pop : function ContextStack_pop() {
+            var dict = this[cache_stack].pop().dict;
+            this.top = this[cache_stack][this[cache_stack].length - 1];
+            return dict;
         },
-        push : function(v) {
-            var o = {
-                dict : v
-            };
-            o[ck] = [];
-            this[cs].unshift(o);
+        push : function ContextStack_push(dict) {
+            this[cache_stack].push(this.top = {
+                cache : {},
+                dict : dict
+            });
             return this;
         }
     };
     function Iter(iter, parent, start, count) {
-        if (!iter) return this;
-        start = start === U ? -1 : start - 2;
-        count = count === U ? 0 : count;
-        this.index = start;
-        this.index1 = start + 1;
-        this.items = ba.iterable(iter) ? iter : null;
-        this.type = m8.nativeType(iter);
-        if (this.type == "object") {
-            this.items = Object.values(iter);
-            this.keys = Object.keys(iter);
-            this.firstKey = this.keys[0];
-            this.lastKey = this.keys[this.keys.length - 1];
-        }
-        if (this.items) {
-            this.count = count ? count : this.items.length;
-            this.first = this.items[0];
-            this.last = this.items[this.count - 1];
-        }
-        if (parent.items != U) this.parent = parent;
+        var keys, len;
+        if (iter === null || !m8.iter(iter)) return this.stop();
+        this._ = iter = Object(iter);
+        keys = Object.keys(iter);
+        if (!(len = keys.length)) return this.stop();
+        m8.nativeType(iter) == "object" || (keys = keys.map(Number));
+        this.empty = false;
+        this.count = isNaN(count) ? len : count < 0 ? len + count : count > len ? len : count;
+        this.index = start === U ? -1 : start - 2;
+        this.index1 = this.index + 1;
+        this.firstKey = keys[0];
+        this.first = iter[this.firstKey];
+        this.lastIndex = this.count - 1;
+        this.lastKey = keys[this.lastIndex];
+        this.last = iter[this.lastKey];
+        this.keys = keys;
+        !(parent instanceof Iter) || (this.parent = parent);
     }
     Iter.prototype = {
-        hasNext : function() {
-            if (this.stopped || isNaN(this.index) || !this.items || ++this.index >= this.count) return false;
-            if (this.index >= this.count - 1) this.isLast = true;
-            this.current = this.items[this.index];
-            this.previous = this.items[this.index - 1] || U;
-            this.next = this.items[++this.index1] || U;
-            if (this.type == "object") {
-                this.key = this.keys[this.index];
-                this.previousKey = this.keys[this.index - 1] || U;
-                this.nextKey = this.keys[this.index1] || U;
-            }
+        empty : true,
+        hasNext : function Iter_hasNext() {
+            if (this.stopped || this.empty) return false;
+            ++this.index < this.lastIndex || (this.stop().isLast = true);
+            this.key = this.keys[this.index];
+            this.nextKey = this.keys[++this.index1] || U;
+            this.previousKey = this.keys[this.index - 1] || U;
+            this.current = this._[this.key];
+            this.next = this._[this.nextKey] || U;
+            this.previous = this._[this.previousKey] || U;
             return this;
         },
-        stop : function() {
+        stop : function Iter_stop() {
             this.stopped = true;
             return this;
         }
     };
     function Output(o) {
-        this.__data = m8.nativeType(o) == "array" ? o : [];
+        this.__data = Array.isArray(o) ? o : [];
     }
     Output.prototype = {
-        join : function() {
+        join : function Output_join() {
             return this.__data.join("");
         },
-        push : function(o) {
-            this.__data.push(stringify(o));
+        push : function Output_push(o) {
+            this.__data.push(o);
             return this;
         }
     };
     function aggregatetNonEmpty(res, str) {
-        !not_empty(str) || res.push(str);
+        m8.empty(str) || res.push(str);
         return res;
     }
     function aggregateStatement(ctx, s) {
@@ -250,12 +250,12 @@
         return str.replace(re_format_delim, "").replace(re_new_line, "\n").replace(re_space, " ").trim();
     }
     function compileTemplate(ctx, fn) {
-        if (ctx.debug && typeof console != "undefined") {
-            console.info("Templ8: ", ctx.id, ", source: ");
-            console.log(fn);
+        if (ctx.debug && typeof m8.global[logger] != "undefined") {
+            m8.global[logger].info("Templ8: ", ctx.id, ", source: ");
+            m8.global[logger].log(fn);
         }
-        var func = new Function("root", fn_var.filter, fn_var.assert, fn_var.util, fn_var.dict, fn);
-        return func.bind(ctx, m8.global, m8.copy(ctx.filters, Templ8.Filter.all(), true), ba, bu);
+        var func = new Function("root", "ContextStack", "Iter", fn_var.filter, fn_var.assert, fn_var.util, fn_var.dict, fn);
+        return func.bind(ctx, m8.global, ContextStack, Iter, m8.copy(ctx.filters, Templ8.Filter.all(), true), ba, bu);
     }
     function createTemplate(ctx) {
         ctx.currentIterKeys = [];
@@ -290,24 +290,29 @@
         return str.replace(re_split_tpl, split_replace).split(split_token).reduce(aggregatetNonEmpty, []);
     }
     function stringify(o, str) {
-        switch (m8.type(o)) {
+        switch (typeof o) {
           case "boolean":
           case "number":
           case "string":
             return String(o);
-          case "date":
-            return o.toDateString();
-          case "array":
-            return mapc(o, stringify).join(", ");
-          case "nullobject":
-          case "object":
-            return ck in o ? stringify(o.dict) : (str = o.toString()) != "[object Object]" ? str : mapc(Object.values(o), stringify).join(", ");
-          case "htmlelement":
-            return o.textContent || o.text || o.innerText;
-          case "htmlcollection":
-            return mapc(Array.coerce(o), function(el) {
-                return stringify(el);
-            }).join(", ");
+          default:
+            switch (m8.nativeType(o)) {
+              case "date":
+                return o.toDateString();
+              case "array":
+                return mapc(o, stringify).join(", ");
+              case "object":
+                return cache_key in o ? stringify(o.dict) : (str = o.toString()) != "[object Object]" ? str : mapc(Object.values(o), stringify).join(", ");
+              default:
+                switch (m8.type(o)) {
+                  case "htmlelement":
+                    return o.textContent || o.text || o.innerText;
+                  case "htmlcollection":
+                    return mapc(Array.coerce(o), function(el) {
+                        return stringify(el);
+                    }).join(", ");
+                }
+            }
         }
         return "";
     }
@@ -325,7 +330,7 @@
         return contains(o, ".call(") || re_special_char.test(o) || ba.startsWith(o, '"') && ba.endsWith(o, '"') || ba.startsWith(o, "'") && ba.endsWith(o, "'") || !isNaN(o) ? o : ba.startsWith(o, "$_.") || ba.startsWith(o, "iter.") || k.length && usingIterKeys(k, o) || o in RESERVED ? o.replace(re_statement_fix, re_statement_replacer) : format('$C.get( "{0}" )', o);
     }
     function wrapStr(str) {
-        return format("{0}.push( {1} );", fn_var.output, str.replace(/[\n\r]/gm, "\\n"));
+        return format("{0} += {1};", fn_var.output, str.replace(re_br, "\\n"));
     }
     internals = {
         assembleparts : assembleParts,
@@ -381,6 +386,9 @@
         parse : parse
     };
     m8.defs(Templ8, {
+        m8 : {
+            value : m8
+        },
         escapeRE : escapeRE,
         format : format,
         get : getTPL,
@@ -480,12 +488,12 @@
             if (!(tag = getStatement(str.toLowerCase()))) {
                 parts = str.split(" ");
                 tag = getStatement(parts.shift().toLowerCase());
-                if (parts.length == 0 && is_str(tag)) return tag;
+                if (parts.length == 0 && typeof tag == "string") return tag;
                 statement = parts.join(" ");
                 if (!tag || !statement) throw new SyntaxError("Templ8 missing tag or statement in statement declaration.");
             }
             if (!tag) throw new SyntaxError(format("Templ8 tag: {0} does not exist.", tag));
-            return is_fn(tag) ? tag(internals, ctx, statement, tpl_parts) : tag;
+            return typeof tag == "function" ? tag(internals, ctx, statement, tpl_parts) : tag;
         }
     }, {
         start : "{[",
@@ -530,28 +538,26 @@
     (function() {
         var _statements = {
             "for" : function(internals, ctx, statement) {
-                var count, iter, keys, parts = internals.clean(statement).match(re_for_split), start, str = [], undef = "U", vars = internals.fnvar;
-                if (parts === null) {
-                    iter = statement;
-                } else {
+                var undef = "U", count = undef, iter, keys, parts = internals.clean(statement).match(re_for_split), start = undef, str = [];
+                if (parts === null) iter = statement; else {
                     parts.shift();
-                    count = parts.pop() || U;
-                    start = parts.pop() || U;
+                    count = parts.pop() || undef;
+                    start = parts.pop() || undef;
                     iter = parts.pop() || parts.pop();
                     keys = (parts.pop() || "").match(re_keys);
                 }
                 iter = internals.formatstatement(ctx, iter);
-                str.push(format([ "\n\rif ( {0}.iterable( {1} ) ) iter = {2}.iter( {1}, iter, {3}, {4} );", "while ( iter.hasNext() ) {", "$_ = iter.current;", "$C.push( iter.current );\n\r" ].join("\n\r"), vars.assert, iter, vars.util, start || undef, count || undef));
+                str.push(format([ "", "iter = new Iter( {0}, iter, {1}, {2} );", "while ( iter.hasNext() ) {", "$_ = iter.current;" ].join("\n\r"), iter, start, count));
                 if (keys && keys.length > 0) {
                     ctx.currentIterKeys.unshift(keys);
-                    if (keys.length < 2) str.push(format("var {0} = iter.current;\n\r", keys[0])); else if (keys.length >= 2) str.push(format("var {0} = iter.key || iter.index, {1} = iter.current;\n\r", keys[0], keys[1]));
+                    if (keys.length < 2) str.push(format("var {0} = iter.current;\n\r", keys[0])); else if (keys.length >= 2) str.push(format("var {0} = iter.key, {1} = iter.current;\n\r", keys[0], keys[1]));
                 }
                 return str.join("");
             },
-            forempty : "\n\r}\n\rif ( iter.count <= 0 || !iter.items )\n\r{\n\r",
+            forempty : "\n\r}\n\rif ( iter.empty ) {\n\r",
             endfor : function(internals, ctx) {
                 ctx.currentIterKeys.shift();
-                return format([ "\n\r$C.pop();", "}", "if ( $C.current() === iter.current ) { $C.pop(); }", "iter = iter.parent || {0}.iter();", "$_ = iter.current || $C.current();\n\r" ].join("\n\r"), internals.fnvar.util);
+                return format([ "\n\r}", "iter = iter.parent  || new Iter( null );", "$_   = iter.current || $C.current(); \n\r" ].join("\n\r"), internals.fnvar.util);
             },
             "if" : function(internals, ctx, statement) {
                 return format("if ( {0} ) { ", formatStatement(ctx, internals.formatstatement, statement));
@@ -648,9 +654,6 @@
             return start + str + (end || start);
         }
     });
-    m8.def(Templ8, "m8", m8.describe({
-        value : m8
-    }, "r"));
     m8.ENV != "commonjs" ? m8.def(m8.global, "Templ8", m8.describe({
         value : Templ8
     }, "r")) : module.exports = Templ8;

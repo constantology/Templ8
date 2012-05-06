@@ -1,45 +1,40 @@
 ( function() {
 	var _statements = {
 		'for'      : function( internals, ctx, statement ) {
-			var count, iter, keys,
+			var undef = 'U', count = undef, iter, keys,
 				parts = internals.clean( statement ).match( re_for_split ),
-				start, str = [],
-				undef = 'U',
-				vars  = internals.fnvar;
+				start = undef, str = [];
 
-			if ( parts === null ) { iter = statement; }
+			if ( parts === null ) iter = statement;
 			else {
 				parts.shift();
-				count = parts.pop()   || U;
-				start = parts.pop()   || U;
-				iter  = parts.pop()   || parts.pop();
+				count =   parts.pop() || undef;
+				start =   parts.pop() || undef;
+				iter  =   parts.pop() || parts.pop();
 				keys  = ( parts.pop() || '' ).match( re_keys );
 			}
 
 			iter = internals.formatstatement( ctx, iter );
 
-			str.push( format( ['\n\rif ( {0}.iterable( {1} ) ) iter = {2}.iter( {1}, iter, {3}, {4} );',
-									'while ( iter.hasNext() ) {',
-										'$_ = iter.current;',
-										'$C.push( iter.current );\n\r' ].join( '\n\r' ),
-						vars.assert, iter, vars.util, ( start || undef ), ( count || undef ) ) );
+			str.push( format( ['',
+				'iter = new Iter( {0}, iter, {1}, {2} );',
+				'while ( iter.hasNext() ) {',
+					'$_ = iter.current;'].join( '\n\r' ), iter, start, count ) );
 
 			if ( keys && keys.length > 0 ) {
 				ctx.currentIterKeys.unshift( keys );
 				if ( keys.length < 2 ) str.push( format( 'var {0} = iter.current;\n\r', keys[0] ) );
-				else if ( keys.length >= 2 ) str.push( format( 'var {0} = iter.key || iter.index, {1} = iter.current;\n\r', keys[0], keys[1] ) );
+				else if ( keys.length >= 2 ) str.push( format( 'var {0} = iter.key, {1} = iter.current;\n\r', keys[0], keys[1] ) );
 			}
 
 			return str.join( '' );
 		},
-		'forempty' : '\n\r}\n\rif ( iter.count <= 0 || !iter.items )\n\r{\n\r',
+		'forempty' : '\n\r}\n\rif ( iter.empty ) {\n\r',
 		'endfor'   : function( internals, ctx ) {
 			ctx.currentIterKeys.shift();
-			return format( ['\n\r$C.pop();',
-			                '}',
-			                'if ( $C.current() === iter.current ) { $C.pop(); }',
-			                'iter = iter.parent || {0}.iter();',
-			                '$_ = iter.current || $C.current();\n\r'].join( '\n\r' ), internals.fnvar.util );
+			return format( ['\n\r}',
+			                'iter = iter.parent  || new Iter( null );',
+			                '$_   = iter.current || $C.current(); \n\r'].join( '\n\r' ), internals.fnvar.util );
 		},
 		'if'       : function( internals, ctx, statement ) { return format( 'if ( {0} ) { ',         formatStatement( ctx, internals.formatstatement, statement ) ); },
 		'elseif'   : function( internals, ctx, statement ) { return format( ' } else if ( {0} ) { ', formatStatement( ctx, internals.formatstatement, statement ) ); },
