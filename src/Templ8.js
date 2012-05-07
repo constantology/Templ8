@@ -49,8 +49,8 @@
 		esc_chars = /([-\*\+\?\.\|\^\$\/\\\(\)[\]\{\}])/g,   esc_val     = '\\$1',
 
 		fn_var    = { assert : '__ASSERT__', dict : '__CONTEXT__', filter : '__FILTER__', output : '__OUTPUT__', util : '__UTIL__' },
-		fn_end    = format( '$C.destroy(); return {0}.join( "" );\n ', fn_var.output ),
-		fn_start  = '\n"use strict";\n' + format( 'var $C = new ContextStack( {0}, this.fallback ), $_ = $C.current(), iter = new Iter( null ), {1} = [], U;', fn_var.dict, fn_var.output ),
+		fn_end    = format( '$C.destroy(); return {0};\n ', fn_var.output ),
+		fn_start  = '\n"use strict";\n' + format( 'var $C = new ContextStack( {0}, this.fallback ), $_ = $C.current(), iter = new Iter( null ), {1} = "", U;', fn_var.dict, fn_var.output ),
 
 		id_count  = 999, internals, logger = 'console', // <= gets around jsLint
 
@@ -297,7 +297,7 @@
 		? o.replace( re_statement_fix, re_statement_replacer ) : format( '$C.get( "{0}" )', o );
 	}
 
-	function wrapStr( str ) { return format( '{0}.push( {1} );', fn_var.output, str.replace( re_br, '\\n' ) ); }
+	function wrapStr( str ) { return format( '{0} += {1};', fn_var.output, str.replace( re_br, '\\n' ) ); }
 
 // these will be passed to tags & statements for internal usage
 	internals = {
