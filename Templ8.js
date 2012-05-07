@@ -82,7 +82,7 @@
         filter : "__FILTER__",
         output : "__OUTPUT__",
         util : "__UTIL__"
-    }, fn_end = format("$C.destroy(); return {0};\n ", fn_var.output), fn_start = '\n"use strict";\n' + format('var $C = new ContextStack( {0}, this.fallback ), $_ = $C.current(), iter = new Iter( null ), {1} = "", U;', fn_var.dict, fn_var.output), id_count = 999, internals, logger = "console", re_br = /[\n\r]/gm, re_esc = /(['"])/g, re_format_delim = new RegExp(delim, "gm"), re_new_line = /[\r\n]+/g, re_space = /\s+/g, re_special_char = /[\(\)\[\]\{\}\?\*\+\/<>%&=!-]/, re_split_tpl, re_statement_fix = /\.(\d+)(\.?)/g, re_statement_replacer = "['$1']$2", re_statement_split = new RegExp("\\s*([^\\|]+(?:\\|[^\\|]+?)){0,}" + delim, "g"), split_token = "<__SPLIT__TEMPL8__HERE__>", split_replace = [ "", "$1", "$2", "" ].join(split_token), tpl = {}, tpl_id = "t8-anon-{0}", tpl_statement = '{0}["{1}"].call( this, {2}{3}, {4} )', tpl_sub = "{0}.{1}";
+    }, fn_end = format("return {0};\n ", fn_var.output), fn_start = '\n"use strict";\n' + format('var $C = new ContextStack( {0}, this.fallback ), $_ = $C.current(), iter = new Iter( null ), {1} = "", U;', fn_var.dict, fn_var.output), id_count = 999, internals, logger = "console", re_br = /[\n\r]/gm, re_esc = /(['"])/g, re_format_delim = new RegExp(delim, "gm"), re_new_line = /[\r\n]+/g, re_space = /\s+/g, re_special_char = /[\(\)\[\]\{\}\?\*\+\/<>%&=!-]/, re_split_tpl, re_statement_fix = /\.(\d+)(\.?)/g, re_statement_replacer = "['$1']$2", re_statement_split = new RegExp("\\s*([^\\|]+(?:\\|[^\\|]+?)){0,}" + delim, "g"), split_token = "<__SPLIT__TEMPL8__HERE__>", split_replace = [ "", "$1", "$2", "" ].join(split_token), tpl = {}, tpl_id = "t8-anon-{0}", tpl_statement = '{0}["{1}"].call( this, {2}{3}, {4} )', tpl_sub = "{0}.{1}";
     function contains(o, k) {
         return typeof o.indexOf == "function" && !!~o.indexOf(k) || m8.got(o, k);
     }
@@ -145,18 +145,12 @@
         current : function ContextStack_current() {
             return this.top.dict;
         },
-        destroy : function ContextStack_destroy() {
-            this.destroyed = true;
-            delete this[cache_key];
-            delete this[cache_stack];
-            return this;
-        },
         get : function ContextStack_get(key) {
             var ctx, stack = this[cache_stack], l = stack.length, val;
             while (l--) {
                 ctx = stack[l];
                 if (key in ctx.cache) return ctx.cache[key];
-                if ((val = Object.value(ctx.dict, key)) !== U) return ctx.cache[key] = val;
+                if ((val = ctx.dict[key]) !== U || (val = Object.value(ctx.dict, key)) !== U) return ctx.cache[key] = val;
             }
             return this.hasFallback ? this.fallback : U;
         },
@@ -167,7 +161,7 @@
         },
         push : function ContextStack_push(dict) {
             this[cache_stack].push(this.top = {
-                cache : {},
+                cache : m8.obj(),
                 dict : dict
             });
             return this;
@@ -179,16 +173,12 @@
         this._ = iter = Object(iter);
         keys = Object.keys(iter);
         if (!(len = keys.length)) return this.stop();
-        m8.nativeType(iter) == "object" || (keys = keys.map(Number));
+        m8.tostr(iter) == "[object Object]" || (keys = keys.map(Number));
         this.empty = false;
         this.count = isNaN(count) ? len : count < 0 ? len + count : count > len ? len : count;
         this.index = start === U ? -1 : start - 2;
         this.index1 = this.index + 1;
-        this.firstKey = keys[0];
-        this.first = iter[this.firstKey];
         this.lastIndex = this.count - 1;
-        this.lastKey = keys[this.lastIndex];
-        this.last = iter[this.lastKey];
         this.keys = keys;
         !(parent instanceof Iter) || (this.parent = parent);
     }
@@ -197,12 +187,8 @@
         hasNext : function Iter_hasNext() {
             if (this.stopped || this.empty) return false;
             ++this.index < this.lastIndex || (this.stop().isLast = true);
-            this.key = this.keys[this.index];
-            this.nextKey = this.keys[++this.index1] || U;
-            this.previousKey = this.keys[this.index - 1] || U;
+            this.key = this.keys[this.index1++];
             this.current = this._[this.key];
-            this.next = this._[this.nextKey] || U;
-            this.previous = this._[this.previousKey] || U;
             return this;
         },
         stop : function Iter_stop() {
@@ -210,6 +196,48 @@
             return this;
         }
     };
+    m8.defs(Iter.prototype, {
+        first : {
+            get : function() {
+                return this._[this.keys[0]];
+            }
+        },
+        last : {
+            get : function() {
+                return this._[this.keys[this.lastIndex]];
+            }
+        },
+        next : {
+            get : function() {
+                return this._[this.keys[this.index + 1]] || U;
+            }
+        },
+        prev : {
+            get : function() {
+                return this._[this.keys[this.index - 1]] || U;
+            }
+        },
+        firstKey : {
+            get : function() {
+                return this.keys[0];
+            }
+        },
+        lastKey : {
+            get : function() {
+                return this.keys[this.lastIndex];
+            }
+        },
+        nextKey : {
+            get : function() {
+                return this.keys[this.index + 1] || U;
+            }
+        },
+        prevKey : {
+            get : function() {
+                return this.keys[this.index - 1] || U;
+            }
+        }
+    }, "r");
     function aggregatetNonEmpty(res, str) {
         m8.empty(str) || res.push(str);
         return res;
@@ -242,8 +270,9 @@
             m8.global[logger].info("Templ8: ", ctx.id, ", source: ");
             m8.global[logger].log(fn);
         }
-        var func = new Function("root", "ContextStack", "Iter", fn_var.filter, fn_var.assert, fn_var.util, fn_var.dict, fn);
-        return func.bind(ctx, m8.global, ContextStack, Iter, m8.copy(ctx.filters, Templ8.Filter.all(), true), ba, bu);
+        var func = (new Function("root", "ContextStack", "Iter", fn_var.filter, fn_var.assert, fn_var.util, fn_var.dict, fn)).bind(ctx, m8.global, ContextStack, Iter, m8.copy(ctx.filters, Templ8.Filter.all(), true), ba, bu);
+        m8.def(func, "src", m8.describe(fn, "r"));
+        return func;
     }
     function createTemplate(ctx) {
         ctx.currentIterKeys = [];
