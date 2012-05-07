@@ -157,43 +157,46 @@ It has the following properties available for both **Arrays** and **Objects**:
 </tr><tr>
 	<td><strong>current</strong></td><td>The current item being iterated over.</td>
 </tr><tr>
+	<td><strong>empty</strong></td><td>Whether or not the item to iterate over is empty – has no items. Note: if the item is not iterable, this will never be true.</td>
+</tr><tr>
 	<td><strong>first</strong></td><td>The first item in the Array/ Object. Note: you cannot guarantee iteration order in an Object.</td>
 </tr><tr>
-	<td><strong>index</strong></td><td>The zero based index of the curent iteration.</td>
+	<td><strong>firstKey</strong></td><td>The first key in the Array/ Object.</td>
 </tr><tr>
-	<td><strong>index1</strong></td><td>The one based index of thecurrent iteration.</td>
+	<td><strong>index</strong></td><td>The zero based index of the current iteration.</td>
 </tr><tr>
+	<td><strong>index1</strong></td><td>The one based index of the current iteration.</td>
+</tr><tr>
+	<td><strong>key</strong></td><td>The key of the current item being iterated over in the Array/ Object. For Arrays this will be the same as <code>index</code>.</td>
+  </tr><tr>
 	<td><strong>last</strong></td><td>The last item in the Array/ Object.</td>
+</tr><tr>
+	<td><strong>lastIndex</strong></td><td>The zero based index of the last item in the Array/ Object.</td>
+</tr><tr>
+	<td><strong>lastKey</strong></td><td>The key of the last item in the Array/ Object.</td>
 </tr><tr>
 	<td><strong>next</strong></td><td>The next item in the iteration, or undefined if we're at the last item.</td>
 </tr><tr>
-	<td><strong>parent</strong></td><td>If you are in a nested loop and want to call the parent iter, you can access it via this property.</td>
-</tr><tr>
-	<td><strong>previous</strong></td><td>The previous item in the iteration, or undefined if we're at the first item.</td>
-</tr>
-</table>
-
-It has the following extra properties available for **Objects**:
-<table border="0" cellpadding="0" cellspacing="0">
-<tr>
-	<td><strong>firstKey</strong></td><td>The key of the first item in the Object.</td>
-</tr><tr>
-	<td><strong>lastKey</strong></td><td>The key of the last item in the Object.</td>
-</tr><tr>
-	<td><strong>key</strong></td><td>The key of the current item being iterated over in the Object.</td>
-</tr><tr>
 	<td><strong>nextKey</strong></td><td>The next key in the iteration, or undefined if we're at the last item.</td>
 </tr><tr>
-	<td><strong>previousKey</strong></td><td>The previous key in the iteration, or undefined if we're at the first item.</td>
+	<td><strong>parent</strong></td><td>If you are in a nested loop and want to call the parent iter, you can access it via this property.</td>
+</tr><tr>
+	<td><strong>prev</strong></td><td>The previous item in the iteration, or undefined if we're at the first item.</td>
+</tr><tr>
+	<td><strong>prevKey</strong></td><td>The previous key in the iteration, or undefined if we're at the first item.</td>
+</tr><tr>
+	<td><strong>stopped</strong></td><td>Whether or not the iteration has been stopped..</td>
+</tr><tr>
+	<td><strong>val</strong></td><td>The same as <code>current</code>.</td>
 </tr>
 </table>
 
 It also has the following two methods:
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>
-	<td><strong>hasNext</strong></td><td>returns true if there is a value after the current iteration to iterate over. Otherwise it will return false.</td>
+	<td><strong>hasNext</strong></td><td>returns <code>false</code> if there is no value after the current iteration to iterate over. Otherwise it will return the <code>Iter</code> instance (this).</td>
 </tr><tr>
-	<td><strong>stop</strong></td><td>will stop the iterating, once it finishes it's current iteration.</td>
+	<td><strong>stop</strong></td><td>will stop the <code>Iter</code> instance from iterating after the current iteration has completed.</td>
 </tr>
 </table>
 
@@ -213,8 +216,6 @@ It has five methods (**you should NOT** call these if you DO NOT know what you'r
 <tr>
 	<td><strong>current</strong></td><td>returns the current context Object</td>
 </tr><tr>
-	<td><strong>destroy</strong></td><td>destroys the ContextStack.</td>
-</tr><tr>
 	<td><strong>get</strong></td><td>attempts to return the value of a dictionary Object, if it is in the ContextStack, otherwise it will return the fallback value or undefined.</td>
 </tr><tr>
 	<td><strong>pop</strong></td><td>removes the most recently added dictionary Object from the ContextStack.</td>
@@ -227,15 +228,15 @@ It has five methods (**you should NOT** call these if you DO NOT know what you'r
 
 This is where all parsed template output is stored.
 
-##### \_\_ASSERT\_\_
+##### \_\_ASSERT\_\_:Function{}
 
 This is a reference to Templ8.Assertions.
 
-##### \_\_FILTER\_\_
+##### \_\_FILTER\_\_:Function{}
 
 This is a reference to Templ8.Filters.
 
-##### \_\_UTIL\_\_
+##### \_\_UTIL\_\_:Function{}
 
 This is a reference to the internal utility functions used by Templ8.
 
@@ -309,7 +310,7 @@ If you only want to parse a value if a certain condition is met, rather than wri
 Which translates to something like this:
 
 ```javascript
-    if ( exists( value ) ) { value; }
+    if ( exists( value ) ) { __OUTPUT__ += value; }
 ```
 
 Notice how you can use the same pipe syntax for conditionals. Templ8's internals work out whether your method is an assertion or a filter and reference the appropriate method.

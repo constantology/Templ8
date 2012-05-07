@@ -38,12 +38,6 @@
             return String(s).indexOf(str) === 0;
         }
     }, bf = {}, bu = {
-        context : function(o, fb) {
-            return new ContextStack(o, fb);
-        },
-        output : function(o) {
-            return new Output(o);
-        },
         objectify : function(v, k) {
             var o = {};
             o[k] = v;
@@ -76,13 +70,13 @@
         type : function(o) {
             return m8.type(o);
         }
-    }, cache_key = "__tpl_cs_cached_keys", cache_stack = "__tpl_cs_stack", defaults = [ "compiled", "debug", "fallback", "id" ], delim = "<~>", esc_chars = /([-\*\+\?\.\|\^\$\/\\\(\)[\]\{\}])/g, esc_val = "\\$1", fn_var = {
+    }, cache_key = "__tpl_cs_cached_keys", cache_stack = "__tpl_cs_stack", defaults = "compiled debug dict fallback id".split(" "), delim = "<~>", esc_chars = /([-\*\+\?\.\|\^\$\/\\\(\)[\]\{\}])/g, esc_val = "\\$1", fn_var = {
         assert : "__ASSERT__",
         dict : "__CONTEXT__",
         filter : "__FILTER__",
         output : "__OUTPUT__",
         util : "__UTIL__"
-    }, fn_end = format("return {0};\n ", fn_var.output), fn_start = '\n"use strict";\n' + format('var $C = new ContextStack( {0}, this.fallback ), $_ = $C.current(), iter = new Iter( null ), {1} = "", U;', fn_var.dict, fn_var.output), id_count = 999, internals, logger = "console", re_br = /[\n\r]/gm, re_esc = /(['"])/g, re_format_delim = new RegExp(delim, "gm"), re_new_line = /[\r\n]+/g, re_space = /\s+/g, re_special_char = /[\(\)\[\]\{\}\?\*\+\/<>%&=!-]/, re_split_tpl, re_statement_fix = /\.(\d+)(\.?)/g, re_statement_replacer = "['$1']$2", re_statement_split = new RegExp("\\s*([^\\|]+(?:\\|[^\\|]+?)){0,}" + delim, "g"), split_token = "<__SPLIT__TEMPL8__HERE__>", split_replace = [ "", "$1", "$2", "" ].join(split_token), tpl = {}, tpl_id = "t8-anon-{0}", tpl_statement = '{0}["{1}"].call( this, {2}{3}, {4} )', tpl_sub = "{0}.{1}";
+    }, fn_end = format("return {0};\n ", fn_var.output), fn_start = '\n"use strict";\n' + format('var $C = new ContextStack( {0}, this.fallback, this.dict ), $_ = $C.current(), iter = new Iter( null ), {1} = "", U;', fn_var.dict, fn_var.output), id_count = 999, internals, logger = "console", re_br = /[\n\r]/gm, re_esc = /(['"])/g, re_format_delim = new RegExp(delim, "gm"), re_new_line = /[\r\n]+/g, re_space = /\s+/g, re_special_char = /[\(\)\[\]\{\}\?\*\+\/<>%&=!-]/, re_split_tpl, re_statement_fix = /\.(\d+)(\.?)/g, re_statement_replacer = "['$1']$2", re_statement_split = new RegExp("\\s*([^\\|]+(?:\\|[^\\|]+?)){0,}" + delim, "g"), split_token = "<__SPLIT__TEMPL8__HERE__>", split_replace = [ "", "$1", "$2", "" ].join(split_token), tpl = {}, tpl_id = "t8-anon-{0}", tpl_statement = '{0}["{1}"].call( this, {2}{3}, {4} )', tpl_sub = "{0}.{1}";
     function contains(o, k) {
         return typeof o.indexOf == "function" && !!~o.indexOf(k) || m8.got(o, k);
     }
@@ -132,7 +126,7 @@
     function not_empty(o) {
         return !m8.empty(o);
     }
-    function ContextStack(dict, fallback) {
+    function ContextStack(dict, fallback, base) {
         this[cache_stack] = [];
         this.push(m8.global);
         if (fallback !== U) {
@@ -143,7 +137,7 @@
     }
     ContextStack.prototype = {
         current : function ContextStack_current() {
-            return this.top.dict;
+            return (this.top || this[cache_stack][0]).dict;
         },
         get : function ContextStack_get(key) {
             var ctx, stack = this[cache_stack], l = stack.length, val;
@@ -168,11 +162,8 @@
         }
     };
     function Iter(iter, parent, start, count) {
-        var keys, len;
-        if (iter === null || !m8.iter(iter)) return this.stop();
-        this._ = iter = Object(iter);
-        keys = Object.keys(iter);
-        if (!(len = keys.length)) return this.stop();
+        var keys = Object.keys(iter = this._ = Object(iter)), len = keys.length;
+        if (!len) return this.stop();
         m8.tostr(iter) == "[object Object]" || (keys = keys.map(Number));
         this.empty = false;
         this.count = isNaN(count) ? len : count < 0 ? len + count : count > len ? len : count;
@@ -188,7 +179,7 @@
             if (this.stopped || this.empty) return false;
             ++this.index < this.lastIndex || (this.stop().isLast = true);
             this.key = this.keys[this.index1++];
-            this.current = this._[this.key];
+            this.current = this.val = this._[this.key];
             return this;
         },
         stop : function Iter_stop() {
@@ -323,11 +314,11 @@
               default:
                 switch (m8.type(o)) {
                   case "htmlelement":
-                    return o.textContent || o.text || o.innerText;
+                    return o.outerHTML;
                   case "htmlcollection":
                     return mapc(Array.coerce(o), function(el) {
                         return stringify(el);
-                    }).join(", ");
+                    }).join("\n");
                 }
             }
         }
@@ -399,6 +390,7 @@
     Templ8.prototype = {
         compiled : false,
         debug : false,
+        dict : null,
         fallback : "",
         parse : parse
     };

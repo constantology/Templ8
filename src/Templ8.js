@@ -22,11 +22,9 @@
 			startsWith : function( s, str ) { return String( s ).indexOf( str ) === 0; }
 		},
 		bf = {}, bu = {
-			context    : function( o, fb )      { return new ContextStack( o, fb ); },
-			output     : function( o )          { return new Output( o ); },
 			objectify  : function( v, k )       { var o = {}; o[k] = v; return o; },
-			parse      : function( o, id, mixins ) {
-				id    = String( id ).trim();
+			parse      : function( o, id, mixins ) { // todo: pass in the parent ContextStack
+				id    = String( id ).trim();         // todo: so the sub template can reference all dictionary values
 				var t = getTPL( format( tpl_sub, this.id, id ) ) || getTPL( id );
 
 				if ( is_obj( o ) && mixins !== this.__dict__ ) {
@@ -44,13 +42,13 @@
 			stringify  : stringify,
 			type       : function( o )    { return m8.type( o ); }
 		},
-		cache_key = '__tpl_cs_cached_keys',                  cache_stack = '__tpl_cs_stack',
-		defaults  = ['compiled', 'debug', 'fallback', 'id'], delim       = '<~>',
-		esc_chars = /([-\*\+\?\.\|\^\$\/\\\(\)[\]\{\}])/g,   esc_val     = '\\$1',
+		cache_key = '__tpl_cs_cached_keys',                         cache_stack = '__tpl_cs_stack',
+		defaults  = 'compiled debug dict fallback id'.split( ' ' ), delim       = '<~>',
+		esc_chars = /([-\*\+\?\.\|\^\$\/\\\(\)[\]\{\}])/g,          esc_val     = '\\$1',
 
 		fn_var    = { assert : '__ASSERT__', dict : '__CONTEXT__', filter : '__FILTER__', output : '__OUTPUT__', util : '__UTIL__' },
 		fn_end    = format( 'return {0};\n ', fn_var.output ),
-		fn_start  = '\n"use strict";\n' + format( 'var $C = new ContextStack( {0}, this.fallback ), $_ = $C.current(), iter = new Iter( null ), {1} = "", U;', fn_var.dict, fn_var.output ),
+		fn_start  = '\n"use strict";\n' + format( 'var $C = new ContextStack( {0}, this.fallback, this.dict ), $_ = $C.current(), iter = new Iter( null ), {1} = "", U;', fn_var.dict, fn_var.output ),
 
 		id_count  = 999, internals, logger = 'console', // <= gets around jsLint
 
@@ -99,9 +97,13 @@
 /*** END:   Utility Functions ***/
 
 /*** START: Classes used by compiled templates ***/
-	function ContextStack( dict, fallback ) {
+	function ContextStack( dict, fallback, base ) {
 		this[cache_stack] = [];
 		this.push( m8.global );
+//		if ( base ) switch ( m8.nativeType( base ) ) { // todo: analyse performance impace of this before implementing
+//			case 'object' : this.push( base );               break;
+//			case 'array'  : base.forEach( this.push, this ); break;
+//		}
 		if ( fallback !== U ) {
 			this.hasFallback = true;
 			this.fallback    = fallback;
@@ -109,12 +111,7 @@
 		!m8.exists( dict ) || this.push( dict );
 	}
 	ContextStack.prototype = {
-		current : function ContextStack_current() { return this.top.dict; },
-//		destroy : function ContextStack_destroy() {
-//			this.destroyed = true;
-//			delete this[cache_key]; delete this[cache_stack];
-//			return this;
-//		},
+		current : function ContextStack_current() { return ( this.top || this[cache_stack][0] ).dict; },
 		get     : function ContextStack_get( key ) {
 			var ctx, stack = this[cache_stack], l = stack.length, val;
 			while ( l-- ) {
@@ -137,27 +134,18 @@
 	};
 
 	function Iter( iter, parent, start, count ) {
-		var keys, len;
-		if ( iter === null || !m8.iter( iter ) ) return this.stop();
+		var keys = Object.keys( iter = this._ = Object( iter ) ),
+			len  = keys.length;
 
-		this._ = iter  = Object( iter );
-		         keys  = Object.keys( iter );
-		if ( !( len    = keys.length ) ) return this.stop();
+		if ( !len ) return this.stop();
 
 		m8.tostr( iter ) == '[object Object]' || ( keys = keys.map( Number ) );
-		this.empty     = false;
 
+		this.empty     = false;
 		this.count     = isNaN( count ) ? len : count < 0 ? len + count : count > len ? len : count;
 		this.index     = start === U ? -1 : start - 2;
 		this.index1    = this.index + 1;
-
-//		this.firstKey  = keys[0];
-//		this.first     = iter[this.firstKey];
-
 		this.lastIndex = this.count - 1;
-//		this.lastKey   = keys[this.lastIndex];
-//		this.last      = iter[this.lastKey];
-
 		this.keys      = keys;
 
 		!( parent instanceof Iter ) || ( this.parent = parent );
@@ -170,13 +158,8 @@
 			if ( this.stopped || this.empty ) return false;
 			++this.index < this.lastIndex || ( this.stop().isLast = true );
 
-			this.key         = this.keys[this.index1++];
-//			this.nextKey     = this.keys[++this.index1]  || U;
-//			this.previousKey = this.keys[this.index - 1] || U;
-
-			this.current     = this._[this.key];
-//			this.next        = this._[this.nextKey]      || U;
-//			this.previous    = this._[this.previousKey]  || U;
+			this.key     = this.keys[this.index1++];
+			this.current = this.val = this._[this.key];
 
 			return this;
 		},
@@ -186,7 +169,7 @@
 		}
 	};
 
-	m8.defs( Iter.prototype, {
+	m8.defs( Iter.prototype, { // todo: these aren't tested yet!
 		first    : { get : function() { return this._[this.keys[0]]; } },
 		last     : { get : function() { return this._[this.keys[this.lastIndex]]; } },
 		next     : { get : function() { return this._[this.keys[this.index + 1]] || U; } },
@@ -286,9 +269,9 @@
 				case 'object' : return cache_key in o
 							  ? stringify( o.dict ) : ( ( str = o.toString() ) != '[object Object]' )
 							  ? str : mapc( Object.values( o ), stringify ).join( ', ' );
-				default       : switch ( m8.type( o ) ) { // todo: should this return outerHTML instead? might be nicer
-					case 'htmlelement'    : return o.textContent || o.text || o.innerText;
-					case 'htmlcollection' : return mapc( Array.coerce( o ), function( el ) { return stringify( el ); } ).join( ', ' );
+				default       : switch ( m8.type( o ) ) { // todo: should this return outerHTML instead? might be nicer.
+					case 'htmlelement'    : return o.outerHTML; //o.textContent || o.text || o.innerText;
+					case 'htmlcollection' : return mapc( Array.coerce( o ), function( el ) { return stringify( el ); } ).join( '\n' );
 				}
 			}
 		}
@@ -366,7 +349,7 @@
 	}
 
 	Templ8.prototype = {
-		compiled : false, debug : false, fallback : '',
+		compiled : false, debug : false, dict : null, fallback : '',
 		parse    : parse
 	};
 /*** END:   Templ8 constructor and prototype ***/
