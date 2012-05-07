@@ -191,7 +191,7 @@
 		last     : { get : function() { return this._[this.keys[this.lastIndex]]; } },
 		next     : { get : function() { return this._[this.keys[this.index + 1]] || U; } },
 		prev     : { get : function() { return this._[this.keys[this.index - 1]] || U; } },
-		
+
 		firstKey : { get : function() { return this.keys[0]; } },
 		lastKey  : { get : function() { return this.keys[this.lastIndex]; } },
 		nextKey  : { get : function() { return this.keys[this.index + 1] || U; } },

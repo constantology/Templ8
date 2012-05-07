@@ -24,5 +24,5 @@
 		"type"        : "git",
 		"url"         : "git@github.com:constantology/Templ8.git"
 	},
-	"version"         : "0.9.4"
+	"version"         : "0.9.5"
 }
