@@ -82,7 +82,7 @@
         filter : "__FILTER__",
         output : "__OUTPUT__",
         util : "__UTIL__"
-    }, fn_end = format("$C.destroy(); return {0};\n ", fn_var.output), fn_start = '\n"use strict";\n' + format('var $C = new ContextStack( {0}, this.fallback ), $_ = $C.current(), iter = new Iter( null ), {1} = "", U;', fn_var.dict, fn_var.output), id_count = 999, internals, logger = "console", re_br = /[\n\r]/gm, re_esc = /(['"])/g, re_format_delim = new RegExp(delim, "gm"), re_new_line = /[\r\n]+/g, re_space = /\s+/g, re_special_char = /[\(\)\[\]\{\}\?\*\+\/<>%&=!-]/, re_split_tpl, re_statement_fix = /\.(\d+)(\.?)/g, re_statement_replacer = "['$1']$2", re_statement_split = new RegExp("\\s*([^\\|]+(?:\\|[^\\|]+?)){0,}" + delim, "g"), split_token = "<__SPLIT__TEMPL8__HERE__>", split_replace = [ "", "$1", "$2", "" ].join(split_token), tpl = {}, tpl_id = "t8-anon-{0}", tpl_statement = '{0}["{1}"].call( this, {2}{3}, {4} )', tpl_sub = "{0}.{1}";
+    }, fn_end = format('$C.destroy(); return {0}.join( "" );\n ', fn_var.output), fn_start = '\n"use strict";\n' + format("var $C = new ContextStack( {0}, this.fallback ), $_ = $C.current(), iter = new Iter( null ), {1} = [], U;", fn_var.dict, fn_var.output), id_count = 999, internals, logger = "console", re_br = /[\n\r]/gm, re_esc = /(['"])/g, re_format_delim = new RegExp(delim, "gm"), re_new_line = /[\r\n]+/g, re_space = /\s+/g, re_special_char = /[\(\)\[\]\{\}\?\*\+\/<>%&=!-]/, re_split_tpl, re_statement_fix = /\.(\d+)(\.?)/g, re_statement_replacer = "['$1']$2", re_statement_split = new RegExp("\\s*([^\\|]+(?:\\|[^\\|]+?)){0,}" + delim, "g"), split_token = "<__SPLIT__TEMPL8__HERE__>", split_replace = [ "", "$1", "$2", "" ].join(split_token), tpl = {}, tpl_id = "t8-anon-{0}", tpl_statement = '{0}["{1}"].call( this, {2}{3}, {4} )', tpl_sub = "{0}.{1}";
     function contains(o, k) {
         return typeof o.indexOf == "function" && !!~o.indexOf(k) || m8.got(o, k);
     }
@@ -318,7 +318,7 @@
         return contains(o, ".call(") || re_special_char.test(o) || ba.startsWith(o, '"') && ba.endsWith(o, '"') || ba.startsWith(o, "'") && ba.endsWith(o, "'") || !isNaN(o) ? o : ba.startsWith(o, "$_.") || ba.startsWith(o, "iter.") || k.length && usingIterKeys(k, o) || o in RESERVED ? o.replace(re_statement_fix, re_statement_replacer) : format('$C.get( "{0}" )', o);
     }
     function wrapStr(str) {
-        return format("{0} += {1};", fn_var.output, str.replace(re_br, "\\n"));
+        return format("{0}.push( {1} );", fn_var.output, str.replace(re_br, "\\n"));
     }
     internals = {
         assembleparts : assembleParts,
