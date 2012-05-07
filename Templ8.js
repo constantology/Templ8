@@ -167,9 +167,15 @@
         m8.tostr(iter) == "[object Object]" || (keys = keys.map(Number));
         this.empty = false;
         this.count = isNaN(count) ? len : count < 0 ? len + count : count > len ? len : count;
-        this.index = start === U ? -1 : start - 2;
+        if (start == 0 || isNaN(start)) {
+            this.firstIndex = 0;
+            this.index = -1;
+        } else {
+            this.firstIndex = start;
+            this.index = start - 2;
+        }
         this.index1 = this.index + 1;
-        this.lastIndex = this.count - 1;
+        this.lastIndex = this.count === len ? this.count - 1 : this.count;
         this.keys = keys;
         !(parent instanceof Iter) || (this.parent = parent);
     }
@@ -190,27 +196,39 @@
     m8.defs(Iter.prototype, {
         first : {
             get : function() {
-                return this._[this.keys[0]];
+                return this._[this.keys[this.firstKey]];
             }
         },
         last : {
             get : function() {
-                return this._[this.keys[this.lastIndex]];
+                return this._[this.keys[this.lastKey]];
             }
         },
         next : {
             get : function() {
-                return this._[this.keys[this.index + 1]] || U;
+                return this._[this.keys[this.nextKey]];
             }
         },
         prev : {
             get : function() {
-                return this._[this.keys[this.index - 1]] || U;
+                return this._[this.keys[this.prevKey]];
+            }
+        },
+        nextIndex : {
+            get : function() {
+                var i = this.index + 1;
+                return i <= this.lastIndex ? i : U;
+            }
+        },
+        prevIndex : {
+            get : function() {
+                var i = this.index - 1;
+                return i >= this.firstIndex ? i : U;
             }
         },
         firstKey : {
             get : function() {
-                return this.keys[0];
+                return this.keys[this.firstIndex];
             }
         },
         lastKey : {
@@ -220,12 +238,12 @@
         },
         nextKey : {
             get : function() {
-                return this.keys[this.index + 1] || U;
+                return this.keys[this.nextIndex];
             }
         },
         prevKey : {
             get : function() {
-                return this.keys[this.index - 1] || U;
+                return this.keys[this.prevIndex];
             }
         }
     }, "r");

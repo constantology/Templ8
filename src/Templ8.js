@@ -143,9 +143,16 @@
 
 		this.empty     = false;
 		this.count     = isNaN( count ) ? len : count < 0 ? len + count : count > len ? len : count;
-		this.index     = start === U ? -1 : start - 2;
+		if ( start == 0 || isNaN( start ) ) {
+			this.firstIndex =  0;
+			this.index      = -1;
+		}
+		else {
+			this.firstIndex = start;
+			this.index      = start - 2;
+		}
 		this.index1    = this.index + 1;
-		this.lastIndex = this.count - 1;
+		this.lastIndex = this.count === len ? this.count - 1 : this.count;
 		this.keys      = keys;
 
 		!( parent instanceof Iter ) || ( this.parent = parent );
@@ -170,15 +177,24 @@
 	};
 
 	m8.defs( Iter.prototype, { // todo: these aren't tested yet!
-		first    : { get : function() { return this._[this.keys[0]]; } },
-		last     : { get : function() { return this._[this.keys[this.lastIndex]]; } },
-		next     : { get : function() { return this._[this.keys[this.index + 1]] || U; } },
-		prev     : { get : function() { return this._[this.keys[this.index - 1]] || U; } },
+		first     : { get : function() { return this._[this.keys[this.firstKey]]; } },
+		last      : { get : function() { return this._[this.keys[this.lastKey]];  } },
+		next      : { get : function() { return this._[this.keys[this.nextKey]];  } },
+		prev      : { get : function() { return this._[this.keys[this.prevKey]];  } },
 
-		firstKey : { get : function() { return this.keys[0]; } },
-		lastKey  : { get : function() { return this.keys[this.lastIndex]; } },
-		nextKey  : { get : function() { return this.keys[this.index + 1] || U; } },
-		prevKey  : { get : function() { return this.keys[this.index - 1] || U; } }
+		nextIndex : { get : function() {
+			var i = this.index + 1;
+			return i <= this.lastIndex  ? i : U;
+		} },
+		prevIndex : { get : function() {
+			var i = this.index - 1;
+			return i >= this.firstIndex ? i : U;
+		} },
+
+		firstKey  : { get : function() { return this.keys[this.firstIndex]; } },
+		lastKey   : { get : function() { return this.keys[this.lastIndex];  } },
+		nextKey   : { get : function() { return this.keys[this.nextIndex];  } },
+		prevKey   : { get : function() { return this.keys[this.prevIndex];  } }
 	}, 'r' );
 
 /*** END:   Classes used by compiled templates ***/
