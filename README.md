@@ -34,16 +34,6 @@ If you are using Templ8 within a commonjs module, you don't need to require m8 b
 
 See [m8: Extending into the future](/constantology/m8) for more information on working with sandboxed modules.
 
-## File size
-
-<table border="0" cellpadding="0" cellspacing="0">
-	<tbody>
-		<tr><td>Templ8.js</td><td>6.6kb</td><td>deflate</td>
-		<tr><td>Templ8.min.js</td><td>5.0kb</td><td>uglified + deflate</td>
-		<tr><td>Templ8.Filter.html.js</td><td>0.59kb</td><td>deflate</td>
-	</tbody>
-</table>
-
 ## API
 
 If all you want to do is swap out values you can use one of the following two smaller template functions.
