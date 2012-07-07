@@ -24,13 +24,13 @@ function processFiles( params ) {
 		src      = '',
 		src_ast;
 
-	path.existsSync( out_dir ) || mkdirp.sync( out_dir, 0777 );
+	fs.existsSync( out_dir ) || mkdirp.sync( out_dir, 0777 );
 
 	params.src.files = ( src_dir + params.src.files.join( Templ8.format( '.{0}, {1}', params.ext, src_dir ) ) + '.' + params.ext ).split( ', ' );
 	params.src.files.forEach( function( file ) {
 		console.log( timestamp(), '- processing file:       ', file );
 
-		if ( !path.existsSync( file ) ) {
+		if ( !fs.existsSync( file ) ) {
 			console.log( 'file: ', file, ' does not exist.' );
 			switch ( params.file_err ) {
 				case 'break'    : console.log( timestamp(), ' - terminating build.' ); return;
