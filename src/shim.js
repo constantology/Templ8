@@ -1,6 +1,6 @@
      typeof document == 'undefined'
 ||   m8.tostr( document.createElement( 'div' ) ) == '[object HTMLDivElement]'
-|| ( Templ8.type = function() {
+|| ( __Class__.type = function() {
 	var U, re_global = /global|window/;
 	return function type( o ) {
 		if ( o === U || o === null ) return !1;

@@ -59,7 +59,7 @@
 		re_statement_fix   = /\.(\d+)(\.?)/g,                 re_statement_replacer = '[\'$1\']$2',
 		re_statement_split = new RegExp( '\\s*([^\\|]+(?:\\|[^\\|]+?)){0,}' + delim, 'g' ),
 
-		split_token        = '<__SPLIT__TEMPL8__HERE__>',     split_replace         = ['', '$1', '$2', ''].join( split_token ),
+		split_token        = '<__SPLIT__TEMPLATE__HERE__>',     split_replace         = ['', '$1', '$2', ''].join( split_token ),
 
 		tpl = {}, tpl_id = 't8-anon-{0}', tpl_statement = '{0}["{1}"].call( this, {2}{3}, {4} )', tpl_sub = '{0}.{1}';
 
@@ -234,9 +234,9 @@
 
 	function compileTemplate( ctx, fn ) {
 		if ( ctx.debug && typeof m8.global[logger] != 'undefined' ) {
-			m8.global[logger].info( 'Templ8: ', ctx.id, ', source: ' ); m8.global[logger].log( fn );
+			m8.global[logger].info( Name + ': ', ctx.id, ', source: ' ); m8.global[logger].log( fn );
 		}
-		var func = ( new Function( 'root', 'ContextStack', 'Iter', fn_var.filter, fn_var.assert, fn_var.util, fn_var.dict, fn ) ).bind( ctx, m8.global, ContextStack, Iter, m8.copy( ctx.filters, Templ8.Filter.all(), true ), ba, bu );
+		var func = ( new Function( 'root', 'ContextStack', 'Iter', fn_var.filter, fn_var.assert, fn_var.util, fn_var.dict, fn ) ).bind( ctx, m8.global, ContextStack, Iter, m8.copy( ctx.filters, __Class__.Filter.all(), true ), ba, bu );
 		m8.def( func, 'src', m8.describe( fn, 'r' ) );
 		return func;
 	}
@@ -250,7 +250,7 @@
 
 	function emitTag( ctx, part, parts ) {
 		var tag;
-		if ( tag = Templ8.Tag.get( part ) ) {
+		if ( tag = __Class__.Tag.get( part ) ) {
 			part = parts.shift();
 			return tag.emit( internals, ctx, part, parts );
 		}
@@ -320,12 +320,12 @@
 /*** END:   create template methods ***/
 
 /*** START: Templ8 constructor and prototype ***/
-	function Templ8() {
+	function __Class__() {
 		var a = Array.coerce( arguments ),
 			f = is_obj( a[a.length - 1] ) ? a.pop() : is_obj( a[0] ) ? a.shift() : null;
 
 // take care of peeps who are too lazy or too ©ººL to use the "new" constructor...
-		if ( !( this instanceof Templ8 ) ) return is_obj( f ) ? new Templ8( a.join( '' ), f ) : new Templ8( a.join( '' ) );
+		if ( !( this instanceof __Class__ ) ) return is_obj( f ) ? new __Class__( a.join( '' ), f ) : new __Class__( a.join( '' ) );
 		
 		!f || defaults.forEach( function( k ) {
 			if ( k in f ) { this[k] = f[k]; delete f[k]; }
@@ -364,7 +364,7 @@
 		return s;
 	}
 
-	Templ8.prototype = {
+	__Class__.prototype = {
 		compiled : false, debug : false, dict : null, fallback : '',
 		parse    : parse
 	};
@@ -372,7 +372,7 @@
 
 /*** START: Templ8 functionality packages ***/
 // exposed for general usage
-	m8.defs( Templ8, {             // store a reference to m8 in Templ8 so we can do fun stuff in commonjs
+	m8.defs( __Class__, {             // store a reference to m8 in Templ8 so we can do fun stuff in commonjs
 		m8       : { value : m8 }, // modules without having to re-request m8 as well as Templ8 each time.
 		escapeRE : escapeRE,  format    : format,    get : getTPL,
 		gsub     : gsub,      stringify : stringify
@@ -397,10 +397,10 @@
 		this.replace = function()     { return add.call( this, true, arguments[0], arguments[1] ); };
 	}
 
-	Templ8.Assert    = new Mgr( ba );
-	Templ8.Filter    = new Mgr( bf );
-	Templ8.Statement = new Mgr;
-	Templ8.Tag       = new function() {
+	__Class__.Assert    = new Mgr( ba );
+	__Class__.Filter    = new Mgr( bf );
+	__Class__.Statement = new Mgr;
+	__Class__.Tag       = new function() {
 		var KEYS   = 'emit end start'.split( ' ' ),
 			ERRORS = {
 				emit  : 'emit function',
@@ -415,7 +415,7 @@
 			tag[this.start] = this;
 		}
 
-		function assert_exists( k ) { if ( !( k in this ) ) { throw new TypeError( format( 'A Templ8 Tag requires an {0}', ERRORS[k] ) ); } }
+		function assert_exists( k ) { if ( !( k in this ) ) { throw new TypeError( format( 'A ' + Name + ' Tag requires an {0}', ERRORS[k] ) ); } }
 		
 		this.all = function() { return m8.copy( tag ); };
 

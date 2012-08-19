@@ -1,11 +1,11 @@
-	Templ8.Filter.add( {
+	__Class__.Filter.add( {
 		capitalize     : function( str ) {
-			str = Templ8.stringify( str );
+			str = __Class__.stringify( str );
 			return str.charAt( 0 ).toUpperCase() + str.substring( 1 ).toLowerCase();
 		},
 		count          : function( o ) { return m8.len( o ) || 0; },
 		crop           : function( str, i ) {
-			str = Templ8.stringify( str );
+			str = __Class__.stringify( str );
 			i   = parseInt( i, 10 ) || 50;
 			return str.length > i ? str.substring( 0, i / 2 ) + '...' + str.substring( str.length - ( i / 2 ) ) : str;
 		},
@@ -23,14 +23,14 @@
 				case 'string' : return o.charAt( o.length - 1 );
 			}
 		},
-		lowercase      : function( str ) { return Templ8.stringify( str ).toLowerCase(); },
+		lowercase      : function( str ) { return __Class__.stringify( str ).toLowerCase(); },
 		prefix         : function( str1, str2 ) { return str2 + str1; },
 		suffix         : function( str1, str2 ) { return str1 + str2; },
 		truncate       : function( str, i ) {
-			str = Templ8.stringify( str );
+			str = __Class__.stringify( str );
 			i   = parseInt( i, 10 ) || 50;
 			return str.length > i ? str.substring( 0, i ) + '...' : str;
 		},
-		uppercase      : function( str ) { return Templ8.stringify( str ).toUpperCase(); },
+		uppercase      : function( str ) { return __Class__.stringify( str ).toUpperCase(); },
 		wrap           : function( str, start, end ) { return start + str + ( end || start ); }
 	} );
