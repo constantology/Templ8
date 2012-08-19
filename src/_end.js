@@ -1,7 +1,7 @@
-	util.iter( PACKAGE ) || ( PACKAGE = util.global );
+	util.iter( PACKAGE ) || ( PACKAGE = util.ENV == 'commonjs' ? module : util.global );
 
 // expose Templ8
-	__Class__ = util.expose( __Class__, Name, util.ENV == 'commonjs' ? module : util.global );
+	__Class__ = util.expose( __Class__, Name, PACKAGE );
 	util.expose( util, __Class__ );  // store a reference to m8 on Templ8
 
 // at this point we don't know if m8 is available or not, and as such do not know what environment we are in.
