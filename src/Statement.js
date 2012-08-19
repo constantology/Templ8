@@ -51,7 +51,7 @@
 
 			id = format( '{0}.{1}', ctx.id, id );
 
-			sub_tpl = new __Class__( '', m8.copy( { debug : ctx.debug, fallback : ctx.fallback, id : id }, ctx.filters ) );
+			sub_tpl = new __Class__( '', util.copy( { debug : ctx.debug, fallback : ctx.fallback, id : id }, ctx.filters ) );
 // the parts have already been split, for efficiency we can skip a call to createTemplate() and the more costly splitStr()
 			sub_tpl.currentIterKeys = [];
 			sub_tpl.__tpl__  = parts.join( '' );

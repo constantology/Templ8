@@ -1,18 +1,18 @@
      typeof document == 'undefined'
-||   m8.tostr( document.createElement( 'div' ) ) == '[object HTMLDivElement]'
+||   util.tostr( document.createElement( 'div' ) ) == '[object HTMLDivElement]'
 || ( __Class__.type = function() {
 	var U, re_global = /global|window/;
 	return function type( o ) {
 		if ( o === U || o === null ) return !1;
-		var t = m8.tostr( o ).split( ' ' )[1].toLowerCase();
+		var t = util.tostr( o ).split( ' ' )[1].toLowerCase();
 			t = t.substring( 0, t.length - 1 );
 		switch ( t ) {
 			case 'object'   :
-				if ( m8.global.attachEvent ) {              // handle IE coz it can has stupidz
+				if ( util.global.attachEvent ) {              // handle IE coz it can has stupidz
 					return o.nodeName && o.nodeType == 1
 						 ? 'htmlelement'    : !isNaN( o.length ) && is_fn( o.item )
-						 ? 'htmlcollection' : o === m8.global.document
-						 ? 'htmldocument'   : o === m8.global
+						 ? 'htmlcollection' : o === util.global.document
+						 ? 'htmldocument'   : o === util.global
 						 ? 'global'         : t;
 				}
 				return t;

@@ -1,54 +1,49 @@
 	var U, RESERVED = '__ASSERT__ __CONTEXT__ __FILTER_ __OUTPUT__ __UTIL__ $_ document false global instanceof null true typeof undefined window'.split( ' ' ).reduce( function( o, k ) {
 			o[k] = true; return o;
-		}, m8.obj() ),
+		}, util.obj() ),
 		RE_GSUB     = /\$?\{([^\}\s]+)\}/g,
 		ba          = {
-			blank      : function( o ) { return m8.empty( o ) || ( typeof o == 'string' && !o.trim() ); },
+			blank      : function( o ) { return util.empty( o ) || ( typeof o == 'string' && !o.trim() ); },
 			contains   : contains,
 			endsWith   : function( s, str ) {
 				s = String( s );
 				var n = s.length - str.length;
 				return n >= 0 && s.lastIndexOf( str ) == n;
 			},
-			empty      : m8.empty,
+			empty      : util.empty,
 			equals     : function( o, v )   { return o == v },
-			exists     : m8.exists,
+			exists     : util.exists,
 			is         : function( o, v )   { return o === v },
 			isEven     : function( i )      { return  !( parseInt( i, 10 ) & 1 ); },
 			isOdd      : function( i )      { return  !( parseInt( i, 10 ) & 1 ); },
 			isTPL      : function( id )     { return !!( getTPL( format( tpl_sub, this.id, id ) ) || getTPL( id ) ); },
-			iterable   : function( o )      { return m8.iter( o ); },
+			iterable   : function( o )      { return util.iter( o ); },
 			notEmpty   : not_empty,
 			startsWith : function( s, str ) { return String( s ).indexOf( str ) === 0; }
 		},
 		bf = {}, bu = {
 			objectify  : function( v, k )       { var o = {}; o[k] = v; return o; },
-			parse      : function( o, id, mixins ) { // todo: pass in the parent ContextStack
-				id    = String( id ).trim();         // todo: so the sub template can reference all dictionary values
-				var t = getTPL( format( tpl_sub, this.id, id ) ) || getTPL( id );
+			parse      : function( o, id, tpl ) {
+				id = String( id ).trim();
 
-				if ( is_obj( o ) && mixins !== this.__dict__ ) {
-					switch( m8.nativeType( mixins ) ) {
-						case 'object' :                                 break;
-						case 'null'   : case 'undefined' : mixins = {}; break;
-						default       : mixins = { __MIXINS__ : mixins };
-					}
-					o = m8.copy( mixins, o, true );
-				}
+				var d = [tpl[fn_var.dict], o],
+					t = getTPL( format( tpl_sub, this.id, id ) ) || getTPL( id );
+
+				d[fn_var.dict] = true;
 
 				return t ? t.parse( o ) : this.fallback;
 			},
 			stop       : function( iter ) { iter.stop(); },
 			stringify  : stringify,
-			type       : function( o )    { return m8.type( o ); }
+			type       : function( o )    { return util.type( o ); }
 		},
 		cache_key = '__tpl_cs_cached_keys',                         cache_stack = '__tpl_cs_stack',
 		defaults  = 'compiled debug dict fallback id'.split( ' ' ), delim       = '<~>',
 		esc_chars = /([-\*\+\?\.\|\^\$\/\\\(\)[\]\{\}])/g,          esc_val     = '\\$1',
 
-		fn_var    = { assert : '__ASSERT__', dict : '__CONTEXT__', filter : '__FILTER__', output : '__OUTPUT__', util : '__UTIL__' },
+		fn_var    = { assert : '__ASSERT__', ctx : '__CONTEXT__', dict : '__dict__', filter : '__FILTER__', output : '__OUTPUT__', util : '__UTIL__' },
 		fn_end    = format( 'return {0};\n ', fn_var.output ),
-		fn_start  = '\n"use strict";\n' + format( 'var $C = new ContextStack( {0}, this.fallback, this.dict ), $_ = $C.current(), iter = new Iter( null ), {1} = "", U;', fn_var.dict, fn_var.output ),
+		fn_start  = '\n"use strict";\n' + format( 'var $C = new ContextStack( {0}, this.fallback, this.dict ), $_ = $C.current(), iter = new Iter( null ), {1} = "", U;', fn_var.ctx, fn_var.output ),
 
 		id_count  = 999, internals, logger = 'console', // <= gets around jsLint
 
@@ -64,7 +59,7 @@
 		tpl = {}, tpl_id = 't8-anon-{0}', tpl_statement = '{0}["{1}"].call( this, {2}{3}, {4} )', tpl_sub = '{0}.{1}';
 
 /*** START: Utility Functions ***/
-	function contains( o, k ) { return ( typeof o.indexOf == 'function' && !!~o.indexOf( k ) ) || m8.got( o, k ) ; }
+	function contains( o, k ) { return ( typeof o.indexOf == 'function' && !!~o.indexOf( k ) ) || util.got( o, k ) ; }
 
 	function escapeRE( s ) { return String( s ).replace( esc_chars, esc_val ); }
 
@@ -77,7 +72,7 @@
 	function is_obj( o ) { return typeof o == 'object' && ( o.constructor === Object || o.constructor === U ); }
 
 	function mapc( a, fn, ctx ) {
-		fn || ( fn = m8 ); ctx || ( ctx = a );
+		fn || ( fn = util ); ctx || ( ctx = a );
 		var i = -1, l = a.length, res = [], v;
 		while ( ++i < l ) {
 			v = fn.call( ctx, a[i], i, a );
@@ -86,29 +81,34 @@
 				default   : switch ( typeof v ) {
 					case 'string' : v.trim() === '' || res.push( v ); break;
 					case 'number' : isNaN( v )      || res.push( v ); break;
-					default       : ( !m8.iter( v ) || m8.len( v ) ) || res.push( v ); break;
+					default       : ( !util.iter( v ) || util.len( v ) ) || res.push( v ); break;
 				}
 			}
 		}
 		return res;
 	}
 	
-	function not_empty( o ) { return !m8.empty( o ); }
+	function not_empty( o ) { return !util.empty( o ); }
 /*** END:   Utility Functions ***/
 
 /*** START: Classes used by compiled templates ***/
-	function ContextStack( dict, fallback, base ) {
+	function ContextStack( dict, fallback ) {
 		this[cache_stack] = [];
-		this.push( m8.global );
-//		if ( base ) switch ( m8.nativeType( base ) ) { // todo: analyse performance impace of this before implementing
-//			case 'object' : this.push( base );               break;
-//			case 'array'  : base.forEach( this.push, this ); break;
-//		}
+		this.push( util.global );
+
 		if ( fallback !== U ) {
 			this.hasFallback = true;
 			this.fallback    = fallback;
 		}
-		!m8.exists( dict ) || this.push( dict );
+
+		switch( util.nativeType( dict ) ) {
+			case 'object' : this.push( dict );
+							break;
+			case 'array'  : dict[fn_var.dict]
+						  ? dict.map( this.push, this ) : this.push( dict );
+						  	break;
+			default       : !util.exists( dict ) || this.push( dict );
+		}
 	}
 	ContextStack.prototype = {
 		current : function ContextStack_current() { return ( this.top || this[cache_stack][0] ).dict; },
@@ -128,7 +128,7 @@
 			return dict;
 		},
 		push    : function ContextStack_push( dict ) {
-			this[cache_stack].push( this.top = { cache : m8.obj(), dict : dict } );
+			this[cache_stack].push( this.top = { cache : util.obj(), dict : dict } );
 			return this;
 		}
 	};
@@ -139,7 +139,7 @@
 
 		if ( !len ) return this.stop();
 
-		m8.tostr( iter ) == '[object Object]' || ( keys = keys.map( Number ) );
+		util.tostr( iter ) == '[object Object]' || ( keys = keys.map( Number ) );
 
 		this.empty     = false;
 		this.count     = isNaN( count ) ? len : count < 0 ? len + count : count > len ? len : count;
@@ -176,7 +176,7 @@
 		}
 	};
 
-	m8.defs( Iter.prototype, { // todo: these aren't tested yet!
+	util.defs( Iter.prototype, { // todo: these aren't tested yet!
 		first     : { get : function() { return this._[this.keys[this.firstKey]]; } },
 		last      : { get : function() { return this._[this.keys[this.lastKey]];  } },
 		next      : { get : function() { return this._[this.keys[this.nextKey]];  } },
@@ -202,7 +202,7 @@
 /*** START: create template methods ***/
 
 	function aggregatetNonEmpty( res, str ) {
-		m8.empty( str ) || res.push( str );
+		util.empty( str ) || res.push( str );
 		return res;
 	}
 
@@ -216,7 +216,7 @@
 			}
 			else fn = v;
 			!args || ( args = ', ' + args.split( ',' ).map( function( o ) { return wrapGetter( this, o ); }, ctx ).join( ', ' ) );
-			return format( tpl_statement, getFnParent( fn ), fn, wrapGetter( ctx, res ), args, fn_var.dict );
+			return format( tpl_statement, getFnParent( fn ), fn, wrapGetter( ctx, res ), args, fn_var.ctx );
 		}, '' );
 	}
 
@@ -233,11 +233,11 @@
 	function clean( str ) { return str.replace( re_format_delim, '' ).replace( re_new_line, '\n' ).replace( re_space, ' ' ).trim(); }
 
 	function compileTemplate( ctx, fn ) {
-		if ( ctx.debug && typeof m8.global[logger] != 'undefined' ) {
-			m8.global[logger].info( Name + ': ', ctx.id, ', source: ' ); m8.global[logger].log( fn );
+		if ( ctx.debug && typeof util.global[logger] != 'undefined' ) {
+			util.global[logger].info( Name + ': ', ctx.id, ', source: ' ); util.global[logger].log( fn );
 		}
-		var func = ( new Function( 'root', 'ContextStack', 'Iter', fn_var.filter, fn_var.assert, fn_var.util, fn_var.dict, fn ) ).bind( ctx, m8.global, ContextStack, Iter, m8.copy( ctx.filters, __Class__.Filter.all(), true ), ba, bu );
-		m8.def( func, 'src', m8.describe( fn, 'r' ) );
+		var func = ( new Function( 'root', 'ContextStack', 'Iter', fn_var.filter, fn_var.assert, fn_var.util, fn_var.ctx, fn ) ).bind( ctx, util.global, ContextStack, Iter, util.copy( ctx.filters, __Class__.Filter.all(), true ), ba, bu );
+		util.def( func, 'src', util.describe( fn, 'r' ) );
 		return func;
 	}
 
@@ -279,13 +279,13 @@
 	function stringify( o, str ) {
 		switch ( typeof o ) {
 			case 'boolean' : case 'number' : case 'string' : return String( o );
-			default        : switch ( m8.nativeType( o ) ) {
+			default        : switch ( util.nativeType( o ) ) {
 				case 'date'   : return o.toDateString();
 				case 'array'  : return mapc( o, stringify ).join( ', ' );
 				case 'object' : return cache_key in o
 							  ? stringify( o.dict ) : ( ( str = o.toString() ) != '[object Object]' )
 							  ? str : mapc( Object.values( o ), stringify ).join( ', ' );
-				default       : switch ( m8.type( o ) ) { // todo: should this return outerHTML instead? might be nicer.
+				default       : switch ( util.type( o ) ) {
 					case 'htmlelement'    : return o.outerHTML; //o.textContent || o.text || o.innerText;
 					case 'htmlcollection' : return mapc( Array.coerce( o ), function( el ) { return stringify( el ); } ).join( '\n' );
 				}
@@ -358,9 +358,9 @@
 
 	function parse( dict ) {
 		this.compiled || compile( this );
-		this.__dict__ = dict;
+		this[fn_var.dict] = dict;
 		var s = this._parse( dict );
-		delete this.__dict__;
+		delete this[fn_var.dict];
 		return s;
 	}
 
@@ -372,8 +372,8 @@
 
 /*** START: Templ8 functionality packages ***/
 // exposed for general usage
-	m8.defs( __Class__, {             // store a reference to m8 in Templ8 so we can do fun stuff in commonjs
-		m8       : { value : m8 }, // modules without having to re-request m8 as well as Templ8 each time.
+	util.defs( __Class__, {             // store a reference to m8 in Templ8 so we can do fun stuff in commonjs
+		m8       : { value : util }, // modules without having to re-request m8 as well as Templ8 each time.
 		escapeRE : escapeRE,  format    : format,    get : getTPL,
 		gsub     : gsub,      stringify : stringify
 	}, 'r' );
@@ -381,7 +381,7 @@
 	function Mgr( o ) {
 		var cache = {};
 
-		!is_obj( o ) || m8.copy( cache, o );
+		!is_obj( o ) || util.copy( cache, o );
 
 		function _add( id, fn, replace ) { ( !replace && id in cache ) || ( cache[id] = fn ); }
 		function  add( replace, o ) {
@@ -391,7 +391,7 @@
 			} return this;
 		}
 
-		this.all     = function()     { return m8.copy( cache ); };
+		this.all     = function()     { return util.copy( cache ); };
 		this.add     = function()     { return add.call( this, false, arguments[0], arguments[1] ); };
 		this.get     = function( id ) { return cache[id]; };
 		this.replace = function()     { return add.call( this, true, arguments[0], arguments[1] ); };
@@ -411,13 +411,13 @@
 
 		function Tag( config ) {
 			KEYS.forEach( assert_exists, config );
-			m8.copy( this, config );
+			util.copy( this, config );
 			tag[this.start] = this;
 		}
 
 		function assert_exists( k ) { if ( !( k in this ) ) { throw new TypeError( format( 'A ' + Name + ' Tag requires an {0}', ERRORS[k] ) ); } }
 		
-		this.all = function() { return m8.copy( tag ); };
+		this.all = function() { return util.copy( tag ); };
 
 		this.compileRegExp = function() {
 			var end = [], start = [], t;

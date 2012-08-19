@@ -3,7 +3,7 @@
 			str = __Class__.stringify( str );
 			return str.charAt( 0 ).toUpperCase() + str.substring( 1 ).toLowerCase();
 		},
-		count          : function( o ) { return m8.len( o ) || 0; },
+		count          : function( o ) { return util.len( o ) || 0; },
 		crop           : function( str, i ) {
 			str = __Class__.stringify( str );
 			i   = parseInt( i, 10 ) || 50;
@@ -11,14 +11,14 @@
 		},
 		def            : function( str, def ) { return ba.blank( str ) ? def : str; },
 		first          : function( o ) {
-			switch ( m8.nativeType( o ) ) {
+			switch ( util.nativeType( o ) ) {
 				case 'array'  : return o[0];
 				case 'string' : return o.charAt( 0 );
 			}
 		},
-		join           : function( o, s ) { return m8.got( o, 'join' ) && typeof o.join == 'function' ? o.join( s ) : o; },
+		join           : function( o, s ) { return util.got( o, 'join' ) && typeof o.join == 'function' ? o.join( s ) : o; },
 		last           : function( o ) {
-			switch ( m8.nativeType( o ) ) {
+			switch ( util.nativeType( o ) ) {
 				case 'array'  : return o[o.length-1];
 				case 'string' : return o.charAt( o.length - 1 );
 			}
