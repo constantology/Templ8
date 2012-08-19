@@ -10,11 +10,6 @@ It's fast, light weight and unlike a lot of other JavaScript template engines: *
 
 Templ8 does not restrict you to generating HTML. All outputs are strings so if you want to generate HTML, CSS, JavaScript or whatever, the choice is yours...
 
-## WARNING!!!
-While **Templ8** has been tested, the testing framework I've written and used is very much a work in progress.
-
-Also I'm currently between virtual machine software and operating system licenses, so I have only tested on mac osx lion and snow leopard: nodejs – >= v0.6.13 – as well as current – and beta/ nightly – versions of Chrome, Safari/ Webkit and FireFox.
-
 ## Dependencies
 
 Templ8.js only has one dependency [m8.js](/constantology/m8).

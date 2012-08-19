@@ -5,13 +5,4 @@
 node_modules/
 npm-debug.log
 
-wedgES/
-test/
-src
-src/.*
-build*
-
-cre8.js
-Templ8.min.js
-*shim*
-index.html
+test.bak/*
