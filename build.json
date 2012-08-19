@@ -5,6 +5,6 @@
 	"out"       : { "dir" : "./", "file" : "Templ8", "min" : "Templ8.min" },
 	"src" : {
 		"dir"   : "./src",
-		"files" : [".begin", "Templ8", "Tag", "Statement", "Filter", ".end"]
+		"files" : ["_begin", "Templ8", "Tag", "Statement", "Filter", "_end"]
 	}
 }
