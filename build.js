@@ -38,7 +38,7 @@ function processFiles( params ) {
 			}
 		}
 
-		src += Templ8.format( '\n/* file: {0} */\n{1}\n', file.substring( file.lastIndexOf( '/' ) + 1 ), fs.readFileSync( file, params.encoding ) );
+		src += Templ8.format( '\n{0}', fs.readFileSync( file, params.encoding ) );
 	} );
 
 	out_file = Templ8.format( '{0}{1}.{2}', out_dir, ( params.out.file || 'out' ), params.ext );
@@ -46,7 +46,8 @@ function processFiles( params ) {
 
 	src_ast = jsp.parse( src );
 
-	fs.writeFileSync( out_file, pro.gen_code( src_ast, { beautify : true, space_colon : true } ), params.encoding );
+	fs.writeFileSync( out_file, src, params.encoding );
+//	fs.writeFileSync( out_file, pro.gen_code( src_ast, { beautify : true, space_colon : true } ), params.encoding );
 
 	if ( params.out.min ) {
 		out_file = Templ8.format( '{0}{1}.{2}', out_dir, params.out.min, params.ext );
