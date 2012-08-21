@@ -27,5 +27,5 @@
 	"scripts"         : {
 		"test"        : "mocha -c --globals mocha,expect,m8,Templ8,tpl_test_value -R spec -u tdd ./test"
 	},
-	"version"         : "0.9.8"
+	"version"         : "0.9.9"
 }
