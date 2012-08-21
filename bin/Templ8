@@ -21,7 +21,7 @@ function toId( f ) {
 
 function toTempl8( id, str ) {
 	str = str.split( /[\n\r]/ ).compact( true ).map( lines ).join( ',\n' );
-	return Templ8.format( 'new Templ8( Templ8.copy( { id : \'{0}\' }, config ), {1} );', id, str );
+	return Templ8.format( 'new Templ8( m8.copy( { id : \'{0}\' }, config ), {1} );', id, str );
 }
 
 function validFiles( f ) {
