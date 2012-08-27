@@ -1,4 +1,5 @@
-[![build status](https://secure.travis-ci.org/constantology/Templ8.png)](http://travis-ci.org/constantology/Templ8)
+<!-- [![build status](https://secure.travis-ci.org/constantology/Templ8.png)](http://travis-ci.org/constantology/Templ8) -->
+
 #TODO:
 
 - documentation is not yet complete
