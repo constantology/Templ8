@@ -8,8 +8,8 @@
 	<body>
 		<div id="mocha"></div>
 
-		<script src="https://raw.github.com/visionmedia/mocha/master/mocha.js"     type="text/javascript"></script>
-		<script src="https://raw.github.com/LearnBoost/expect.js/master/expect.js" type="text/javascript"></script>
+		<script src="https://raw.github.com/visionmedia/mocha/master/mocha.js" type="text/javascript"></script>
+		<script src="https://raw.github.com/chaijs/chai/master/chai.js"        type="text/javascript"></script>
 
 		<script src="https://raw.github.com/constantology/m8/master/m8.js" type="text/javascript"></script>
 		<script src="../Templ8.js"                                         type="text/javascript"></script>
@@ -17,8 +17,8 @@
 
 		<script type="text/javascript">
 			mocha.setup( {
-				globals : ['m8', 'Templ8', 'tpl_test_value'],
-				ui      : 'tdd'
+				ignoreLeaks : true,
+				ui          : 'tdd'
 			} );
 		</script>
 

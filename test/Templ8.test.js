@@ -1,8 +1,10 @@
-typeof m8     !== 'undefined' || ( m8     = require( 'm8' ) );
+typeof m8     !== 'undefined' || ( m8     = require( 'm8'     ) );
 typeof Templ8 !== 'undefined' || ( Templ8 = require( 'Templ8' ) );
-typeof expect !== 'undefined' || ( expect = require( 'expect.js' ) );
+typeof chai   !== 'undefined' || ( chai   = require( 'chai'   ) );
 
 m8.ENV != 'commonjs' || require( '../Templ8.Filter.html' );
+
+expect  = chai.expect;
 
 suite( 'Templ8', function() {
 
@@ -240,9 +242,9 @@ suite( 'Templ8', function() {
 			tpl1 = new Templ8( '{{columns.name.width}}', { compiled : true, id : 'test.tpl.1' } ),
 			tpl2 = new Templ8( '{{items.10.email}}',     { compiled : true, id : 'test.tpl.2' } );
 
-		expect( tpl0.parse( data ) ).to.eql( 600 );
-		expect( tpl1.parse( data ) ).to.eql( 6 );
-		expect( tpl2.parse( data ).trim() ).to.eql( 'ultrices.sit.amet@nullamagnamalesuada.ca' );
+		expect( tpl0.parse( data ) ).to.equal( '600' );
+		expect( tpl1.parse( data ) ).to.equal( '6' );
+		expect( tpl2.parse( data ).trim() ).to.equal( 'ultrices.sit.amet@nullamagnamalesuada.ca' );
 		
 		done();
 	} );
@@ -252,9 +254,9 @@ suite( 'Templ8', function() {
 			tpl1 = new Templ8( '{{columns.name.width|italics}}', { compiled : true, id : 'test.tpl.1' } ),
 			tpl2 = new Templ8( '{{items.10.email|link|bold}}',   { compiled : true, id : 'test.tpl.2' } );
 
-		expect( tpl0.parse( data ).trim() ).to.eql( '<strong>600</strong>' );
-		expect( tpl1.parse( data ).trim() ).to.eql( '<em>6</em>' );
-		expect( tpl2.parse( data ).trim() ).to.eql( '<strong><a href="mailto:ultrices.sit.amet@nullamagnamalesuada.ca">ultrices.sit.amet@nullamagnamalesuada.ca</a></strong>' );
+		expect( tpl0.parse( data ).trim() ).to.equal( '<strong>600</strong>' );
+		expect( tpl1.parse( data ).trim() ).to.equal( '<em>6</em>' );
+		expect( tpl2.parse( data ).trim() ).to.equal( '<strong><a href="mailto:ultrices.sit.amet@nullamagnamalesuada.ca">ultrices.sit.amet@nullamagnamalesuada.ca</a></strong>' );
 
 		done();
 	} );
@@ -262,7 +264,7 @@ suite( 'Templ8', function() {
 	test( 'Filter(s) can include custom parameters to alter Dictionary values with', function( done ) {
 		var tpl0 = new Templ8( '{{items.10.email|link:items.10.name|prefix:"email - "|paragraph}}', { compiled : true, id : 'test.tpl.0' } );
 
-		expect( tpl0.parse( data ).trim() ).to.eql( '<p>email - <a href="mailto:ultrices.sit.amet@nullamagnamalesuada.ca">Zahir</a></p>' );
+		expect( tpl0.parse( data ).trim() ).to.equal( '<p>email - <a href="mailto:ultrices.sit.amet@nullamagnamalesuada.ca">Zahir</a></p>' );
 
 		done();
 	} );
@@ -272,9 +274,9 @@ suite( 'Templ8', function() {
 			tpl1 = new Templ8( '{{items.10.email|link:items.10.name|prefix:"email - "|paragraph if items.10.email|notEmpty}}', { compiled : true, id : 'test.tpl.1' } ),
 			tpl2 = new Templ8( '{{items.10.email|link:items.10.name|prefix:"email - "|paragraph if items.10.email|empty}}',    { compiled : true, id : 'test.tpl.2' } );
 
-		expect( tpl0.parse( data ).trim() ).to.eql( 'ultrices.sit.amet@nullamagnamalesuada.ca' );
-		expect( tpl1.parse( data ).trim() ).to.eql( '<p>email - <a href="mailto:ultrices.sit.amet@nullamagnamalesuada.ca">Zahir</a></p>' );
-		expect( tpl2.parse( data ).trim() ).to.be.empty();
+		expect( tpl0.parse( data ).trim() ).to.equal( 'ultrices.sit.amet@nullamagnamalesuada.ca' );
+		expect( tpl1.parse( data ).trim() ).to.equal( '<p>email - <a href="mailto:ultrices.sit.amet@nullamagnamalesuada.ca">Zahir</a></p>' );
+		expect( tpl2.parse( data ).trim() ).to.be.empty;
 
 		done();
 	} );
@@ -283,8 +285,8 @@ suite( 'Templ8', function() {
 		var tpl0 = new Templ8( '{{items.10.email|link:items.10.name|prefix:"email - "|paragraph unless items.10.email|notEmpty }}', { compiled : true, id : 'test.tpl.0' } ),
 			tpl1 = new Templ8( '{{items.10.email|link:items.10.name|prefix:"email - "|paragraph unless items.10.email|empty }}',    { compiled : true, id : 'test.tpl.1' } );
 
-		expect( tpl0.parse( data ).trim() ).to.be.empty();
-		expect( tpl1.parse( data ).trim() ).to.eql( '<p>email - <a href="mailto:ultrices.sit.amet@nullamagnamalesuada.ca">Zahir</a></p>' );
+		expect( tpl0.parse( data ).trim() ).to.be.empty;
+		expect( tpl1.parse( data ).trim() ).to.equal( '<p>email - <a href="mailto:ultrices.sit.amet@nullamagnamalesuada.ca">Zahir</a></p>' );
 
 		done();
 	} );
@@ -298,8 +300,8 @@ suite( 'Templ8', function() {
 '										{{items.10.email|link:items.10.name|prefix:"email - "|paragraph}}',
 								'{% endif %}', { compiled : true, id : 'test.tpl.1' } );
 
-		expect( tpl0.parse( data ).trim() ).to.eql( '<p>email - <a href="mailto:ultrices.sit.amet@nullamagnamalesuada.ca">Zahir</a></p>' );
-		expect( tpl1.parse( data ).trim() ).to.be.empty();
+		expect( tpl0.parse( data ).trim() ).to.equal( '<p>email - <a href="mailto:ultrices.sit.amet@nullamagnamalesuada.ca">Zahir</a></p>' );
+		expect( tpl1.parse( data ).trim() ).to.be.empty;
 
 		done();
 	} );
@@ -313,8 +315,8 @@ suite( 'Templ8', function() {
 									'{{items.10.email|link:items.10.name|prefix:"email - "|paragraph}}',
 								'{% endif %}', { compiled : true, id : 'test.tpl.1' } );
 
-		expect( tpl0.parse( data ).trim() ).to.eql( '<p>email - <a href="mailto:ultrices.sit.amet@nullamagnamalesuada.ca">Zahir</a></p>' );
-		expect( tpl1.parse( data ).trim() ).to.be.empty();
+		expect( tpl0.parse( data ).trim() ).to.equal( '<p>email - <a href="mailto:ultrices.sit.amet@nullamagnamalesuada.ca">Zahir</a></p>' );
+		expect( tpl1.parse( data ).trim() ).to.be.empty;
 
 		done();
 	} );
@@ -326,7 +328,7 @@ suite( 'Templ8', function() {
 									'{{items.10.email|link:items.10.name|prefix:"email - "|paragraph}}',
 								'{% endif %}', { compiled : true, id : 'test.tpl.0' } );
 
-		expect( tpl0.parse( data ).trim() ).to.eql( '<p>email - <a href="mailto:ultrices.sit.amet@nullamagnamalesuada.ca">Zahir</a></p>' );
+		expect( tpl0.parse( data ).trim() ).to.equal( '<p>email - <a href="mailto:ultrices.sit.amet@nullamagnamalesuada.ca">Zahir</a></p>' );
 
 		done();
 	} );
@@ -338,7 +340,7 @@ suite( 'Templ8', function() {
 									'{{items.10.email|link:items.10.name|prefix:"email - "|paragraph}}',
 								'{% endif %}', { compiled : true, id : 'test.tpl.0' } );
 
-		expect( tpl0.parse( data ).trim() ).to.eql( '<p>email - <a href="mailto:ultrices.sit.amet@nullamagnamalesuada.ca">Zahir</a></p>' );
+		expect( tpl0.parse( data ).trim() ).to.equal( '<p>email - <a href="mailto:ultrices.sit.amet@nullamagnamalesuada.ca">Zahir</a></p>' );
 
 		done();
 	} );
@@ -354,10 +356,10 @@ suite( 'Templ8', function() {
 									'foo equals {{foo}}',
 								'{% endif %}', { compiled : true, id : 'test.tpl.0' } );
 
-		expect( tpl0.parse( { foo :  1 } ) ).to.eql( 'foo equals 1'  );
-		expect( tpl0.parse( { foo :  0 } ) ).to.eql( 'foo equals 0'  );
-		expect( tpl0.parse( { foo : -1 } ) ).to.eql( 'foo equals -1' );
-		expect( tpl0.parse( { foo :  2 } ) ).to.eql( 'foo equals 2'  );
+		expect( tpl0.parse( { foo :  1 } ) ).to.equal( 'foo equals 1'  );
+		expect( tpl0.parse( { foo :  0 } ) ).to.equal( 'foo equals 0'  );
+		expect( tpl0.parse( { foo : -1 } ) ).to.equal( 'foo equals -1' );
+		expect( tpl0.parse( { foo :  2 } ) ).to.equal( 'foo equals 2'  );
 
 		done();
 	} );
@@ -390,12 +392,12 @@ suite( 'Templ8', function() {
 									'<p>{{iter.index1}}. {{item.email|link:$_.name}}</p>',
 								'{% endfor %}', { compiled : true, id : 'test.tpl.5' } );
 
-		expect( tpl0.parse( data ) ).to.eql( e1 );
-		expect( tpl1.parse( data ) ).to.eql( e1 );
-		expect( tpl2.parse( data ) ).to.eql( e2 );
-		expect( tpl3.parse( data ) ).to.eql( e3 );
-		expect( tpl4.parse( data ) ).to.eql( e2 );
-		expect( tpl5.parse( data ) ).to.eql( e3 );
+		expect( tpl0.parse( data ) ).to.equal( e1 );
+		expect( tpl1.parse( data ) ).to.equal( e1 );
+		expect( tpl2.parse( data ) ).to.equal( e2 );
+		expect( tpl3.parse( data ) ).to.equal( e3 );
+		expect( tpl4.parse( data ) ).to.equal( e2 );
+		expect( tpl5.parse( data ) ).to.equal( e3 );
 
 		done();
 	} );
@@ -405,7 +407,7 @@ suite( 'Templ8', function() {
 									'<index>{{iter.index}}</index><prevIndex>{{iter.prevIndex}}</prevIndex><nextIndex>{{iter.nextIndex}}</nextIndex><first>{{iter.first.name}}</first><last>{{iter.last.name}}</last><next>{{iter.next.name if iter.next|exists }}</next><prev>{{iter.prev.name if iter.prev|exists }}</prev>',
 								'{% endfor %}', { compiled : true, id : 'test.tpl.0' } );
 
-		expect( tpl0.parse( data ) ).to.eql( '<index>0</index><prevIndex>undefined</prevIndex><nextIndex>1</nextIndex><first>Baxter</first><last>Fleur</last><next>Alyssa</next><prev></prev><index>1</index><prevIndex>0</prevIndex><nextIndex>2</nextIndex><first>Baxter</first><last>Fleur</last><next>Fleur</next><prev>Baxter</prev><index>2</index><prevIndex>1</prevIndex><nextIndex>undefined</nextIndex><first>Baxter</first><last>Fleur</last><next></next><prev>Alyssa</prev>' );
+		expect( tpl0.parse( data ) ).to.equal( '<index>0</index><prevIndex>undefined</prevIndex><nextIndex>1</nextIndex><first>Baxter</first><last>Fleur</last><next>Alyssa</next><prev></prev><index>1</index><prevIndex>0</prevIndex><nextIndex>2</nextIndex><first>Baxter</first><last>Fleur</last><next>Fleur</next><prev>Baxter</prev><index>2</index><prevIndex>1</prevIndex><nextIndex>undefined</nextIndex><first>Baxter</first><last>Fleur</last><next></next><prev>Alyssa</prev>' );
 
 		done();
 	} );
@@ -446,14 +448,14 @@ suite( 'Templ8', function() {
 									'<p>{{iter.index1}}. {{k}}: {{v.width}}</p>',
 								'{% endfor %}', { compiled : true, id : 'test.tpl.7' } );
 
-		expect( tpl0.parse( data ) ).to.eql( e1 );
-		expect( tpl1.parse( data ) ).to.eql( e1 );
-		expect( tpl2.parse( data ) ).to.eql( e2 );
-		expect( tpl3.parse( data ) ).to.eql( e3 );
-		expect( tpl4.parse( data ) ).to.eql( e2 );
-		expect( tpl5.parse( data ) ).to.eql( e3 );
-		expect( tpl6.parse( data ) ).to.eql( e2 );
-		expect( tpl7.parse( data ) ).to.eql( e3 );
+		expect( tpl0.parse( data ) ).to.equal( e1 );
+		expect( tpl1.parse( data ) ).to.equal( e1 );
+		expect( tpl2.parse( data ) ).to.equal( e2 );
+		expect( tpl3.parse( data ) ).to.equal( e3 );
+		expect( tpl4.parse( data ) ).to.equal( e2 );
+		expect( tpl5.parse( data ) ).to.equal( e3 );
+		expect( tpl6.parse( data ) ).to.equal( e2 );
+		expect( tpl7.parse( data ) ).to.equal( e3 );
 
 		done();
 	} );
@@ -477,9 +479,9 @@ suite( 'Templ8', function() {
 									'<p>PASS</p>',
 								'{% endfor %}', { compiled : true, id : 'test.tpl.1' } );
 
-		expect( tpl0.parse( data ) ).to.eql( '<p>PASS</p>' );
-		expect( tpl1.parse( data ) ).to.eql( '<p>PASS</p>' );
-		expect( tpl2.parse( data ) ).to.eql( '<p>PASS</p>' );
+		expect( tpl0.parse( data ) ).to.equal( '<p>PASS</p>' );
+		expect( tpl1.parse( data ) ).to.equal( '<p>PASS</p>' );
+		expect( tpl2.parse( data ) ).to.equal( '<p>PASS</p>' );
 
 		done();
 	} );
@@ -494,8 +496,8 @@ suite( 'Templ8', function() {
 								'{{title|parse:"test.subtpl.sub_template"}}',
 								{ compiled : true, id : 'test.subtpl' } );
 
-		expect( tpl1.parse( data ) ).to.eql( '<p>Test data</p>' );
-//		expect( tpl2.parse( data ) ).to.eql( '<p><strong>Test data</strong></p>' );
+		expect( tpl1.parse( data ) ).to.equal( '<p>Test data</p>' );
+//		expect( tpl2.parse( data ) ).to.equal( '<p><strong>Test data</strong></p>' );
 
 		done();
 	} );
@@ -513,28 +515,28 @@ suite( 'Templ8', function() {
 			tpl9  = new Templ8( '{[ v + k for each ( [k, v] in items [2..5] ) if v < 4 ]}',      { compiled : true, id : 'test.tpl.9'  } ),
 			tpl10 = new Templ8( '{[ v + k for each ( [k, v] in items [3..] ) unless v == 3 ]}',  { compiled : true, id : 'test.tpl.10' } );
 
-		expect( tpl0.parse(  { items : [1, 2, 3, 4, 5, 6] } ) ).to.eql(  '123456' );
-		expect( tpl1.parse(  { items : [1, 2, 3, 4, 5, 6] } ) ).to.eql(     '123' );
-		expect( tpl2.parse(  { items : [1, 2, 3, 4, 5, 6] } ) ).to.eql(     '123' );
-		expect( tpl3.parse(  { items : [1, 2, 3, 4, 5, 6] } ) ).to.eql(  '123456' );
-		expect( tpl4.parse(  { items : [1, 2, 3, 4, 5, 6] } ) ).to.eql(     '123' );
-		expect( tpl5.parse(  { items : [1, 2, 3, 4, 5, 6] } ) ).to.eql(     '123' );
-		expect( tpl6.parse(  { items : [1, 2, 3, 4, 5, 6] } ) ).to.eql( '1357911' );//
-		expect( tpl7.parse(  { items : [1, 2, 3, 4, 5, 6] } ) ).to.eql(     '135' );//
-		expect( tpl8.parse(  { items : [1, 2, 3, 4, 5, 6] } ) ).to.eql(     '123' );
-		expect( tpl9.parse(  { items : [1, 2, 3, 4, 5, 6] } ) ).to.eql(      '35' );//
-		expect( tpl10.parse( { items : [1, 2, 3, 4, 5, 6] } ) ).to.eql(    '7911' );//
-		expect( tpl0.parse(  { items : { one : 1, two : 2, three : 3, four : 4, five : 5, six : 6 } } ) ).to.eql( '123456' );
-		expect( tpl1.parse(  { items : { one : 1, two : 2, three : 3, four : 4, five : 5, six : 6 } } ) ).to.eql(    '123' );
-		expect( tpl2.parse(  { items : { one : 1, two : 2, three : 3, four : 4, five : 5, six : 6 } } ) ).to.eql(    '123' );
-		expect( tpl3.parse(  { items : { one : 1, two : 2, three : 3, four : 4, five : 5, six : 6 } } ) ).to.eql( '123456' );
-		expect( tpl4.parse(  { items : { one : 1, two : 2, three : 3, four : 4, five : 5, six : 6 } } ) ).to.eql(    '123' );
-		expect( tpl5.parse(  { items : { one : 1, two : 2, three : 3, four : 4, five : 5, six : 6 } } ) ).to.eql(    '123' );
-		expect( tpl6.parse(  { items : { one : 1, two : 2, three : 3, four : 4, five : 5, six : 6 } } ) ).to.eql( '1one2two3three4four5five6six' );
-		expect( tpl7.parse(  { items : { one : 1, two : 2, three : 3, four : 4, five : 5, six : 6 } } ) ).to.eql( '1one2two3three' );
-		expect( tpl8.parse(  { items : { one : 1, two : 2, three : 3, four : 4, five : 5, six : 6 } } ) ).to.eql(    '123' );
-		expect( tpl9.parse(  { items : { one : 1, two : 2, three : 3, four : 4, five : 5, six : 6 } } ) ).to.eql( '2two3three' );
-		expect( tpl10.parse( { items : { one : 1, two : 2, three : 3, four : 4, five : 5, six : 6 } } ) ).to.eql( '4four5five6six' );
+		expect( tpl0.parse(  { items : [1, 2, 3, 4, 5, 6] } ) ).to.equal(  '123456' );
+		expect( tpl1.parse(  { items : [1, 2, 3, 4, 5, 6] } ) ).to.equal(     '123' );
+		expect( tpl2.parse(  { items : [1, 2, 3, 4, 5, 6] } ) ).to.equal(     '123' );
+		expect( tpl3.parse(  { items : [1, 2, 3, 4, 5, 6] } ) ).to.equal(  '123456' );
+		expect( tpl4.parse(  { items : [1, 2, 3, 4, 5, 6] } ) ).to.equal(     '123' );
+		expect( tpl5.parse(  { items : [1, 2, 3, 4, 5, 6] } ) ).to.equal(     '123' );
+		expect( tpl6.parse(  { items : [1, 2, 3, 4, 5, 6] } ) ).to.equal( '1357911' );//
+		expect( tpl7.parse(  { items : [1, 2, 3, 4, 5, 6] } ) ).to.equal(     '135' );//
+		expect( tpl8.parse(  { items : [1, 2, 3, 4, 5, 6] } ) ).to.equal(     '123' );
+		expect( tpl9.parse(  { items : [1, 2, 3, 4, 5, 6] } ) ).to.equal(      '35' );//
+		expect( tpl10.parse( { items : [1, 2, 3, 4, 5, 6] } ) ).to.equal(    '7911' );//
+		expect( tpl0.parse(  { items : { one : 1, two : 2, three : 3, four : 4, five : 5, six : 6 } } ) ).to.equal( '123456' );
+		expect( tpl1.parse(  { items : { one : 1, two : 2, three : 3, four : 4, five : 5, six : 6 } } ) ).to.equal(    '123' );
+		expect( tpl2.parse(  { items : { one : 1, two : 2, three : 3, four : 4, five : 5, six : 6 } } ) ).to.equal(    '123' );
+		expect( tpl3.parse(  { items : { one : 1, two : 2, three : 3, four : 4, five : 5, six : 6 } } ) ).to.equal( '123456' );
+		expect( tpl4.parse(  { items : { one : 1, two : 2, three : 3, four : 4, five : 5, six : 6 } } ) ).to.equal(    '123' );
+		expect( tpl5.parse(  { items : { one : 1, two : 2, three : 3, four : 4, five : 5, six : 6 } } ) ).to.equal(    '123' );
+		expect( tpl6.parse(  { items : { one : 1, two : 2, three : 3, four : 4, five : 5, six : 6 } } ) ).to.equal( '1one2two3three4four5five6six' );
+		expect( tpl7.parse(  { items : { one : 1, two : 2, three : 3, four : 4, five : 5, six : 6 } } ) ).to.equal( '1one2two3three' );
+		expect( tpl8.parse(  { items : { one : 1, two : 2, three : 3, four : 4, five : 5, six : 6 } } ) ).to.equal(    '123' );
+		expect( tpl9.parse(  { items : { one : 1, two : 2, three : 3, four : 4, five : 5, six : 6 } } ) ).to.equal( '2two3three' );
+		expect( tpl10.parse( { items : { one : 1, two : 2, three : 3, four : 4, five : 5, six : 6 } } ) ).to.equal( '4four5five6six' );
 
 		done();
 	} );
@@ -544,7 +546,7 @@ suite( 'Templ8', function() {
 
 		tpl.parse( data );
 
-		expect( m8.global.tpl_test_value ).to.be( true );
+		expect( m8.global.tpl_test_value ).to.be.true;
 
 		done();
 	} );
@@ -552,19 +554,19 @@ suite( 'Templ8', function() {
 	test( 'Comments will not be parsed and thus not affect a Templ8\'s output', function( done ) {
 		var tpl = new Templ8( '{# test comments #}', { compiled : true, id : 'test.tpl' } );
 
-		expect( tpl.parse( data ) ).to.be.empty();
+		expect( tpl.parse( data ) ).to.be.empty;
 
 		done();
 	} );
 
 	test( '<static> format can perform simple string substitutions', function( done ) {
-		expect( Templ8.format( 'Hello {3}, a {0}, a {1}, a {0}, {1}, {2}, HIT IT!!!', 1, 2, 3, 'World' ) ).to.eql( 'Hello World, a 1, a 2, a 1, 2, 3, HIT IT!!!' );
+		expect( Templ8.format( 'Hello {3}, a {0}, a {1}, a {0}, {1}, {2}, HIT IT!!!', 1, 2, 3, 'World' ) ).to.equal( 'Hello World, a 1, a 2, a 1, 2, 3, HIT IT!!!' );
 
 		done();
 	} );
 
 	test( '<static> gsub can perform simple string substitutions', function( done ) {
-		expect( Templ8.gsub( 'Hello {name}, a {first}, a {second}, a {first}, {second}, {third}, HIT IT!!!', { first : 1, second : 2, third : 3, name : 'World' } ) ).to.eql( 'Hello World, a 1, a 2, a 1, 2, 3, HIT IT!!!' );
+		expect( Templ8.gsub( 'Hello {name}, a {first}, a {second}, a {first}, {second}, {third}, HIT IT!!!', { first : 1, second : 2, third : 3, name : 'World' } ) ).to.equal( 'Hello World, a 1, a 2, a 1, 2, 3, HIT IT!!!' );
 
 		done();
 	} );

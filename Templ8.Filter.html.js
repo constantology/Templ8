@@ -10,7 +10,7 @@
 		linebreaks : function( str ) { return Templ8.stringify( str ).replace( /[\r\n]/gm, '<br />\n' ); },
 		link       : function( url, str ) {
 			str = typeof str == 'string' ? str : url;
-			return str.link( ( !!~url.indexOf( '@' ) ? 'mailto:' : '' ) + url );
+			return '<a href="' + ( !!~url.indexOf( '@' ) ? 'mailto:' : '' ) + url + '">' + str + '</a>';
 		},
 		paragraph  : function( str ) { return Templ8.stringify( str ).replace( /([^\r\n]+)/gm, '<p>$1</p>' ); },
 		stripe     : function( i ) { return parseInt( i, 10 ) & 1 ? 'stripe-odd' : 'stripe-even'; }

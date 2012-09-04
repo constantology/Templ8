@@ -4,7 +4,9 @@
 		"email"       : "christos@muigui.com",
 		"url"         : "http://muigui.com"
 	},
-	"bin"             : { "Templ8" : "./bin/Templ8" },
+	"bin"             : {
+		"Templ8"      : "./bin/Templ8"
+	},
 	"description"     : "JavaScript Client/ Server Template Engine",
 	"dependencies"    : {
 		"m8"          : ">= 0.1.0",
@@ -16,16 +18,16 @@
 	"keywords"        : ["template", "tpl", "Templ8"],
 	"licenses"        : [ {
 		"type"        : "MIT",
-		"url"        : "https://raw.github.com/constantology/Templ8/master/LICENSE"
+		"url"         : "https://raw.github.com/constantology/Templ8/master/LICENSE"
 	} ],
-	"main"            : "./Templ8.js",
+	"main"            : "./Templ8",
 	"name"            : "Templ8",
 	"repository"      : {
 		"type"        : "git",
 		"url"         : "git@github.com:constantology/Templ8.git"
 	},
 	"scripts"         : {
-		"test"        : "mocha -c --globals mocha,expect,m8,Templ8,tpl_test_value -R spec -u tdd ./test"
+		"test"        : "mocha -c --ignore-leaks -R spec -u tdd ./test/Templ8.test.js"
 	},
-	"version"         : "0.9.9"
+	"version"         : "0.9.10"
 }
