@@ -27,7 +27,7 @@
 		"url"         : "git@github.com:constantology/Templ8.git"
 	},
 	"scripts"         : {
-		"test"        : "mocha -c --ignore-leaks -R spec -u tdd ./test/Templ8.test.js"
+		"test"        : "mocha -c --ignore-leaks -R spec -u tdd ./test/*.test.js"
 	},
-	"version"         : "0.9.10"
+	"version"         : "0.9.11"
 }
