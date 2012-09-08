@@ -58,7 +58,7 @@ defaults.prefix = function( pfx ) {
 
 process.argv.length > 2 || process.argv.push( '-h' );
 
-program.version( '0.8.1' )
+program.version( '0.9.11' )
 	   .description( 'Generate Templ8s from your nice clean HTML.' )
 	   .option( '-c, --config <file>',       'An optional Templ8 configuration include in all processed Templ8\'s.', defaults.config )
 	   .option( '-cs, --charset [encoding]', 'File encoding. Defaults to utf-8.', 'utf-8' )
