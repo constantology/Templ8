@@ -1,7 +1,7 @@
-
 ;!function( util, Name, PACKAGE ) {
 	"use strict";
 
+/*~  Templ8/src/Templ8.js  ~*/
 	var U, RESERVED = '__ASSERT__ __CONTEXT__ __FILTER_ __OUTPUT__ __UTIL__ $_ document false global instanceof null true typeof undefined window'.split( ' ' ).reduce( function( o, k ) {
 			o[k] = true; return o;
 		}, util.obj() ),
@@ -442,6 +442,7 @@
 
 /*** END:   Templ8 functionality packages ***/
 
+/*~  Templ8/src/Tag.js  ~*/
 	var _tags = [ {
 			start : '{{', end : '}}',
 			emit  : function( internals, ctx, str, tpl_parts ) {
@@ -534,6 +535,7 @@
 
 	__Class__.Tag.compileRegExp();
 
+/*~  Templ8/src/Statement.js  ~*/
 ( function() {
 	var _statements = {
 		'for'      : function( internals, ctx, statement ) {
@@ -608,6 +610,7 @@
 	__Class__.Statement.add( 'elsif', _statements.elseif );
 }() );
 
+/*~  Templ8/src/Filter.js  ~*/
 	__Class__.Filter.add( {
 		capitalize     : function( str ) {
 			str = __Class__.stringify( str );

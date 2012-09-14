@@ -1,0 +1,10 @@
+{
+	"source"    : {
+		"dir"   : "./src",
+		"files" : ["Templ8", "Tag", "Statement", "Filter"]
+	},
+	"target"    : {
+		"dir"   : "{pwd}"
+	},
+	"type"      : "application/javascript"
+}
