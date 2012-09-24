@@ -1,16 +1,14 @@
-[![build status](https://secure.travis-ci.org/constantology/Templ8.png)](http://travis-ci.org/constantology/Templ8)
-
-#TODO:
-
-- documentation is not yet complete
-
-# Templ8
+# Templ8 [![build status](https://secure.travis-ci.org/constantology/Templ8.png)](http://travis-ci.org/constantology/Templ8)
 
 Templ8 as you can probably guess is a JavaScript template engine, with a Django'ish style of syntax.
 
 It's fast, light weight and unlike a lot of other JavaScript template engines: **Templ8 does not use the JavaScript `with` statement**. This actually makes Templ8 parse templates faster than it would if it did use the `with` statement!
 
 Templ8 does not restrict you to generating HTML. All outputs are strings so if you want to generate HTML, CSS, JavaScript or whatever, the choice is yours...
+
+#TODO:
+
+- documentation is not yet complete
 
 ## Dependencies
 
