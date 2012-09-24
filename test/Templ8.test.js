@@ -1,5 +1,5 @@
 typeof m8     !== 'undefined' || ( m8     = require( 'm8'     ) );
-typeof Templ8 !== 'undefined' || ( Templ8 = require( 'Templ8' ) );
+typeof Templ8 !== 'undefined' || ( Templ8 = require( '../Templ8' ) );
 typeof chai   !== 'undefined' || ( chai   = require( 'chai'   ) );
 
 m8.ENV != 'commonjs' || require( '../Templ8.Filter.html' );
