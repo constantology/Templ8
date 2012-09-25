@@ -1,4 +1,4 @@
-# Templ8 [![build status](https://secure.travis-ci.org/constantology/Templ8.png)](http://travis-ci.org/constantology/Templ8)
+# Templ8.js [![build status](https://secure.travis-ci.org/constantology/Templ8.png)](http://travis-ci.org/constantology/Templ8)
 
 Templ8 as you can probably guess is a JavaScript template engine, with a Django'ish style of syntax.
 
