@@ -39,7 +39,8 @@
 			},
 			stop       : function( iter ) { iter.stop(); },
 			stringify  : stringify,
-			type       : function( o )    { return util.type( o ); }
+			type       : function( o )    { return util.type( o ); },
+			value      : function( o, key ) { return Object.value( o, key ); }
 		},
 		cache_key = '__tpl_cs_cached_keys',                         cache_stack = '__tpl_cs_stack',
 		defaults  = 'compiled debug dict fallback id'.split( ' ' ), delim       = '<~>',
