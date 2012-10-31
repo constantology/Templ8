@@ -1,7 +1,7 @@
 ;!function( util, Name, PACKAGE ) {
 	"use strict";
 
-/*~  Templ8/src/Templ8.js  ~*/
+/*~  src/Templ8.js  ~*/
 	var U, RESERVED = '__ASSERT__ __CONTEXT__ __FILTER_ __OUTPUT__ __UTIL__ $_ document false global instanceof null true typeof undefined window'.split( ' ' ).reduce( function( o, k ) {
 			o[k] = true; return o;
 		}, util.obj() ),
@@ -26,27 +26,44 @@
 			startsWith : function( s, str ) { return String( s ).indexOf( str ) === 0; }
 		},
 		bf = {}, bu = {
-			objectify  : function( v, k )       { var o = {}; o[k] = v; return o; },
+			inspect    : function( v ) {
+				switch ( util.nativeType( v ) ) {
+					case 'object' :
+					case 'array'  : console.dir( v ); break;
+					default       : console.log( v );
+				}
+				return '';
+			},
+			objectify  : function( v, k ) { var o = {}; o[k] = v; return o; },
 			parse      : function( o, id, tpl ) {
-				id = String( id ).trim();
+				var d = [tpl[fn_var.dict], o], t;
 
-				var d = [tpl[fn_var.dict], o],
-					t = getTPL( format( tpl_sub, this.id, id ) ) || getTPL( id );
+				if ( id instanceof __Class__ )
+					t  = id;
+				else {
+					id = String( id ).trim();
+					t  = getTPL( format( tpl_sub, this.id, id ) ) || getTPL( id )
+				}
 
-				d[fn_var.dict] = true;
+				if ( !t ) return this.fallback;
 
-				return t ? t.parse( o ) : this.fallback;
+				o[fn_var.parent] = tpl[fn_var.dict];
+
+				return t.parse( o );
 			},
 			stop       : function( iter ) { iter.stop(); },
 			stringify  : stringify,
-			type       : function( o )    { return util.type( o ); },
+			type       : function( o, match ) {
+				var type = util.type( o );
+				return typeof match == 'string' ? type == match : type;
+			},
 			value      : function( o, key ) { return Object.value( o, key ); }
 		},
 		cache_key = '__tpl_cs_cached_keys',                         cache_stack = '__tpl_cs_stack',
 		defaults  = 'compiled debug dict fallback id'.split( ' ' ), delim       = '<~>',
 		esc_chars = /([-\*\+\?\.\|\^\$\/\\\(\)[\]\{\}])/g,          esc_val     = '\\$1',
 
-		fn_var    = { assert : '__ASSERT__', ctx : '__CONTEXT__', dict : '__dict__', filter : '__FILTER__', output : '__OUTPUT__', util : '__UTIL__' },
+		fn_var    = { assert : '__ASSERT__', ctx : '__CONTEXT__', dict : '__dict__', filter : '__FILTER__', output : '__OUTPUT__', parent : '__PARENT__', util : '__UTIL__' },
 		fn_end    = format( 'return {0};\n ', fn_var.output ),
 		fn_start  = '\n"use strict";\n' + format( 'var $C = new ContextStack( {0}, this.fallback, this.dict ), $_ = $C.current(), iter = new Iter( null ), {1} = "", U;', fn_var.ctx, fn_var.output ),
 
@@ -94,7 +111,7 @@
 	}
 	
 	function not_empty( o ) { return !util.empty( o ); }
-/*** END:   Utility Functions ***/
+/*** END:   Utility Functions  ***/
 
 /*** START: Classes used by compiled templates ***/
 	function ContextStack( dict, fallback ) {
@@ -443,7 +460,7 @@
 
 /*** END:   Templ8 functionality packages ***/
 
-/*~  Templ8/src/Tag.js  ~*/
+/*~  src/Tag.js  ~*/
 	var _tags = [ {
 			start : '{{', end : '}}',
 			emit  : function( internals, ctx, str, tpl_parts ) {
@@ -536,7 +553,7 @@
 
 	__Class__.Tag.compileRegExp();
 
-/*~  Templ8/src/Statement.js  ~*/
+/*~  src/Statement.js  ~*/
 ( function() {
 	var _statements = {
 		'for'      : function( internals, ctx, statement ) {
@@ -611,7 +628,7 @@
 	__Class__.Statement.add( 'elsif', _statements.elseif );
 }() );
 
-/*~  Templ8/src/Filter.js  ~*/
+/*~  src/Filter.js  ~*/
 	__Class__.Filter.add( {
 		capitalize     : function( str ) {
 			str = __Class__.stringify( str );
