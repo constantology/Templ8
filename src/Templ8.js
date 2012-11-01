@@ -23,7 +23,7 @@
 		},
 		bf = {}, bu = {
 			inspect    : function( v ) {
-				switch ( util.nativeType( v ) ) {
+				switch ( util.ntype( v ) ) {
 					case 'object' :
 					case 'array'  : console.dir( v ); break;
 					default       : console.log( v );
@@ -119,7 +119,7 @@
 			this.fallback    = fallback;
 		}
 
-		switch( util.nativeType( dict ) ) {
+		switch( util.ntype( dict ) ) {
 			case 'object' : this.push( dict );
 							break;
 			case 'array'  : dict[fn_var.dict]
@@ -297,7 +297,7 @@
 	function stringify( o, str ) {
 		switch ( typeof o ) {
 			case 'boolean' : case 'number' : case 'string' : return String( o );
-			default        : switch ( util.nativeType( o ) ) {
+			default        : switch ( util.ntype( o ) ) {
 				case 'date'   : return o.toDateString();
 				case 'array'  : return mapc( o, stringify ).join( ', ' );
 				case 'object' : return cache_key in o

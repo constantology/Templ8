@@ -27,7 +27,7 @@
 		},
 		bf = {}, bu = {
 			inspect    : function( v ) {
-				switch ( util.nativeType( v ) ) {
+				switch ( util.ntype( v ) ) {
 					case 'object' :
 					case 'array'  : console.dir( v ); break;
 					default       : console.log( v );
@@ -111,7 +111,7 @@
 	}
 	
 	function not_empty( o ) { return !util.empty( o ); }
-/*** END:   Utility Functions  ***/
+/*** END:   Utility Functions ***/
 
 /*** START: Classes used by compiled templates ***/
 	function ContextStack( dict, fallback ) {
@@ -123,7 +123,7 @@
 			this.fallback    = fallback;
 		}
 
-		switch( util.nativeType( dict ) ) {
+		switch( util.ntype( dict ) ) {
 			case 'object' : this.push( dict );
 							break;
 			case 'array'  : dict[fn_var.dict]
@@ -301,7 +301,7 @@
 	function stringify( o, str ) {
 		switch ( typeof o ) {
 			case 'boolean' : case 'number' : case 'string' : return String( o );
-			default        : switch ( util.nativeType( o ) ) {
+			default        : switch ( util.ntype( o ) ) {
 				case 'date'   : return o.toDateString();
 				case 'array'  : return mapc( o, stringify ).join( ', ' );
 				case 'object' : return cache_key in o
@@ -642,14 +642,14 @@
 		},
 		def            : function( str, def ) { return ba.blank( str ) ? def : str; },
 		first          : function( o ) {
-			switch ( util.nativeType( o ) ) {
+			switch ( util.ntype( o ) ) {
 				case 'array'  : return o[0];
 				case 'string' : return o.charAt( 0 );
 			}
 		},
 		join           : function( o, s ) { return util.got( o, 'join' ) && typeof o.join == 'function' ? o.join( s ) : o; },
 		last           : function( o ) {
-			switch ( util.nativeType( o ) ) {
+			switch ( util.ntype( o ) ) {
 				case 'array'  : return o[o.length-1];
 				case 'string' : return o.charAt( o.length - 1 );
 			}

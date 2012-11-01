@@ -11,14 +11,14 @@
 		},
 		def            : function( str, def ) { return ba.blank( str ) ? def : str; },
 		first          : function( o ) {
-			switch ( util.nativeType( o ) ) {
+			switch ( util.ntype( o ) ) {
 				case 'array'  : return o[0];
 				case 'string' : return o.charAt( 0 );
 			}
 		},
 		join           : function( o, s ) { return util.got( o, 'join' ) && typeof o.join == 'function' ? o.join( s ) : o; },
 		last           : function( o ) {
-			switch ( util.nativeType( o ) ) {
+			switch ( util.ntype( o ) ) {
 				case 'array'  : return o[o.length-1];
 				case 'string' : return o.charAt( o.length - 1 );
 			}
