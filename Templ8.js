@@ -36,7 +36,7 @@
 			},
 			objectify  : function( v, k ) { var o = {}; o[k] = v; return o; },
 			parse      : function( o, id, tpl ) {
-				var d = [tpl[fn_var.dict], o], t;
+				var s, t;
 
 				if ( id instanceof __Class__ )
 					t  = id;
@@ -47,9 +47,13 @@
 
 				if ( !t ) return this.fallback;
 
-				o[fn_var.parent] = tpl[fn_var.dict];
+				o[fn_var.parent] = this[fn_var.dict];
 
-				return t.parse( o );
+				s = t.parse( o );
+
+				delete o[fn_var.parent];
+
+				return s;
 			},
 			stop       : function( iter ) { iter.stop(); },
 			stringify  : stringify,
