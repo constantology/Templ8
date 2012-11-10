@@ -262,6 +262,7 @@
 		if ( ctx.debug && typeof util.global[logger] != 'undefined' ) {
 			util.global[logger].info( Name + ': ', ctx.id, ', source: ' ); util.global[logger].log( fn );
 		}
+		fn += '//@ sourceURL=/Templ8/' + ctx.id + '\.tpl';
 		var func = ( new Function( 'root', 'ContextStack', 'Iter', fn_var.filter, fn_var.assert, fn_var.util, fn_var.ctx, fn ) ).bind( ctx, util.global, ContextStack, Iter, util.copy( ctx.filters, __Class__.Filter.all(), true ), ba, bu );
 		util.def( func, 'src', util.describe( fn, 'r' ) );
 		return func;
