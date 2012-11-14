@@ -64,7 +64,7 @@
 			value      : function( o, key ) { return Object.value( o, key ); }
 		},
 		cache_key = '__tpl_cs_cached_keys',                         cache_stack = '__tpl_cs_stack',
-		defaults  = 'compiled debug dict fallback id'.split( ' ' ), delim       = '<~>',
+		defaults  = 'compiled debug dict fallback id sourceURL'.split( ' ' ), delim       = '<~>',
 		esc_chars = /([-\*\+\?\.\|\^\$\/\\\(\)[\]\{\}])/g,          esc_val     = '\\$1',
 
 		fn_var    = { assert : '__ASSERT__', ctx : '__CONTEXT__', dict : '__dict__', filter : '__FILTER__', output : '__OUTPUT__', parent : '__PARENT__', util : '__UTIL__' },
@@ -262,7 +262,7 @@
 		if ( ctx.debug && typeof util.global[logger] != 'undefined' ) {
 			util.global[logger].info( Name + ': ', ctx.id, ', source: ' ); util.global[logger].log( fn );
 		}
-		fn += '//@ sourceURL=/Templ8/' + ctx.id + '\.tpl';
+		fn += format( '\n//@ sourceURL={0}', ctx.sourceURL ? ctx.sourceURL : format( '{0}\.tpl', ctx.id ) );
 		var func = ( new Function( 'root', 'ContextStack', 'Iter', fn_var.filter, fn_var.assert, fn_var.util, fn_var.ctx, fn ) ).bind( ctx, util.global, ContextStack, Iter, util.copy( ctx.filters, __Class__.Filter.all(), true ), ba, bu );
 		util.def( func, 'src', util.describe( fn, 'r' ) );
 		return func;

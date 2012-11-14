@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 var fs       = require( 'fs' ),
+	path     = require( 'path' ),
 
 	mkdirp   = require( 'mkdirp' ),
 	program  = require( 'commander' ),
@@ -19,9 +20,14 @@ function toId( f ) {
 	return program.prefix + f.substring( f.lastIndexOf( '/' ) + 1, f.lastIndexOf( program.extension ) );
 }
 
-function toTempl8( id, str ) {
+function toSourceURL( f ) {
+	return path.resolve( f );
+}
+
+function toTempl8( id, src, str ) {
 	str = str.split( /[\n\r]/ ).compact( true ).map( lines ).join( ',\n' );
-	return Templ8.format( 'new Templ8( m8.copy( { id : \'{0}\' }, config ), {1} );', id, str );
+console.log( src );
+	return Templ8.format( 'new Templ8( m8.copy( { id : \'{0}\', sourceURL : \'{1}\'  }, config ), {2} );', id, src, str );
 }
 
 function validFiles( f ) {
@@ -73,7 +79,7 @@ if ( program.directory.length ) {
 	output = ['!function() {', ( 'var config = ' + program.config + ';' )];
 
 	program.directory.forEach( function( f ) {
-		output.push( toTempl8( toId( f ), fs.readFileSync( f, program.charset ) ) );
+		output.push( toTempl8( toId( f ), toSourceURL( f ), fs.readFileSync( f, program.charset ) ) );
 	} );
 
 	output.push( '}();' );
