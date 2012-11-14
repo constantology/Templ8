@@ -15,7 +15,7 @@
 			exists     : util.exists,
 			is         : function( o, v )   { return o === v },
 			isEven     : function( i )      { return  !( parseInt( i, 10 ) & 1 ); },
-			isOdd      : function( i )      { return  !( parseInt( i, 10 ) & 1 ); },
+			isOdd      : function( i )      { return !!( parseInt( i, 10 ) & 1 ); },
 			isTPL      : function( id )     { return !!( getTPL( format( tpl_sub, this.id, id ) ) || getTPL( id ) ); },
 			iterable   : function( o )      { return util.iter( o ); },
 			notEmpty   : not_empty,
