@@ -1,7 +1,6 @@
 	var U, RESERVED = '__ASSERT__ __CONTEXT__ __FILTER_ __OUTPUT__ __UTIL__ $_ document false global instanceof null true typeof undefined window'.split( ' ' ).reduce( function( o, k ) {
 			o[k] = true; return o;
 		}, util.obj() ),
-		RE_GSUB     = /\$?\{([^\}\s]+)\}/g,
 		ba          = {
 			blank      : function( o ) { return util.empty( o ) || ( typeof o == 'string' && !o.trim() ); },
 			contains   : contains,
@@ -16,7 +15,7 @@
 			is         : function( o, v )   { return o === v },
 			isEven     : function( i )      { return  !( parseInt( i, 10 ) & 1 ); },
 			isOdd      : function( i )      { return !!( parseInt( i, 10 ) & 1 ); },
-			isTPL      : function( id )     { return !!( getTPL( format( tpl_sub, this.id, id ) ) || getTPL( id ) ); },
+			isTPL      : function( id )     { return !!( getTPL( util.format( tpl_sub, this.id, id ) ) || getTPL( id ) ); },
 			iterable   : function( o )      { return util.iter( o ); },
 			notEmpty   : not_empty,
 			startsWith : function( s, str ) { return String( s ).indexOf( str ) === 0; }
@@ -38,7 +37,7 @@
 					t  = id;
 				else {
 					id = String( id ).trim();
-					t  = getTPL( format( tpl_sub, this.id, id ) ) || getTPL( id )
+					t  = getTPL( util.format( tpl_sub, this.id, id ) ) || getTPL( id )
 				}
 
 				if ( !t ) return this.fallback;
@@ -64,8 +63,8 @@
 		esc_chars = /([-\*\+\?\.\|\^\$\/\\\(\)[\]\{\}])/g,          esc_val     = '\\$1',
 
 		fn_var    = { assert : '__ASSERT__', ctx : '__CONTEXT__', dict : '__dict__', filter : '__FILTER__', output : '__OUTPUT__', parent : '__PARENT__', util : '__UTIL__' },
-		fn_end    = format( 'return {0};\n ', fn_var.output ),
-		fn_start  = '\n"use strict";\n' + format( 'var $C = new ContextStack( {0}, this.fallback, this.dict ), $_ = $C.current(), iter = new Iter( null ), {1} = "", U;', fn_var.ctx, fn_var.output ),
+		fn_end    = util.format( 'return {0};\n ', fn_var.output ),
+		fn_start  = '\n"use strict";\n' + util.format( 'var $C = new ContextStack( {0}, this.fallback, this.dict ), $_ = $C.current(), iter = new Iter( null ), {1} = "", U;', fn_var.ctx, fn_var.output ),
 
 		id_count  = 999, internals, logger = 'console', // <= gets around jsLint
 
@@ -85,11 +84,7 @@
 
 	function escapeRE( s ) { return String( s ).replace( esc_chars, esc_val ); }
 
-	function format( s ) { return gsub( s, Array.coerce( arguments, 1 ) ); }
-
 	function getTPL( id ) { return tpl[id] || null; }
-
-	function gsub( s, o, pattern ) { return String( s ).replace( ( pattern || RE_GSUB ), function( m, p ) { return o[p] || ''; } ); }
 
 	function is_obj( o ) { return typeof o == 'object' && ( o.constructor === Object || o.constructor === U ); }
 
@@ -238,7 +233,7 @@
 			}
 			else fn = v;
 			!args || ( args = ', ' + args.split( ',' ).map( function( o ) { return wrapGetter( this, o ); }, ctx ).join( ', ' ) );
-			return format( tpl_statement, getFnParent( fn ), fn, wrapGetter( ctx, res ), args, fn_var.ctx );
+			return util.format( tpl_statement, getFnParent( fn ), fn, wrapGetter( ctx, res ), args, fn_var.ctx );
 		}, '' );
 	}
 
@@ -258,7 +253,7 @@
 		if ( ctx.debug && typeof util.global[logger] != 'undefined' ) {
 			util.global[logger].info( Name + ': ', ctx.id, ', source: ' ); util.global[logger].log( fn );
 		}
-		fn += format( '\n//@ sourceURL={0}', ctx.sourceURL ? ctx.sourceURL : format( '/Templ8/{0}\.tpl', ctx.id ) );
+		fn += util.format( '\n//@ sourceURL={0}', ctx.sourceURL ? ctx.sourceURL : util.format( '/Templ8/{0}\.tpl', ctx.id ) );
 		var func = ( new Function( 'root', 'ContextStack', 'Iter', fn_var.filter, fn_var.assert, fn_var.util, fn_var.ctx, fn ) ).bind( ctx, util.global, ContextStack, Iter, util.copy( ctx.filters, __Class__.Filter.all(), true ), ba, bu );
 		util.def( func, 'src', util.describe( fn, 'r' ) );
 		return func;
@@ -277,7 +272,7 @@
 			part = parts.shift();
 			return tag.emit( internals, ctx, part, parts );
 		}
-		return wrapStr( format( '"{0}"', part.replace( re_esc, "\\$1" ) ) );
+		return wrapStr( util.format( '"{0}"', part.replace( re_esc, "\\$1" ) ) );
 	}
 
  	function formatStatement( ctx, str ) {
@@ -328,10 +323,10 @@
 			|| ( ba.startsWith( o, "'" ) && ba.endsWith( o, "'" ) )
 			|| !isNaN( o ) )
 		? o : ( ba.startsWith( o, '$_.' ) || ba.startsWith( o, 'iter.' ) || ( k.length && usingIterKeys( k, o ) ) || o in RESERVED )
-		? o.replace( re_statement_fix, re_statement_replacer ) : format( '$C.get( "{0}" )', o );
+		? o.replace( re_statement_fix, re_statement_replacer ) : util.format( '$C.get( "{0}" )', o );
 	}
 
-	function wrapStr( str ) { return format( '{0} += {1};', fn_var.output, str.replace( re_br, '\\n' ) ); }
+	function wrapStr( str ) { return util.format( '{0} += {1};', fn_var.output, str.replace( re_br, '\\n' ) ); }
 
 // these will be passed to tags & statements for internal usage
 	internals = {
@@ -367,7 +362,7 @@
 	}
 
 	function $id( ctx ) {
-		ctx.id || ( ctx.id = format( tpl_id, ++id_count ) );
+		ctx.id || ( ctx.id = util.format( tpl_id, ++id_count ) );
 		return ctx.id;
 	}
 
@@ -397,8 +392,8 @@
 // exposed for general usage
 	util.defs( __Class__, {             // store a reference to m8 in Templ8 so we can do fun stuff in commonjs
 		m8       : { value : util }, // modules without having to re-request m8 as well as Templ8 each time.
-		escapeRE : escapeRE,  format    : format,    get : getTPL,
-		gsub     : gsub,      stringify : stringify
+		escapeRE : escapeRE,  format    : util.format,  get : getTPL,
+		gsub     : util.gsub, stringify : stringify
 	}, 'r' );
 
 	function Mgr( o ) {
@@ -438,7 +433,7 @@
 			tag[this.start] = this;
 		}
 
-		function assert_exists( k ) { if ( !( k in this ) ) { throw new TypeError( format( 'A ' + Name + ' Tag requires an {0}', ERRORS[k] ) ); } }
+		function assert_exists( k ) { if ( !( k in this ) ) { throw new TypeError( util.format( 'A ' + Name + ' Tag requires an {0}', ERRORS[k] ) ); } }
 		
 		this.all = function() { return util.copy( tag ); };
 

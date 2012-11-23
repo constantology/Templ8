@@ -594,7 +594,7 @@ Allows you to add comments in your template.
 ## File size
 
 - Templ8.js ≅ 7.7kb (gzipped)
-- Templ8.min.js ≅ 5.1kb (minzipped)
+- Templ8.min.js ≅ 5.2kb (minzipped)
 
 ## License
 

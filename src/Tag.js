@@ -42,7 +42,7 @@
 					}
 				}
 
-				if ( !tag ) throw new SyntaxError( format( Name + ' tag: {0} does not exist.', tag ) );
+				if ( !tag ) throw new SyntaxError( util.format( Name + ' tag: {0} does not exist.', tag ) );
 
 				return typeof tag == 'function' ? tag( internals, ctx, statement, tpl_parts ) : tag;
 			}

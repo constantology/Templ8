@@ -4,7 +4,8 @@
 		"files" : ["Templ8", "Tag", "Statement", "Filter"]
 	},
 	"target"    : {
-		"dir"   : "{pwd}"
+		"dir"   : "{pwd}",
+		"min"   : true
 	},
 	"type"      : "application/javascript"
 }

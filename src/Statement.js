@@ -16,15 +16,15 @@
 
 			iter = internals.formatstatement( ctx, iter );
 
-			str.push( format( ['',
+			str.push( util.format( ['',
 				'iter = new Iter( {0}, iter, {1}, {2} );',
 				'while ( iter.hasNext() ) {',
 					'$_ = iter.current;'].join( '\n\r' ), iter, start, count ) );
 
 			if ( keys && keys.length > 0 ) {
 				ctx.currentIterKeys.unshift( keys );
-				if ( keys.length < 2 ) str.push( format( 'var {0} = iter.current;\n\r', keys[0] ) );
-				else if ( keys.length >= 2 ) str.push( format( 'var {0} = iter.key, {1} = iter.current;\n\r', keys[0], keys[1] ) );
+				if ( keys.length < 2 ) str.push( util.format( 'var {0} = iter.current;\n\r', keys[0] ) );
+				else if ( keys.length >= 2 ) str.push( util.format( 'var {0} = iter.key, {1} = iter.current;\n\r', keys[0], keys[1] ) );
 			}
 
 			return str.join( '' );
@@ -32,12 +32,12 @@
 		'forempty' : '\n\r}\n\rif ( iter.empty ) {\n\r',
 		'endfor'   : function( internals, ctx ) {
 			ctx.currentIterKeys.shift();
-			return format( ['\n\r}',
+			return util.format( ['\n\r}',
 			                'iter = iter.parent  || new Iter( null );',
 			                '$_   = iter.current || $C.current(); \n\r'].join( '\n\r' ), internals.fnvar.util );
 		},
-		'if'       : function( internals, ctx, statement ) { return format( 'if ( {0} ) { ',         formatStatement( ctx, internals.formatstatement, statement ) ); },
-		'elseif'   : function( internals, ctx, statement ) { return format( ' } else if ( {0} ) { ', formatStatement( ctx, internals.formatstatement, statement ) ); },
+		'if'       : function( internals, ctx, statement ) { return util.format( 'if ( {0} ) { ',         formatStatement( ctx, internals.formatstatement, statement ) ); },
+		'elseif'   : function( internals, ctx, statement ) { return util.format( ' } else if ( {0} ) { ', formatStatement( ctx, internals.formatstatement, statement ) ); },
 		'else'     : ' } else { ',
 		'endif'    : ' }',
 		'sub'      : function( internals, ctx, statement, tpl_parts ) {
@@ -49,7 +49,7 @@
 			parts = tpl_parts.splice( 0, i + 1 );
 			parts.splice( parts.length - 2, parts.length );
 
-			id = format( '{0}.{1}', ctx.id, id );
+			id = util.format( '{0}.{1}', ctx.id, id );
 
 			sub_tpl = new __Class__( '', util.copy( { debug : ctx.debug, fallback : ctx.fallback, id : id }, ctx.filters ) );
 // the parts have already been split, for efficiency we can skip a call to createTemplate() and the more costly splitStr()
@@ -61,7 +61,7 @@
 
 			return '';
 		},
-		'unless' : function( internals, ctx, statement ) { return format( 'if ( !( {0} ) ) { ', formatStatement( ctx, internals.formatstatement, statement ) ); }
+		'unless' : function( internals, ctx, statement ) { return util.format( 'if ( !( {0} ) ) { ', formatStatement( ctx, internals.formatstatement, statement ) ); }
 	},
 	re_for_split = /^(\[[^,]+,\s*[^\]]+\]|[^\s]+)(?:\s+in\s+([^\s\[]+)){0,1}\s*(?:\[?(\d+)\.+(\d*)]*\]?){0,1}/i,
 	re_keys      = /(\w+)/g;
