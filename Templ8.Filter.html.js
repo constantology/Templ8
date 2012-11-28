@@ -1,7 +1,5 @@
-!function() {
+!function( Templ8 ) {
 	var reamp = /&/g, regt = />/g, relt = /</g, req = /"/g;
-
-	typeof Templ8 != 'undefined' || typeof require == 'undefined' || ( Templ8 = require( 'Templ8' ) );
 
 	Templ8.Filter.add( {
 		bold       : function( str ) { return Templ8.format( '<strong>{0}</strong>', Templ8.stringify( str ) ); },
@@ -15,4 +13,4 @@
 		paragraph  : function( str ) { return Templ8.stringify( str ).replace( /([^\r\n]+)/gm, '<p>$1</p>' ); },
 		stripe     : function( i ) { return parseInt( i, 10 ) & 1 ? 'stripe-odd' : 'stripe-even'; }
 	} );
-}();
+}( typeof Templ8 != 'undefined' ? Templ8 : typeof require != 'undefined' ? require( 'Templ8' ) : null );
