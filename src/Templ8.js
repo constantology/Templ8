@@ -72,7 +72,7 @@
 		re_esc             = /(['"])/g,                       re_format_delim       = new RegExp( delim, 'gm' ),
 		re_new_line        = /[\r\n]+/g,                      re_space              = /\s+/g,
 		re_special_char    = /[\(\)\[\]\{\}\?\*\+\/<>%&=!-]/, re_split_tpl,
-		re_statement_fix   = /\.(\d+)(\.?)/g,                 re_statement_replacer = '[\'$1\']$2',
+		re_statement_fix   = /\.(\d+)(\.?)/g,                 re_statement_replacer = "['$1']$2",
 		re_statement_split = new RegExp( '\\s*([^\\|]+(?:\\|[^\\|]+?)){0,}' + delim, 'g' ),
 
 		split_token        = '<__SPLIT__TEMPLATE__HERE__>',     split_replace         = ['', '$1', '$2', ''].join( split_token ),

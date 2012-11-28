@@ -1,7 +1,7 @@
 ;!function( util, Name, PACKAGE ) {
 	"use strict";
 
-/*~  Templ8/src/Templ8.js  ~*/
+/*~  src/Templ8.js  ~*/
 	var U, RESERVED = '__ASSERT__ __CONTEXT__ __FILTER_ __OUTPUT__ __UTIL__ $_ document false global instanceof null true typeof undefined window'.split( ' ' ).reduce( function( o, k ) {
 			o[k] = true; return o;
 		}, util.obj() ),
@@ -76,7 +76,7 @@
 		re_esc             = /(['"])/g,                       re_format_delim       = new RegExp( delim, 'gm' ),
 		re_new_line        = /[\r\n]+/g,                      re_space              = /\s+/g,
 		re_special_char    = /[\(\)\[\]\{\}\?\*\+\/<>%&=!-]/, re_split_tpl,
-		re_statement_fix   = /\.(\d+)(\.?)/g,                 re_statement_replacer = '[\'$1\']$2',
+		re_statement_fix   = /\.(\d+)(\.?)/g,                 re_statement_replacer = "['$1']$2",
 		re_statement_split = new RegExp( '\\s*([^\\|]+(?:\\|[^\\|]+?)){0,}' + delim, 'g' ),
 
 		split_token        = '<__SPLIT__TEMPLATE__HERE__>',     split_replace         = ['', '$1', '$2', ''].join( split_token ),
@@ -460,7 +460,7 @@
 
 /*** END:   Templ8 functionality packages ***/
 
-/*~  Templ8/src/Tag.js  ~*/
+/*~  src/Tag.js  ~*/
 	var _tags = [ {
 			start : '{{', end : '}}',
 			emit  : function( internals, ctx, str, tpl_parts ) {
@@ -553,7 +553,7 @@
 
 	__Class__.Tag.compileRegExp();
 
-/*~  Templ8/src/Statement.js  ~*/
+/*~  src/Statement.js  ~*/
 ( function() {
 	var _statements = {
 		'for'      : function( internals, ctx, statement ) {
@@ -628,7 +628,7 @@
 	__Class__.Statement.add( 'elsif', _statements.elseif );
 }() );
 
-/*~  Templ8/src/Filter.js  ~*/
+/*~  src/Filter.js  ~*/
 	__Class__.Filter.add( {
 		capitalize     : function( str ) {
 			str = __Class__.stringify( str );
