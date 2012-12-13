@@ -68,8 +68,8 @@
 
 		id_count  = 999, internals, logger = 'console', // <= gets around jsLint
 
-		re_br              = /[\n\r]/gm,
-		re_esc             = /(['"])/g,                       re_format_delim       = new RegExp( delim, 'gm' ),
+		re_br              = /[\n\r]/gm,                      re_esc                = /(['"])/g,
+		re_fix_jscomments  = /(\*)(\/)/gm,                    re_format_delim       = new RegExp( delim, 'gm' ),
 		re_new_line        = /[\r\n]+/g,                      re_space              = /\s+/g,
 		re_special_char    = /[\(\)\[\]\{\}\?\*\+\/<>%&=!-]/, re_split_tpl,
 		re_statement_fix   = /\.(\d+)(\.?)/g,                 re_statement_replacer = "['$1']$2",
@@ -261,7 +261,7 @@
 	function clean( str ) { return str.replace( re_format_delim, '' ).replace( re_new_line, '\n' ).replace( re_space, ' ' ).trim(); }
 
 	function compileTemplate( ctx, fn ) {
-		fn = util.format( tpl_compiled, '*', ctx.__tpl__, fn, ctx.sourceURL ? ctx.sourceURL : util.format( tpl_srcurl, ctx.id ) );
+		fn = util.format( tpl_compiled, '*', ctx.__tpl__.replace( re_fix_jscomments, '$1 \\$2' ), fn, ctx.sourceURL ? ctx.sourceURL : util.format( tpl_srcurl, ctx.id ) );
 
 		var func = ( new Function( 'root', 'ContextStack', 'Iter', fn_var.filter, fn_var.assert, fn_var.util, fn_var.ctx, fn ) );
 

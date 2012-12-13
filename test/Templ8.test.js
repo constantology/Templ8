@@ -561,6 +561,16 @@ suite( 'Templ8', function() {
 		done();
 	} );
 
+	test( 'Comments don\'t screw with the source map code', function( done ) {
+		var tpl = new Templ8( '{# test comments\
+		on two lines\
+		#}/* more comments */foo', { compiled : true, id : 'test.tpl' } );
+
+		expect( tpl.parse( data ) ).to.equal( '/* more comments */foo' );
+
+		done();
+	} );
+
 	test( 'DEBUG fallback non-existent values', function( done ) {
 		var tpl = new Templ8( '{{ some.non.existent.value.that.is.for.some.reason.very.nexted }}', { compiled : true, debug : true, id : 'test.tpl' } );
 

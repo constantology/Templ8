@@ -1,7 +1,10 @@
 ;!function( util, Name, PACKAGE ) {
 	"use strict";
 
+
+
 /*~  src/Templ8.js  ~*/
+
 	var U, DEBUG = 'DEBUG', RESERVED = '__ASSERT__ __CONTEXT__ __FILTER_ __OUTPUT__ __UTIL__ $_ document false global instanceof null true typeof undefined window'.split( ' ' ).reduce( function( o, k ) {
 			o[k] = true; return o;
 		}, util.obj() ),
@@ -72,8 +75,8 @@
 
 		id_count  = 999, internals, logger = 'console', // <= gets around jsLint
 
-		re_br              = /[\n\r]/gm,
-		re_esc             = /(['"])/g,                       re_format_delim       = new RegExp( delim, 'gm' ),
+		re_br              = /[\n\r]/gm,                      re_esc                = /(['"])/g,
+		re_fix_jscomments  = /(\*)(\/)/gm,                    re_format_delim       = new RegExp( delim, 'gm' ),
 		re_new_line        = /[\r\n]+/g,                      re_space              = /\s+/g,
 		re_special_char    = /[\(\)\[\]\{\}\?\*\+\/<>%&=!-]/, re_split_tpl,
 		re_statement_fix   = /\.(\d+)(\.?)/g,                 re_statement_replacer = "['$1']$2",
@@ -265,7 +268,7 @@
 	function clean( str ) { return str.replace( re_format_delim, '' ).replace( re_new_line, '\n' ).replace( re_space, ' ' ).trim(); }
 
 	function compileTemplate( ctx, fn ) {
-		fn = util.format( tpl_compiled, '*', ctx.__tpl__, fn, ctx.sourceURL ? ctx.sourceURL : util.format( tpl_srcurl, ctx.id ) );
+		fn = util.format( tpl_compiled, '*', ctx.__tpl__.replace( re_fix_jscomments, '$1 \\$2' ), fn, ctx.sourceURL ? ctx.sourceURL : util.format( tpl_srcurl, ctx.id ) );
 
 		var func = ( new Function( 'root', 'ContextStack', 'Iter', fn_var.filter, fn_var.assert, fn_var.util, fn_var.ctx, fn ) );
 
@@ -475,7 +478,10 @@
 
 /*** END:   Templ8 functionality packages ***/
 
+
+
 /*~  src/Tag.js  ~*/
+
 	var _tags = [ {
 			start : '{{', end : '}}',
 			emit  : function( internals, ctx, str, tpl_parts ) {
@@ -568,7 +574,10 @@
 
 	__Class__.Tag.compileRegExp();
 
+
+
 /*~  src/Statement.js  ~*/
+
 ( function() {
 	var _statements = {
 		'for'      : function( internals, ctx, statement ) {
@@ -643,7 +652,10 @@
 	__Class__.Statement.add( 'elsif', _statements.elseif );
 }() );
 
+
+
 /*~  src/Filter.js  ~*/
+
 	__Class__.Filter.add( {
 		capitalize     : function( str ) {
 			str = __Class__.stringify( str );
@@ -680,6 +692,8 @@
 		uppercase      : function( str ) { return __Class__.stringify( str ).toUpperCase(); },
 		wrap           : function( str, start, end ) { return start + str + ( end || start ); }
 	} );
+
+
 
 	util.iter( PACKAGE ) || ( PACKAGE = util.ENV == 'commonjs' ? module : util.global );
 
