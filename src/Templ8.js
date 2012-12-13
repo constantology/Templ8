@@ -1,4 +1,4 @@
-	var U, RESERVED = '__ASSERT__ __CONTEXT__ __FILTER_ __OUTPUT__ __UTIL__ $_ document false global instanceof null true typeof undefined window'.split( ' ' ).reduce( function( o, k ) {
+	var U, DEBUG = 'DEBUG', RESERVED = '__ASSERT__ __CONTEXT__ __FILTER_ __OUTPUT__ __UTIL__ $_ document false global instanceof null true typeof undefined window'.split( ' ' ).reduce( function( o, k ) {
 			o[k] = true; return o;
 		}, util.obj() ),
 		ba          = {
@@ -64,7 +64,7 @@
 
 		fn_var    = { assert : '__ASSERT__', ctx : '__CONTEXT__', dict : '__dict__', filter : '__FILTER__', output : '__OUTPUT__', parent : '__PARENT__', util : '__UTIL__' },
 		fn_end    = util.format( 'return {0};\n ', fn_var.output ),
-		fn_start  = '\n"use strict";\n' + util.format( 'var $C = new ContextStack( {0}, this.fallback, this.dict ), $_ = $C.current(), iter = new Iter( null ), {1} = "", U;', fn_var.ctx, fn_var.output ),
+		fn_start  = '\n"use strict";\n' + util.format( 'var $C = new ContextStack( {0}, this ), $_ = $C.current(), iter = new Iter( null ), {1} = "", U;', fn_var.ctx, fn_var.output ),
 
 		id_count  = 999, internals, logger = 'console', // <= gets around jsLint
 
@@ -77,7 +77,9 @@
 
 		split_token        = '<__SPLIT__TEMPLATE__HERE__>',     split_replace         = ['', '$1', '$2', ''].join( split_token ),
 
-		tpl = {}, tpl_id = 't8-anon-{0}', tpl_statement = '{0}["{1}"].call( this, {2}{3}, {4} )', tpl_sub = '{0}.{1}';
+		tpl           = {}, tpl_compiled  = '\/{0}{0} original template string:\n\n{1}\n\n{0}\/\n\n\/\/ compiled template code: \n\n{2}\n\n\/\/@ sourceURL={3}\n',
+		tpl_debug     = 'WARNING: NO VALUE FOUND FOR => {0}',   tpl_id  = 't8-anon-{0}', tpl_srcurl = '/Templ8/{0}\.tpl',
+		tpl_statement = '{0}["{1}"].call( this, {2}{3}, {4} )', tpl_sub = '{0}.{1}';
 
 /*** START: Utility Functions ***/
 	function contains( o, k ) { return ( typeof o.indexOf == 'function' && !!~o.indexOf( k ) ) || util.got( o, k ) ; }
@@ -96,9 +98,9 @@
 			switch ( v ) {
 				case null : case U : break;
 				default   : switch ( typeof v ) {
-					case 'string' : v.trim() === '' || res.push( v ); break;
-					case 'number' : isNaN( v )      || res.push( v ); break;
-					default       : ( !util.iter( v ) || util.len( v ) ) || res.push( v ); break;
+					case 'string' :    v.trim() === '' || res.push( v );                    break;
+					case 'number' :    isNaN( v )      || res.push( v );                    break;
+					default       : ( !util.iter( v )  || util.len( v ) ) || res.push( v ); break;
 				}
 			}
 		}
@@ -109,13 +111,14 @@
 /*** END:   Utility Functions ***/
 
 /*** START: Classes used by compiled templates ***/
-	function ContextStack( dict, fallback ) {
+	function ContextStack( dict, tpl ) {
 		this[cache_stack] = [];
+		this.tpl = tpl;
 		this.push( util.global );
 
-		if ( fallback !== U ) {
+		if ( tpl.fallback !== U ) {
 			this.hasFallback = true;
-			this.fallback    = fallback;
+			this.fallback    = tpl.fallback;
 		}
 
 		switch( util.ntype( dict ) ) {
@@ -127,17 +130,25 @@
 			default       : !util.exists( dict ) || this.push( dict );
 		}
 	}
+
 	ContextStack.prototype = {
 		current : function ContextStack_current() { return ( this.top || this[cache_stack][0] ).dict; },
 		get     : function ContextStack_get( key ) {
-			var ctx, stack = this[cache_stack], l = stack.length, val;
+			var ctx, fb = this.fallback, stack = this[cache_stack], l = stack.length, val;
+
 			while ( l-- ) {
 				ctx = stack[l];
 				if ( key in ctx.cache ) return ctx.cache[key];
 				if ( ( val = ctx.dict[key] ) !== U || ( val = Object.value( ctx.dict, key ) ) !== U )
 					return ctx.cache[key] = val;
 			}
-			return this.hasFallback ? this.fallback : U;
+
+			if ( this.hasFallback ) switch ( util.ntype( fb ) ) {
+				case 'string'   : return fb === DEBUG ? util.format( tpl_debug, key ) : fb;
+				case 'function' : return fb( key, ctx.dict );
+			}
+
+			return U;
 		},
 		pop     : function ContextStack_pop() {
 			var dict = this[cache_stack].pop().dict;
@@ -250,13 +261,11 @@
 	function clean( str ) { return str.replace( re_format_delim, '' ).replace( re_new_line, '\n' ).replace( re_space, ' ' ).trim(); }
 
 	function compileTemplate( ctx, fn ) {
-		if ( ctx.debug && typeof util.global[logger] != 'undefined' ) {
-			util.global[logger].info( Name + ': ', ctx.id, ', source: ' ); util.global[logger].log( fn );
-		}
-		fn += util.format( '\n//@ sourceURL={0}', ctx.sourceURL ? ctx.sourceURL : util.format( '/Templ8/{0}\.tpl', ctx.id ) );
-		var func = ( new Function( 'root', 'ContextStack', 'Iter', fn_var.filter, fn_var.assert, fn_var.util, fn_var.ctx, fn ) ).bind( ctx, util.global, ContextStack, Iter, util.copy( ctx.filters, __Class__.Filter.all(), true ), ba, bu );
-		util.def( func, 'src', util.describe( fn, 'r' ) );
-		return func;
+		fn = util.format( tpl_compiled, '*', ctx.__tpl__, fn, ctx.sourceURL ? ctx.sourceURL : util.format( tpl_srcurl, ctx.id ) );
+
+		var func = ( new Function( 'root', 'ContextStack', 'Iter', fn_var.filter, fn_var.assert, fn_var.util, fn_var.ctx, fn ) );
+
+		return func.bind( ctx, util.global, ContextStack, Iter, util.copy( ctx.filters, __Class__.Filter.all(), true ), ba, bu );
 	}
 
 	function createTemplate( ctx ) {
@@ -340,18 +349,24 @@
 /*** START: Templ8 constructor and prototype ***/
 	function __Class__() {
 		var a = Array.coerce( arguments ),
-			f = is_obj( a[a.length - 1] ) ? a.pop() : is_obj( a[0] ) ? a.shift() : null;
+			f = is_obj( a[a.length - 1] ) ? a.pop() : is_obj( a[0] ) ? a.shift() : null,
+			fb;
 
 // take care of peeps who are too lazy or too ©ººL to use the "new" constructor...
-		if ( !( this instanceof __Class__ ) ) return is_obj( f ) ? new __Class__( a.join( '' ), f ) : new __Class__( a.join( '' ) );
+		if ( !( this instanceof __Class__ ) )
+			return is_obj( f ) ? new __Class__( a.join( '' ), f ) : new __Class__( a.join( '' ) );
 		
 		!f || defaults.forEach( function( k ) {
 			if ( k in f ) { this[k] = f[k]; delete f[k]; }
 		}, this );
 
+		fb = this.fallback;
+		if ( ( !fb && this.debug ) || ( typeof fb == 'string' && fb.toUpperCase() === DEBUG ) )
+			this.fallback = DEBUG;
+
 		this.filters = f || {};
 
-		this.__tpl__ = a.join( '' );
+		this.__tpl__ = a.join( '\n' );
 
 		tpl[$id( this )] = this;
 
@@ -366,20 +381,20 @@
 		return ctx.id;
 	}
 
-	function compile( ctx ) {
-		if ( !ctx.compiled ) {
-			ctx.compiled = true;
-			ctx._parse = createTemplate( ctx );
-		}
-		return ctx;
-	}
-
 	function parse( dict ) {
 		this.compiled || compile( this );
 		this[fn_var.dict] = dict;
 		var s = this._parse( dict );
 		delete this[fn_var.dict];
 		return s;
+	}
+
+	function compile( ctx ) {
+		if ( !ctx.compiled ) {
+			ctx.compiled = true;
+			ctx._parse   = createTemplate( ctx );
+		}
+		return ctx;
 	}
 
 	__Class__.prototype = {

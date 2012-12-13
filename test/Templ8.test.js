@@ -232,7 +232,9 @@ suite( 'Templ8', function() {
 			{ name : 'Baxter', email : 'at.pretium@ultricies.com', city : 'North Platte', country : 'Guatemala', date : '13/01/2009' }
 		],
 		total              : 600
-	};
+	},
+	new_lines = /\n/gm;
+
 	data.items_big  = data.items.concat( data.items );
 	data.items_mega = data.items_big.concat( data.items );
 	
@@ -356,10 +358,10 @@ suite( 'Templ8', function() {
 									'foo equals {{foo}}',
 								'{% endif %}', { compiled : true, id : 'test.tpl.0' } );
 
-		expect( tpl0.parse( { foo :  1 } ) ).to.equal( 'foo equals 1'  );
-		expect( tpl0.parse( { foo :  0 } ) ).to.equal( 'foo equals 0'  );
-		expect( tpl0.parse( { foo : -1 } ) ).to.equal( 'foo equals -1' );
-		expect( tpl0.parse( { foo :  2 } ) ).to.equal( 'foo equals 2'  );
+		expect( tpl0.parse( { foo :  1 } ).replace( new_lines, '' ) ).to.equal( 'foo equals 1'  );
+		expect( tpl0.parse( { foo :  0 } ).replace( new_lines, '' ) ).to.equal( 'foo equals 0'  );
+		expect( tpl0.parse( { foo : -1 } ).replace( new_lines, '' ) ).to.equal( 'foo equals -1' );
+		expect( tpl0.parse( { foo :  2 } ).replace( new_lines, '' ) ).to.equal( 'foo equals 2'  );
 
 		done();
 	} );
@@ -392,12 +394,12 @@ suite( 'Templ8', function() {
 									'<p>{{iter.index1}}. {{item.email|link:$_.name}}</p>',
 								'{% endfor %}', { compiled : true, id : 'test.tpl.5' } );
 
-		expect( tpl0.parse( data ) ).to.equal( e1 );
-		expect( tpl1.parse( data ) ).to.equal( e1 );
-		expect( tpl2.parse( data ) ).to.equal( e2 );
-		expect( tpl3.parse( data ) ).to.equal( e3 );
-		expect( tpl4.parse( data ) ).to.equal( e2 );
-		expect( tpl5.parse( data ) ).to.equal( e3 );
+		expect( tpl0.parse( data ).replace( new_lines, '' ) ).to.equal( e1 );
+		expect( tpl1.parse( data ).replace( new_lines, '' ) ).to.equal( e1 );
+		expect( tpl2.parse( data ).replace( new_lines, '' ) ).to.equal( e2 );
+		expect( tpl3.parse( data ).replace( new_lines, '' ) ).to.equal( e3 );
+		expect( tpl4.parse( data ).replace( new_lines, '' ) ).to.equal( e2 );
+		expect( tpl5.parse( data ).replace( new_lines, '' ) ).to.equal( e3 );
 
 		done();
 	} );
@@ -407,7 +409,7 @@ suite( 'Templ8', function() {
 									'<index>{{iter.index}}</index><prevIndex>{{iter.prevIndex}}</prevIndex><nextIndex>{{iter.nextIndex}}</nextIndex><first>{{iter.first.name}}</first><last>{{iter.last.name}}</last><next>{{iter.next.name if iter.next|exists }}</next><prev>{{iter.prev.name if iter.prev|exists }}</prev>',
 								'{% endfor %}', { compiled : true, id : 'test.tpl.0' } );
 
-		expect( tpl0.parse( data ) ).to.equal( '<index>0</index><prevIndex>undefined</prevIndex><nextIndex>1</nextIndex><first>Baxter</first><last>Fleur</last><next>Alyssa</next><prev></prev><index>1</index><prevIndex>0</prevIndex><nextIndex>2</nextIndex><first>Baxter</first><last>Fleur</last><next>Fleur</next><prev>Baxter</prev><index>2</index><prevIndex>1</prevIndex><nextIndex>undefined</nextIndex><first>Baxter</first><last>Fleur</last><next></next><prev>Alyssa</prev>' );
+		expect( tpl0.parse( data ).replace( new_lines, '' ) ).to.equal( '<index>0</index><prevIndex>undefined</prevIndex><nextIndex>1</nextIndex><first>Baxter</first><last>Fleur</last><next>Alyssa</next><prev></prev><index>1</index><prevIndex>0</prevIndex><nextIndex>2</nextIndex><first>Baxter</first><last>Fleur</last><next>Fleur</next><prev>Baxter</prev><index>2</index><prevIndex>1</prevIndex><nextIndex>undefined</nextIndex><first>Baxter</first><last>Fleur</last><next></next><prev>Alyssa</prev>' );
 
 		done();
 	} );
@@ -448,14 +450,14 @@ suite( 'Templ8', function() {
 									'<p>{{iter.index1}}. {{k}}: {{v.width}}</p>',
 								'{% endfor %}', { compiled : true, id : 'test.tpl.7' } );
 
-		expect( tpl0.parse( data ) ).to.equal( e1 );
-		expect( tpl1.parse( data ) ).to.equal( e1 );
-		expect( tpl2.parse( data ) ).to.equal( e2 );
-		expect( tpl3.parse( data ) ).to.equal( e3 );
-		expect( tpl4.parse( data ) ).to.equal( e2 );
-		expect( tpl5.parse( data ) ).to.equal( e3 );
-		expect( tpl6.parse( data ) ).to.equal( e2 );
-		expect( tpl7.parse( data ) ).to.equal( e3 );
+		expect( tpl0.parse( data ).replace( new_lines, '' ) ).to.equal( e1 );
+		expect( tpl1.parse( data ).replace( new_lines, '' ) ).to.equal( e1 );
+		expect( tpl2.parse( data ).replace( new_lines, '' ) ).to.equal( e2 );
+		expect( tpl3.parse( data ).replace( new_lines, '' ) ).to.equal( e3 );
+		expect( tpl4.parse( data ).replace( new_lines, '' ) ).to.equal( e2 );
+		expect( tpl5.parse( data ).replace( new_lines, '' ) ).to.equal( e3 );
+		expect( tpl6.parse( data ).replace( new_lines, '' ) ).to.equal( e2 );
+		expect( tpl7.parse( data ).replace( new_lines, '' ) ).to.equal( e3 );
 
 		done();
 	} );
@@ -479,9 +481,9 @@ suite( 'Templ8', function() {
 									'<p>PASS</p>',
 								'{% endfor %}', { compiled : true, id : 'test.tpl.1' } );
 
-		expect( tpl0.parse( data ) ).to.equal( '<p>PASS</p>' );
-		expect( tpl1.parse( data ) ).to.equal( '<p>PASS</p>' );
-		expect( tpl2.parse( data ) ).to.equal( '<p>PASS</p>' );
+		expect( tpl0.parse( data ).replace( new_lines, '' ) ).to.equal( '<p>PASS</p>' );
+		expect( tpl1.parse( data ).replace( new_lines, '' ) ).to.equal( '<p>PASS</p>' );
+		expect( tpl2.parse( data ).replace( new_lines, '' ) ).to.equal( '<p>PASS</p>' );
 
 		done();
 	} );
@@ -496,7 +498,7 @@ suite( 'Templ8', function() {
 								'{{title|parse:"test.subtpl.sub_template"}}',
 								{ compiled : true, id : 'test.subtpl' } );
 
-		expect( tpl1.parse( data ) ).to.equal( '<p>Test data</p>' );
+		expect( tpl1.parse( data ).replace( new_lines, '' ) ).to.equal( '<p>Test data</p>' );
 //		expect( tpl2.parse( data ) ).to.equal( '<p><strong>Test data</strong></p>' );
 
 		done();
@@ -555,6 +557,32 @@ suite( 'Templ8', function() {
 		var tpl = new Templ8( '{# test comments #}', { compiled : true, id : 'test.tpl' } );
 
 		expect( tpl.parse( data ) ).to.be.empty;
+
+		done();
+	} );
+
+	test( 'DEBUG fallback non-existent values', function( done ) {
+		var tpl = new Templ8( '{{ some.non.existent.value.that.is.for.some.reason.very.nexted }}', { compiled : true, debug : true, id : 'test.tpl' } );
+
+		expect( tpl.parse( data ) ).to.equal( 'WARNING: NO VALUE FOUND FOR => some.non.existent.value.that.is.for.some.reason.very.nexted' );
+
+		done();
+	} );
+
+	test( 'Function fallback non-existent values', function( done ) {
+		var fallback_called = false,
+			tpl             = new Templ8( '{{ some.non.existent.value.that.is.for.some.reason.very.nexted }}', {
+				compiled : true,
+				fallback : function( key ) {
+					expect( key ).to.equal( 'some.non.existent.value.that.is.for.some.reason.very.nexted' );
+					fallback_called = true;
+					return 'It\'s not fucking there you stupid, Stupid, STUPID LITTLE MAN!!!';
+				},
+				id       : 'test.tpl'
+			} );
+
+		expect( tpl.parse( data ) ).to.equal( 'It\'s not fucking there you stupid, Stupid, STUPID LITTLE MAN!!!' );
+		expect( fallback_called ).to.be.true;
 
 		done();
 	} );
