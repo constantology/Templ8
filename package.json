@@ -10,7 +10,7 @@
 	"description"     : "JavaScript Client/ Server Template Engine",
 	"dependencies"    : {
 		"commander"   : ">= 1.0.4",
-		"m8"          : ">= 0.3.4",
+		"m8"          : ">= 0.3.8",
 		"mkdirp"      : ">= 0.3.4",
 		"n8iv"        : ">= 0.2.8"
 	},
@@ -33,5 +33,5 @@
 	"scripts"         : {
 		"test"        : "mocha -c --ignore-leaks -R spec -u tdd ./test/*.test.js"
 	},
-	"version"         : "0.9.21"
+	"version"         : "0.9.22"
 }
