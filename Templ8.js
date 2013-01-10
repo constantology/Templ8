@@ -38,7 +38,8 @@
 			},
 			objectify  : function( v, k ) { var o = {}; o[k] = v; return o; },
 			parse      : function( o, id, tpl ) {
-				var s, t;
+				var s, t; o = Object( o ); // this fixes an issue in WebKit nightly — 6.0.2 (8536.26.17, 537+) —
+										   // which does not allow you to set a property on a primitive value
 
 				if ( id instanceof __Class__ )
 					t  = id;
