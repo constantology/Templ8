@@ -300,7 +300,7 @@ suite( 'Templ8', function() {
 
 			tpl1 = new Templ8(  '{% if items.10.email|empty %}',
 '										{{items.10.email|link:items.10.name|prefix:"email - "|paragraph}}',
-								'{% endif %}', { compiled : true, id : 'test.tpl.1' } );
+								'{% /if %}', { compiled : true, id : 'test.tpl.1' } );
 
 		expect( tpl0.parse( data ).trim() ).to.equal( '<p>email - <a href="mailto:ultrices.sit.amet@nullamagnamalesuada.ca">Zahir</a></p>' );
 		expect( tpl1.parse( data ).trim() ).to.be.empty;
@@ -315,7 +315,7 @@ suite( 'Templ8', function() {
 
 			tpl1 = new Templ8(  '{% if items.10.email|empty OR items.10.name != "Zahir" %}',
 									'{{items.10.email|link:items.10.name|prefix:"email - "|paragraph}}',
-								'{% endif %}', { compiled : true, id : 'test.tpl.1' } );
+								'{% /if %}', { compiled : true, id : 'test.tpl.1' } );
 
 		expect( tpl0.parse( data ).trim() ).to.equal( '<p>email - <a href="mailto:ultrices.sit.amet@nullamagnamalesuada.ca">Zahir</a></p>' );
 		expect( tpl1.parse( data ).trim() ).to.be.empty;
@@ -340,7 +340,7 @@ suite( 'Templ8', function() {
 									'items empty',
 								'{% else %}',
 									'{{items.10.email|link:items.10.name|prefix:"email - "|paragraph}}',
-								'{% endif %}', { compiled : true, id : 'test.tpl.0' } );
+								'{% /if %}', { compiled : true, id : 'test.tpl.0' } );
 
 		expect( tpl0.parse( data ).trim() ).to.equal( '<p>email - <a href="mailto:ultrices.sit.amet@nullamagnamalesuada.ca">Zahir</a></p>' );
 
@@ -376,7 +376,7 @@ suite( 'Templ8', function() {
 
 			tpl1 = new Templ8(  '{% for item in items_small %}',
 									'<p>{{iter.index1}}. {{item.email|link:item.name}}</p>',
-								'{% endfor %}', { compiled : true, id : 'test.tpl.1' } ),
+								'{% /for %}', { compiled : true, id : 'test.tpl.1' } ),
 
 			tpl2 = new Templ8(  '{% for items_small [1..3] %}',
 									'<p>{{iter.index1}}. {{iter.current.email|link:$_.name}}</p>',
@@ -384,7 +384,7 @@ suite( 'Templ8', function() {
 
 			tpl3 = new Templ8(  '{% for items_small [3..] %}',
 									'<p>{{iter.index1}}. {{iter.current.email|link:$_.name}}</p>',
-								'{% endfor %}', { compiled : true, id : 'test.tpl.3' } ),
+								'{% /for %}', { compiled : true, id : 'test.tpl.3' } ),
 
 			tpl4 = new Templ8(  '{% for item in items_small [1..3] %}',
 									'<p>{{iter.index1}}. {{item.email|link:item.name}}</p>',
@@ -392,7 +392,7 @@ suite( 'Templ8', function() {
 
 			tpl5 = new Templ8(  '{% for item in items_small [3..] %}',
 									'<p>{{iter.index1}}. {{item.email|link:$_.name}}</p>',
-								'{% endfor %}', { compiled : true, id : 'test.tpl.5' } );
+								'{% /for %}', { compiled : true, id : 'test.tpl.5' } );
 
 		expect( tpl0.parse( data ).replace( new_lines, '' ) ).to.equal( e1 );
 		expect( tpl1.parse( data ).replace( new_lines, '' ) ).to.equal( e1 );
@@ -424,7 +424,7 @@ suite( 'Templ8', function() {
 
 			tpl1 = new Templ8(  '{% for col in columns %}',
 									'<p>{{iter.index1}}. {{iter.key}}: {{col.width}}</p>',
-								'{% endfor %}', { compiled : true, id : 'test.tpl.1' } ),
+								'{% /for %}', { compiled : true, id : 'test.tpl.1' } ),
 
 			tpl2 = new Templ8(  '{% for columns [1..3] %}',
 									'<p>{{iter.index1}}. {{iter.key}}: {{$_.width}}</p>',
@@ -432,7 +432,7 @@ suite( 'Templ8', function() {
 
 			tpl3 = new Templ8(  '{% for columns [3..] %}',
 									'<p>{{iter.index1}}. {{iter.key}}: {{$_.width}}</p>',
-								'{% endfor %}', { compiled : true, id : 'test.tpl.3' } ),
+								'{% /for %}', { compiled : true, id : 'test.tpl.3' } ),
 
 			tpl4 = new Templ8(  '{% for col in columns [1..3] %}',
 									'<p>{{iter.index1}}. {{iter.key}}: {{col.width}}</p>',
@@ -440,7 +440,7 @@ suite( 'Templ8', function() {
 
 			tpl5 = new Templ8(  '{% for col in columns [3..] %}',
 									'<p>{{iter.index1}}. {{iter.key}}: {{col.width}}</p>',
-								'{% endfor %}', { compiled : true, id : 'test.tpl.5' } ),
+								'{% /for %}', { compiled : true, id : 'test.tpl.5' } ),
 
 			tpl6 = new Templ8(  '{% for [k, v] in columns [1..3] %}',
 									'<p>{{iter.index1}}. {{k}}: {{v.width}}</p>',
@@ -448,7 +448,7 @@ suite( 'Templ8', function() {
 
 			tpl7 = new Templ8(  '{% for [k,v] in columns [3..] %}',
 									'<p>{{iter.index1}}. {{k}}: {{v.width}}</p>',
-								'{% endfor %}', { compiled : true, id : 'test.tpl.7' } );
+								'{% /for %}', { compiled : true, id : 'test.tpl.7' } );
 
 		expect( tpl0.parse( data ).replace( new_lines, '' ) ).to.equal( e1 );
 		expect( tpl1.parse( data ).replace( new_lines, '' ) ).to.equal( e1 );
@@ -473,7 +473,7 @@ suite( 'Templ8', function() {
 									'<p>FAIL</p>',
 								'{% forempty %}',
 									'<p>PASS</p>',
-								'{% endfor %}', { compiled : true, id : 'test.tpl.0' } ),
+								'{% /for %}', { compiled : true, id : 'test.tpl.0' } ),
 
 			tpl2 = new Templ8(  '{% for items_nonexistent %}',
 									'<p>FAIL</p>',

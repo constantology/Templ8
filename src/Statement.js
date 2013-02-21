@@ -69,5 +69,12 @@
 	function formatStatement( ctx, fmt, stmt ) { return stmt.split( ' ' ).map( function( s ) { return fmt( ctx, s ); } ).join( ' ' ); }
 
 	__Class__.Statement.add( _statements );
-	__Class__.Statement.add( 'elsif', _statements.elseif );
+
+	__Class__.Statement.add( 'elsif',     _statements.elseif );
+	__Class__.Statement.add( 'endunless', _statements.endif );
+
+	__Class__.Statement.add( '\/if',      _statements.endif );
+	__Class__.Statement.add( '\/unless',  _statements.endif );
+	__Class__.Statement.add( '\/for',     _statements.endfor );
+	__Class__.Statement.add( '\/sub',     _statements.endsub );
 }() );
