@@ -324,7 +324,7 @@ Translating to something like:
 
 This tag is used in conjunction with the above tag to give you access to more powerful conditional statements, iteration and sub templates.
 
-##### if/ unless/ elseif/ else/ endif Statements
+##### if/ unless/ elseif/ else/ endif/ endunless Statements
 
 Just like regular JavaScript Templ8 features conditional statements. It also introduces the `unless` statement based off Perl.
 
@@ -343,7 +343,7 @@ An example would be:
         <h2>{{value|italics}}</h2>
     {% else %}
         {{value}}
-    {% endif %}
+    {% endif %} // note: this tag can also be written as: {% /if %}
 ```
 
 Translating to:
@@ -376,7 +376,7 @@ However you can also assign your own variable names to the `for`. e.g.
         {{item}}
     {% forempty %}
         No items
-    {% endfor %}
+    {% endfor %} // note: this tag can also be written as: {% /for %}
 ```
 
 Will assign the current value being iterated over to the variable `item`, which is accessible as demonstrated.
@@ -497,7 +497,7 @@ returns the String:
             '{{value|italics}}',
         '{% else %}',
             'No value',
-        '{% endif %}'
+        '{% endif %}' // note: this tag can also be written as: {% /if %}
     );
 
     tpl.parse( { value : 'foo' } );            // returns: foo
@@ -517,7 +517,7 @@ returns the String:
             '<p>{{item}}</p>',
         '{% forempty %}',
             '<p><strong>No items</strong></p>',
-        '{% endfor %}' 
+        '{% endfor %}'  // note: this tag can also be written as: {% /if %}
     );
 
     tpl.parse( { items : ['one', 'two', 'three'] } );               // returns: <p>one</p><p>two</p><p>three</p>
@@ -533,7 +533,9 @@ returns the String:
 
 ```javascript
     var tpl = new Templ8(
-        '{% sub list_item %}', '<li>{{$_}}</li>', '{% endsub %}', 
+        '{% sub list_item %}',
+        	'<li>{{$_}}</li>',
+        '{% endsub %}',  // note: this tag can also be written as: {% /sub %}
         '<ul>{[ item|parse:"list_item" for each ( item in items ) ]}</ul>'
     );
 
