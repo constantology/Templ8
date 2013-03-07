@@ -90,7 +90,7 @@
 		tpl_statement = '{0}["{1}"].call( this, {2}{3}, {4} )', tpl_sub = '{0}.{1}';
 
 /*** START: Utility Functions ***/
-	function contains( o, k ) { return ( typeof o.indexOf == 'function' && !!~o.indexOf( k ) ) || util.got( o, k ) ; }
+	function contains( o, k ) { return o && ( typeof o.indexOf == 'function' && !!~o.indexOf( k ) ) || util.got( o, k ) ; }
 
 	function escapeRE( s ) { return String( s ).replace( esc_chars, esc_val ); }
 
