@@ -28,7 +28,11 @@ function toTempl8( id, src, str ) {
 
 	console.log( src + ' => ' + id );
 
-	return m8.format( "new Templ8( m8.copy( { id : \'${0}\', sourceURL : \'${1}\'  }, config ), '${2}' );", id, src, str );
+	src = src.split( '/' );
+	if ( src.length > 2 )
+		src = src.slice( src.length - 2 );
+
+	return m8.format( "new Templ8( m8.copy( { id : \'${0}\', sourceURL : \'${1}\'  }, config ), '${2}' );", id, src.join( '/' ), str );
 }
 
 function validFiles( f ) {
