@@ -54,10 +54,11 @@
 			sub_tpl = new __Class__( '', util.copy( { debug : ctx.debug, fallback : ctx.fallback, id : id }, ctx.filters ) );
 // the parts have already been split, for efficiency we can skip a call to createTemplate() and the more costly splitStr()
 			sub_tpl.currentIterKeys = [];
-			sub_tpl.__tpl__  = parts.join( '' );
-			sub_tpl._parse   = internals.compiletpl( sub_tpl, internals.assembleparts( sub_tpl, parts ) );
+			sub_tpl.__tpl__        = parts.join( '' );
+			sub_tpl._parse         = internals.compiletpl( sub_tpl, internals.assembleparts( sub_tpl, parts ) );
 			delete sub_tpl.currentIterKeys;
-			sub_tpl.compiled = true;
+			sub_tpl.compiled       = true;
+			sub_tpl.parentTemplate = ctx;
 
 			return '';
 		},

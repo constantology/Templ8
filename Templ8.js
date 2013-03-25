@@ -5,6 +5,7 @@
 
 /*~  src/Templ8.js  ~*/
 
+
 	var U, DEBUG = 'DEBUG', RESERVED = '__ASSERT__ __CONTEXT__ __FILTER_ __OUTPUT__ __UTIL__ $_ document false global instanceof null true typeof undefined window'.split( ' ' ).reduce( function( o, k ) {
 			o[k] = true; return o;
 		}, util.obj() ),
@@ -22,7 +23,7 @@
 			is         : function( o, v )   { return o === v },
 			isEven     : function( i )      { return  !( parseInt( i, 10 ) & 1 ); },
 			isOdd      : function( i )      { return !!( parseInt( i, 10 ) & 1 ); },
-			isTPL      : function( id )     { return !!( getTPL( util.format( tpl_sub, this.id, id ) ) || getTPL( id ) ); },
+			isTPL      : function( id )     { return !!getTPL( id, this ); },
 			iterable   : function( o )      { return util.iter( o ); },
 			notEmpty   : not_empty,
 			startsWith : function( s, str ) { return String( s ).indexOf( str ) === 0; }
@@ -45,7 +46,7 @@
 					t  = id;
 				else {
 					id = String( id ).trim();
-					t  = getTPL( util.format( tpl_sub, this.id, id ) ) || getTPL( id )
+					t  = getTPL( id, this );
 				}
 
 				if ( !t ) return this.fallback;
@@ -94,7 +95,22 @@
 
 	function escapeRE( s ) { return String( s ).replace( esc_chars, esc_val ); }
 
-	function getTPL( id ) { return tpl[id] || null; }
+	function getTPL( id, ref_tpl ) {
+		if ( !ref_tpl )
+			return tpl[id] || null;
+
+		var _id;
+
+		do {
+			_id = util.format( tpl_sub, ref_tpl.id, id );
+
+			if ( _id in tpl )
+				return tpl[_id];
+
+		} while( ref_tpl = ref_tpl.parentTemplate );
+
+		return tpl[id] || null;
+	}
 
 	function is_obj( o ) { return typeof o == 'object' && ( o.constructor === Object || o.constructor === U ); }
 
@@ -481,7 +497,9 @@
 
 
 
+
 /*~  src/Tag.js  ~*/
+
 
 	var _tags = [ {
 			start : '{{', end : '}}',
@@ -577,7 +595,9 @@
 
 
 
+
 /*~  src/Statement.js  ~*/
+
 
 ( function() {
 	var _statements = {
@@ -635,10 +655,11 @@
 			sub_tpl = new __Class__( '', util.copy( { debug : ctx.debug, fallback : ctx.fallback, id : id }, ctx.filters ) );
 // the parts have already been split, for efficiency we can skip a call to createTemplate() and the more costly splitStr()
 			sub_tpl.currentIterKeys = [];
-			sub_tpl.__tpl__  = parts.join( '' );
-			sub_tpl._parse   = internals.compiletpl( sub_tpl, internals.assembleparts( sub_tpl, parts ) );
+			sub_tpl.__tpl__        = parts.join( '' );
+			sub_tpl._parse         = internals.compiletpl( sub_tpl, internals.assembleparts( sub_tpl, parts ) );
 			delete sub_tpl.currentIterKeys;
-			sub_tpl.compiled = true;
+			sub_tpl.compiled       = true;
+			sub_tpl.parentTemplate = ctx;
 
 			return '';
 		},
@@ -662,7 +683,9 @@
 
 
 
+
 /*~  src/Filter.js  ~*/
+
 
 	__Class__.Filter.add( {
 		capitalize     : function( str ) {
@@ -700,6 +723,7 @@
 		uppercase      : function( str ) { return __Class__.stringify( str ).toUpperCase(); },
 		wrap           : function( str, start, end ) { return start + str + ( end || start ); }
 	} );
+
 
 
 

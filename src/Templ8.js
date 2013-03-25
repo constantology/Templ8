@@ -15,7 +15,7 @@
 			is         : function( o, v )   { return o === v },
 			isEven     : function( i )      { return  !( parseInt( i, 10 ) & 1 ); },
 			isOdd      : function( i )      { return !!( parseInt( i, 10 ) & 1 ); },
-			isTPL      : function( id )     { return !!( getTPL( util.format( tpl_sub, this.id, id ) ) || getTPL( id ) ); },
+			isTPL      : function( id )     { return !!getTPL( id, this ); },
 			iterable   : function( o )      { return util.iter( o ); },
 			notEmpty   : not_empty,
 			startsWith : function( s, str ) { return String( s ).indexOf( str ) === 0; }
@@ -38,7 +38,7 @@
 					t  = id;
 				else {
 					id = String( id ).trim();
-					t  = getTPL( util.format( tpl_sub, this.id, id ) ) || getTPL( id )
+					t  = getTPL( id, this );
 				}
 
 				if ( !t ) return this.fallback;
@@ -87,7 +87,22 @@
 
 	function escapeRE( s ) { return String( s ).replace( esc_chars, esc_val ); }
 
-	function getTPL( id ) { return tpl[id] || null; }
+	function getTPL( id, ref_tpl ) {
+		if ( !ref_tpl )
+			return tpl[id] || null;
+
+		var _id;
+
+		do {
+			_id = util.format( tpl_sub, ref_tpl.id, id );
+
+			if ( _id in tpl )
+				return tpl[_id];
+
+		} while( ref_tpl = ref_tpl.parentTemplate );
+
+		return tpl[id] || null;
+	}
 
 	function is_obj( o ) { return typeof o == 'object' && ( o.constructor === Object || o.constructor === U ); }
 
