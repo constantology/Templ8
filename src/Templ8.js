@@ -48,8 +48,10 @@
 				while( p && p === p[fn_var.parent] )
 					p = p[fn_var.parent];
 
-				o[fn_var.parent] = p;
-				s                = t.parse( o );
+				if ( o !== p )
+					o[fn_var.parent] = p;
+
+				s = t.parse( o );
 
 				delete o[fn_var.parent];
 
