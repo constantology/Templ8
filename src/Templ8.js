@@ -31,7 +31,7 @@
 			},
 			objectify  : function( v, k ) { var o = {}; o[k] = v; return o; },
 			parse      : function( o, id, tpl ) {
-				var s, t; o = Object( o ); // this fixes an issue in WebKit nightly — 6.0.2 (8536.26.17, 537+) —
+				var p, s, t; o = Object( o ); // this fixes an issue in WebKit nightly — 6.0.2 (8536.26.17, 537+) —
 										   // which does not allow you to set a property on a primitive value
 
 				if ( id instanceof __Class__ )
@@ -43,9 +43,12 @@
 
 				if ( !t ) return this.fallback;
 
-				o[fn_var.parent] = this[fn_var.dict];
+				do {
+					p = this[fn_var.dict];
+				} while( p && p === p[fn_var.parent] );
 
-				s = t.parse( o );
+				o[fn_var.parent] = p;
+				s                = t.parse( o );
 
 				delete o[fn_var.parent];
 
@@ -122,7 +125,7 @@
 		}
 		return res;
 	}
-	
+
 	function not_empty( o ) { return !util.empty( o ); }
 /*** END:   Utility Functions ***/
 
@@ -371,7 +374,7 @@
 // take care of peeps who are too lazy or too ©ººL to use the "new" constructor...
 		if ( !( this instanceof __Class__ ) )
 			return is_obj( f ) ? new __Class__( a.join( '' ), f ) : new __Class__( a.join( '' ) );
-		
+
 		!f || defaults.forEach( function( k ) {
 			if ( k in f ) { this[k] = f[k]; delete f[k]; }
 		}, this );
@@ -465,7 +468,7 @@
 		}
 
 		function assert_exists( k ) { if ( !( k in this ) ) { throw new TypeError( util.format( 'A ' + Name + ' Tag requires an {0}', ERRORS[k] ) ); } }
-		
+
 		this.all = function() { return util.copy( tag ); };
 
 		this.compileRegExp = function() {

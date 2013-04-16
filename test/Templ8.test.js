@@ -237,7 +237,7 @@ suite( 'Templ8', function() {
 
 	data.items_big  = data.items.concat( data.items );
 	data.items_mega = data.items_big.concat( data.items );
-	
+
 
 	test( 'Tokens can be replaced with Dictionary values', function( done ) {
 		var tpl0 = new Templ8( '{{total}}',              { compiled : true, id : 'test.tpl.0' } ),
@@ -247,7 +247,7 @@ suite( 'Templ8', function() {
 		expect( tpl0.parse( data ) ).to.equal( '600' );
 		expect( tpl1.parse( data ) ).to.equal( '6' );
 		expect( tpl2.parse( data ).trim() ).to.equal( 'ultrices.sit.amet@nullamagnamalesuada.ca' );
-		
+
 		done();
 	} );
 
@@ -499,7 +499,23 @@ suite( 'Templ8', function() {
 								{ compiled : true, id : 'test.subtpl' } );
 
 		expect( tpl1.parse( data ).replace( new_lines, '' ) ).to.equal( '<p>Test data</p>' );
-//		expect( tpl2.parse( data ) ).to.equal( '<p><strong>Test data</strong></p>' );
+		expect( tpl2.parse( data ).replace( new_lines, '' ) ).to.equal( '<p><strong>Test data</strong></p>' );
+
+		done();
+	} );
+
+	test( 'A "sub" Templ8 can access its parent dictionary', function( done ) {
+		var tpl1 = new Templ8(  '{% sub sub_template %}<p>{{__PARENT__.title}}</p>{% endsub %}',
+								'{{title|parse:"test.tpl1.sub_template"}}',
+								{ compiled : true, id : 'test.tpl1' } ),
+
+			tpl2 = new Templ8(  '{% sub sub_template %}<p>{{__PARENT__.title|parse:"test.subtpl.sub_template2"}}</p>{% endsub %}',
+								'{% sub sub_template2 %}<strong>{{__PARENT__.__PARENT__.title}}</strong>{% endsub %}',
+								'{{title|parse:"test.subtpl.sub_template"}}',
+								{ compiled : true, id : 'test.subtpl' } );
+
+		expect( tpl1.parse( data ).replace( new_lines, '' ) ).to.equal( '<p>Test data</p>' );
+		expect( tpl2.parse( data ).replace( new_lines, '' ) ).to.equal( '<p><strong>Test data</strong></p>' );
 
 		done();
 	} );
