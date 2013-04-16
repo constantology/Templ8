@@ -50,9 +50,10 @@
 
 				if ( !t ) return this.fallback;
 
-				do {
-					p = this[fn_var.dict];
-				} while( p && p === p[fn_var.parent] );
+				p = this[fn_var.dict];
+
+				while( p && p === p[fn_var.parent] )
+					p = p[fn_var.parent];
 
 				o[fn_var.parent] = p;
 				s                = t.parse( o );

@@ -506,13 +506,13 @@ suite( 'Templ8', function() {
 
 	test( 'A "sub" Templ8 can access its parent dictionary', function( done ) {
 		var tpl1 = new Templ8(  '{% sub sub_template %}<p>{{__PARENT__.title}}</p>{% endsub %}',
-								'{{title|parse:"test.tpl1.sub_template"}}',
-								{ compiled : true, id : 'test.tpl1' } ),
+								'{{title|parse:"test.tpl3.sub_template"}}',
+								{ compiled : true, id : 'test.tpl3' } ),
 
-			tpl2 = new Templ8(  '{% sub sub_template %}<p>{{__PARENT__.title|parse:"test.subtpl.sub_template2"}}</p>{% endsub %}',
+			tpl2 = new Templ8(  '{% sub sub_template %}<p>{{__PARENT__.title|parse:"test.subtpl2.sub_template2"}}</p>{% endsub %}',
 								'{% sub sub_template2 %}<strong>{{__PARENT__.__PARENT__.title}}</strong>{% endsub %}',
-								'{{title|parse:"test.subtpl.sub_template"}}',
-								{ compiled : true, id : 'test.subtpl' } );
+								'{{title|parse:"test.subtpl2.sub_template"}}',
+								{ compiled : true, id : 'test.subtpl2' } );
 
 		expect( tpl1.parse( data ).replace( new_lines, '' ) ).to.equal( '<p>Test data</p>' );
 		expect( tpl2.parse( data ).replace( new_lines, '' ) ).to.equal( '<p><strong>Test data</strong></p>' );
