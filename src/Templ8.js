@@ -31,7 +31,7 @@
 			},
 			objectify  : function( v, k ) { var o = {}; o[k] = v; return o; },
 			parse      : function( o, id, tpl ) {
-				var p, s, t; o = Object( o ); // this fixes an issue in WebKit nightly — 6.0.2 (8536.26.17, 537+) —
+				var e, p, s, t; o = Object( o ); // this fixes an issue in WebKit nightly — 6.0.2 (8536.26.17, 537+) —
 										   // which does not allow you to set a property on a primitive value
 
 				if ( id instanceof __Class__ )
@@ -45,6 +45,8 @@
 
 				p = this[fn_var.dict];
 
+				e = fn_var.parent in p;
+
 				while( p && p === p[fn_var.parent] )
 					p = p[fn_var.parent];
 
@@ -53,7 +55,10 @@
 
 				s = t.parse( o );
 
-				delete o[fn_var.parent];
+				if ( e )
+					o[fn_var.parent] = p[fn_var.parent];
+				else
+					delete o[fn_var.parent];
 
 				return s;
 			},
