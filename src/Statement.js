@@ -64,7 +64,7 @@
 		},
 		'unless' : function( internals, ctx, statement ) { return util.format( 'if ( !( {0} ) ) { ', formatStatement( ctx, internals.formatstatement, statement ) ); }
 	},
-	re_for_split = /^(\[[^,]+,\s*[^\]]+\]|[^\s]+)(?:\s+in\s+([^\s\[]+)){0,1}\s*(?:\[?(\d+)\.+(\d*)]*\]?){0,1}/i,
+	re_for_split = /^(\[[^,]+,\s*[^\]]+\]|[^\s]+)(?:\s+in\s+([^\s\[]+)){0,1}\s*(?:\[?(\d*)\.+(\d*)]*\]?){0,1}/i,
 	re_keys      = /(\w+)/g;
 
 	function formatStatement( ctx, fmt, stmt ) { return stmt.split( ' ' ).map( function( s ) { return fmt( ctx, s ); } ).join( ' ' ); }

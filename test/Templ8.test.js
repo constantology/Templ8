@@ -407,9 +407,13 @@ suite( 'Templ8', function() {
 	test( 'Iter instance', function( done ) {
 		var tpl0 = new Templ8(  '{% for items_small [0..2] %}',
 									'<index>{{iter.index}}</index><prevIndex>{{iter.prevIndex}}</prevIndex><nextIndex>{{iter.nextIndex}}</nextIndex><first>{{iter.first.name}}</first><last>{{iter.last.name}}</last><next>{{iter.next.name if iter.next|exists }}</next><prev>{{iter.prev.name if iter.prev|exists }}</prev>',
+								'{% endfor %}', { compiled : true, id : 'test.tpl.0' } ),
+			tpl1 = new Templ8(  '{% for items_small [..2] %}',
+									'<index>{{iter.index}}</index><prevIndex>{{iter.prevIndex}}</prevIndex><nextIndex>{{iter.nextIndex}}</nextIndex><first>{{iter.first.name}}</first><last>{{iter.last.name}}</last><next>{{iter.next.name if iter.next|exists }}</next><prev>{{iter.prev.name if iter.prev|exists }}</prev>',
 								'{% endfor %}', { compiled : true, id : 'test.tpl.0' } );
 
 		expect( tpl0.parse( data ).replace( new_lines, '' ) ).to.equal( '<index>0</index><prevIndex>undefined</prevIndex><nextIndex>1</nextIndex><first>Baxter</first><last>Fleur</last><next>Alyssa</next><prev></prev><index>1</index><prevIndex>0</prevIndex><nextIndex>2</nextIndex><first>Baxter</first><last>Fleur</last><next>Fleur</next><prev>Baxter</prev><index>2</index><prevIndex>1</prevIndex><nextIndex>undefined</nextIndex><first>Baxter</first><last>Fleur</last><next></next><prev>Alyssa</prev>' );
+		expect( tpl1.parse( data ).replace( new_lines, '' ) ).to.equal( '<index>0</index><prevIndex>undefined</prevIndex><nextIndex>1</nextIndex><first>Baxter</first><last>Fleur</last><next>Alyssa</next><prev></prev><index>1</index><prevIndex>0</prevIndex><nextIndex>2</nextIndex><first>Baxter</first><last>Fleur</last><next>Fleur</next><prev>Baxter</prev><index>2</index><prevIndex>1</prevIndex><nextIndex>undefined</nextIndex><first>Baxter</first><last>Fleur</last><next></next><prev>Alyssa</prev>' );
 
 		done();
 	} );
@@ -418,6 +422,7 @@ suite( 'Templ8', function() {
 		var e1 = '<p>1. name: 6</p><p>2. email: 21</p><p>3. city: 22</p><p>4. country: 23</p><p>5. date: 24</p>',
 			e2 = '<p>1. name: 6</p><p>2. email: 21</p><p>3. city: 22</p><p>4. country: 23</p>',
 			e3 = '<p>3. city: 22</p><p>4. country: 23</p><p>5. date: 24</p>',
+			e4 = '<p>1. name: 6</p><p>2. email: 21</p><p>3. city: 22</p><p>4. country: 23</p>',
 			tpl0 = new Templ8(  '{% for columns %}',
 									'<p>{{iter.index1}}. {{iter.key}}: {{iter.current.width}}</p>',
 								'{% endfor %}', { compiled : true, id : 'test.tpl.0' } ),
@@ -448,7 +453,11 @@ suite( 'Templ8', function() {
 
 			tpl7 = new Templ8(  '{% for [k,v] in columns [3..] %}',
 									'<p>{{iter.index1}}. {{k}}: {{v.width}}</p>',
-								'{% /for %}', { compiled : true, id : 'test.tpl.7' } );
+								'{% /for %}', { compiled : true, id : 'test.tpl.7' } ),
+
+			tpl8 = new Templ8(  '{% for [k,v] in columns [..3] %}',
+									'<p>{{iter.index1}}. {{k}}: {{v.width}}</p>',
+								'{% /for %}', { compiled : true, id : 'test.tpl.8' } );
 
 		expect( tpl0.parse( data ).replace( new_lines, '' ) ).to.equal( e1 );
 		expect( tpl1.parse( data ).replace( new_lines, '' ) ).to.equal( e1 );
@@ -458,6 +467,7 @@ suite( 'Templ8', function() {
 		expect( tpl5.parse( data ).replace( new_lines, '' ) ).to.equal( e3 );
 		expect( tpl6.parse( data ).replace( new_lines, '' ) ).to.equal( e2 );
 		expect( tpl7.parse( data ).replace( new_lines, '' ) ).to.equal( e3 );
+		expect( tpl8.parse( data ).replace( new_lines, '' ) ).to.equal( e4 );
 
 		done();
 	} );
