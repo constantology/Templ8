@@ -27,7 +27,7 @@ If you are using Templ8 within a commonjs module, you don't need to require m8 b
 
 ```
 
-See [m8: Extending into the future](/constantology/m8) for more information on working with sandboxed modules.
+See [m8: Extending into the future](https://github.com/constantology/constantology/m8) for more information on working with sandboxed modules.
 
 ## Support
 
